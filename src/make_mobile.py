@@ -23,6 +23,7 @@ u=u[:i]+'''<div class="cab m">
     <div class="frame">
       <div class="banner hidden" id="banner"><span id="bannerTxt"></span></div>
       <div class="grid" id="grid"><div id="beast" class="idle"></div></div>
+      <div class="peekbox" id="peekbox"></div>
       <div class="bubble" id="bubble"></div>
       <div class="msg hidden" id="msg"></div>
     </div>

@@ -49,6 +49,20 @@ h1 span{background:linear-gradient(180deg,#ffe08a,var(--pump));-webkit-backgroun
 .frame>.grid{position:absolute;z-index:1;left:10%;right:10.2%;top:15.4%;bottom:21%;grid-template-rows:repeat(3,1fr);border-radius:4px}
 .frame>.grid .cell,.frame>.grid.moon .cell{aspect-ratio:auto;min-height:0}
 .frame.moonf{aspect-ratio:1600/1900}
+/* Frostfang peeking into the reel window: a clipped box over the reels, behind the stone frame, so his cut-off body hides under the stone */
+.peekbox{position:absolute;z-index:2;overflow:hidden;pointer-events:none;border-radius:4px}
+.peekbox.over{z-index:11}
+.peekbox img{position:absolute;max-width:none;transition:transform .26s cubic-bezier(.3,1.35,.55,1);will-change:transform;filter:drop-shadow(0 0 10px #000a)}
+.peekbox img.L{height:86%;left:0;bottom:-9%;transform:translateX(0)}
+.peekbox img.L.out{transform:translateX(-105%)}
+.peekbox img.R{height:86%;right:0;bottom:-9%;transform:scaleX(-1)}
+.peekbox img.R.out{transform:translateX(105%) scaleX(-1)}
+.peekbox img.T{height:54%;top:-6.5%;transform:scaleY(-1)}
+.peekbox img.T.out{transform:translateY(-105%) scaleY(-1)}
+.peekbox img.B,.peekbox img.W{height:52%;bottom:-2.5%;transform:translateY(0)}
+.peekbox img.W{bottom:-6.5%}
+.peekbox img.B.out,.peekbox img.W.out{transform:translateY(105%)}
+.peekbox img.out{transition-timing-function:ease-in}
 .frame.moonf::after{background-image:url(img/frame_bonus.webp)}
 .frame.moonf>.grid{left:11.6%;right:11.6%;top:8.6%;bottom:11.8%;grid-template-rows:repeat(8,1fr)}
 .grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;background:#0a0620e6;border-radius:6px;padding:6px;position:relative;overflow:hidden}
@@ -227,6 +241,7 @@ button{font-family:inherit;cursor:pointer;border:none;color:#fff;font-weight:700
     <div class="frame">
       <div class="banner hidden" id="banner"><span id="bannerTxt"></span></div>
       <div class="grid" id="grid"><div id="beast" class="idle"></div></div>
+      <div class="peekbox" id="peekbox"></div>
       <div class="bubble" id="bubble"></div>
       <div class="msg hidden" id="msg"></div>
     </div>
@@ -434,6 +449,22 @@ let grid0=E.spinGrid(1,false);grid0.forEach((col,r)=>col.forEach((c,y)=>paint(y*
 
 // ---------- UI helpers ----------
 function banner(t,ice){$('banner').classList.toggle('hidden',!t);$('banner').classList.toggle('ice',!!ice);$('bannerTxt').textContent=t||''}
+// ---------- Frostfang peeks around the frame (base game only) ----------
+// kinds: L/R = from behind a side pillar, T = hanging upside down from the top stone, B = sneaking up over the bottom ledge, W = popping up to cheer a win
+const PEEKIMG={L:'peek_side',R:'peek_side',T:'peek_top',B:'peek_bottom',W:'peek_top'};
+function peek(kind,ms,over){
+ const box=$('peekbox');if(!box||grid.classList.contains('moon')||inHold)return;
+ box.style.left=grid.offsetLeft+'px';box.style.top=grid.offsetTop+'px';box.style.width=grid.offsetWidth+'px';box.style.height=grid.offsetHeight+'px';
+ box.classList.toggle('over',!!over);box.innerHTML='';clearTimeout(peek.t);
+ const im=new Image();im.src='img/'+PEEKIMG[kind]+'.webp';im.className=kind+' out';im.alt='';
+ if(kind!=='L'&&kind!=='R'){ // keep him fully inside the window, toward the left or right side
+  const gw=grid.offsetWidth,gh=grid.offsetHeight,w=gh*(kind==='T'||kind==='W'?.54*720/464:.52*720/418),room=Math.max(0,gw-w-gw*.08);
+  const f=Math.random()<.5?Math.random()*.3:.7+Math.random()*.3;im.style.left=(gw*.04+room*f)+'px';}
+ box.appendChild(im);void im.offsetWidth;
+ requestAnimationFrame(()=>im.classList.remove('out'));
+ peek.t=setTimeout(()=>{im.classList.add('out');peek.t=setTimeout(()=>{if(im.parentNode)im.remove()},320)},Math.max(250,ms));
+}
+window.ffPeek=peek;
 function say(t,ms=1800){SOUND.say(t);const b=$('bubble');b.textContent=t;b.classList.add('on');clearTimeout(say.t);say.t=setTimeout(()=>b.classList.remove('on'),ms)}
 function showMsg(html){const m=$('msg');m.innerHTML=html;m.classList.remove('hidden')}
 function hideMsg(){$('msg').classList.add('hidden')}
@@ -469,6 +500,10 @@ async function spinReels(g){
  stops.forEach((s,r)=>{if(s.tease&&r>0)setTimeout(()=>SOUND.play('tease'),stops[r-1].t)});
  // moon chime only while the Moonrise can still happen: unbroken moons from reel 1, and enough reels left to reach 4
  const moonSnd=[];{let run=0,alive=true;for(let r=0;r<5;r++){const n=g[r].filter(c=>c.s==='M').length;if(!n)alive=false;run+=n;moonSnd.push(alive&&run+3*(4-r)>=4);}}
+ // Frostfang peeks: a gasp from the right pillar when the moon tease starts, otherwise now and then a quick peek before reel 1 lands
+ if(ROWS===3&&!inHold){const tr=stops.findIndex((s,r)=>s.tease&&r>0);
+  if(tr>0){const a=stops[tr-1].t,d=stops[tr].t-a-380;if(d>300)setTimeout(()=>peek('R',d),a);}
+  else if(Math.random()<0.2&&stops[0].t>=650){const k='LRTB'[Math.random()*4|0];setTimeout(()=>peek(k,stops[0].t-420),60);}}
  await Promise.all([0,1,2,3,4].map(r=>spinColumn(r,g[r],ROWS,stops[r].t,r*90*T,stops[r].tease&&r>0?stops[r-1].t:null,rnd,moonSnd[r])));
  SOUND.spin(false);
 }
@@ -564,7 +599,7 @@ async function play(){
  const g=E.spinGrid(bet(),false);let hot=false;
  await spinReels(g);
  const ev=E.evaluate(g,bet());let total=ev.total;
- if(ev.total>0){await showWins(ev,g);await countUp($('win'),0,ev.total,Math.min(1500,300+ev.total/bet()*60));}
+ if(ev.total>0){if(ev.total>=bet()*8&&ev.total<bet()*20&&!ev.holdTrigger&&!ev.freeTrigger)setTimeout(()=>peek('W',1900),250);await showWins(ev,g);await countUp($('win'),0,ev.total,Math.min(1500,300+ev.total/bet()*60));}
  else $('winLine').textContent=ev.orbs>=6?`${ev.orbs} orbs! Hold & Spin!`:ev.orbs>=4?`${ev.orbs} orbs… so close! 6 starts the Hold & Spin.`:' ';
  if(ev.holdTrigger){await sleep(600);total+=await holdAndSpin(g,null);}
  if(ev.freeTrigger){await sleep(700);total+=await moonBonus();}
@@ -573,7 +608,7 @@ async function play(){
  if(auto){await sleep(total>0?900:350);if(auto)play();}
 }
 async function cheer(ms){pose('cheer');setTimeout(()=>pose('idle'),ms)}
-async function bigWin(total){SOUND.play('winBig');cheer(3500);showMsg(`<h2>${total>=bet()*50?'MONSTER WIN!':'BIG WIN!'}</h2><div class="big" id="bw">$0.00</div>`);await countUp($('bw'),0,total,2200);await sleep(1300);hideMsg();}
+async function bigWin(total){SOUND.play('winBig');cheer(3500);peek('W',3200,true);showMsg(`<h2>${total>=bet()*50?'MONSTER WIN!':'BIG WIN!'}</h2><div class="big" id="bw">$0.00</div>`);await countUp($('bw'),0,total,2200);await sleep(1300);hideMsg();}
 
 // ---------- Hold & Spin ----------
 async function holdAndSpin(g,fromFree){
