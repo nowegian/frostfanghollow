@@ -5,6 +5,7 @@ def R(a,b):
     assert u.count(a)==1,(u.count(a),a[:70]); u=u.replace(a,b)
 R('<meta name="viewport" content="width=device-width, initial-scale=1">',
   '<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">\n<meta name="theme-color" content="#0b0720">')
+i=u.index("<!--PHONE-REDIRECT-->");j=u.index("<!--/PHONE-REDIRECT-->")+len("<!--/PHONE-REDIRECT-->");u=u[:i]+u[j:]
 R("<title>Frostfang Hollow Link</title>","<title>Frostfang Hollow Link (Mobile)</title>")
 i=u.index('<div class="cab">'); j=u.index('<div class="modal hidden" id="soundM">')
 u=u[:i]+'''<div class="cab m">
@@ -47,13 +48,14 @@ u=u[:i]+'''<div class="cab m">
     <button class="tg" id="info">PAYS &amp; RULES</button>
     <button class="tg test" id="testBtn">TEST BONUS</button>
     <button class="tg cash" id="refill">ADD $100</button>
-    <button class="tg" id="reset">RESET SESSION</button>
+    <button class="tg" id="toDesktop">DESKTOP VERSION</button>
   </div>
   <p class="foot">Original game for fun. Play money only: nothing to buy, nothing to win.</p>
  </div></div>
 <div class="rotate" id="rotate"><div>&#128241;</div><p>Turn your phone upright to play</p></div>
 '''+u[j:]
-R("$('testBtn').onclick=","""$('menuBtn').onclick=()=>{if(!busy)$('menuM').classList.remove('hidden')};
+R("$('testBtn').onclick=","""$('toDesktop').onclick=()=>{try{sessionStorage.setItem('ffh-desktop','1')}catch(e){};location.href='index.html'};
+$('menuBtn').onclick=()=>{if(!busy)$('menuM').classList.remove('hidden')};
 $('menuClose').onclick=()=>$('menuM').classList.add('hidden');
 $('menuM').onclick=e=>{if(e.target.id==='menuM'||e.target.closest('.mgrid button'))$('menuM').classList.add('hidden')};
 $('testBtn').onclick=""")
@@ -102,7 +104,7 @@ button{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 .msheet{max-width:420px}
 .mgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0}
 .mgrid .tg{padding:14px 6px;font-size:14px}
-.mgrid #reset{grid-column:span 2}
+.mgrid #toDesktop{grid-column:span 2;font-size:12px;opacity:.85}
 .msheet .foot{margin-top:8px}
 .modal .card{max-height:calc(100dvh - 40px)}
 .rotate{display:none;position:fixed;inset:0;z-index:50;background:#0b0720f2;flex-direction:column;align-items:center;justify-content:center;text-align:center;font-size:18px}

@@ -3,7 +3,7 @@
 An original frozen-Halloween slot game with a Hold & Spin orb bonus, four jackpots and a Moonrise Bonus where Frostfang's grid travels and grows. It runs in the browser and uses play money only: nothing to buy, nothing to win.
 
 - **`index.html`**: desktop game
-- **`mobile.html`**: phone game, for a phone held upright
+- **`mobile.html`**: phone game, for a phone held upright. Phones that open `index.html` are sent here automatically, and the phone menu has a DESKTOP VERSION button
 
 ## Play it
 
@@ -22,13 +22,23 @@ python3 -m http.server 8000
 ## Game features
 
 - 5 reels by 3 rows, 243 ways to win, with Wild on reels 2–5
-- Bets from $0.50 to $25.00: 1¢, 2¢ or 5¢ at 1×, 2×, 3×, 5× or 10× (50 to 500 credits). Each session starts with $100, with ADD $100 and RESET
+- Bets from $0.50 to $25.00: 1¢, 2¢ or 5¢ at 1×, 2×, 3×, 5× or 10× (50 to 500 credits). New players start with $100, the balance is saved between visits, and ADD $100 tops it up
 - **Hold & Spin**: 6 or more orbs lock in place with 3 spins that reset on every new orb, and every empty spot spins on its own. Filling all 15 spots doubles the win
 - **Jackpots**: MINI (20× bet), MINOR (50×), MAJOR (300×, grows), and GRAND (starts at $9,000 at every bet, grows). The GRAND orb is more likely at bigger bets
 - **Moonrise Bonus**: 4 or more moons on touching reels, starting from reel 1, grow the reels to 8 rows. A solid grid shape with Frostfang inside travels to collect diamonds and grows from 2×2 up to 8×5. Every diamond resets the spins to 3, at least one orb lands in the grid on every spin, and Frostfang throws prize snowballs
 - Every bonus prize comes in steps of 10 credits, so bonus totals are always round
 - Real reel strips with motion blur and suspense on reel 5, SPEED 1–4, synthesized music and effects, and voice lines for Frostfang
 - A $ / CR toggle for the credit, bet and win displays
+
+## Shared jackpots and saved progress
+
+When the game runs as a Claude artifact, it uses the artifact's database:
+
+- **Shared progressive jackpots:** every player's spins feed one MAJOR and one GRAND meter, shown live to everyone. When anyone wins, that meter resets for all players.
+- **Saved progress:** each signed-in player's balance, bet and settings are saved privately to their account and follow them across devices.
+- **Access:** players need Contributor access to save and to feed the jackpots. Viewers can play and watch the meters.
+
+Hosted anywhere else, such as GitHub Pages, there's no database, so the game saves in the browser only and each player has their own jackpot meters.
 
 ## Payout
 
