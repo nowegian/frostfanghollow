@@ -7,8 +7,8 @@ const ENGINE = (() => {
   };
   // pay per way, as multiple of (bet / 25)
   const PAY = {
-    F:{3:70,4:237,5:886}, P:{3:48,4:148,5:472}, S:{3:35,4:107,5:355}, B:{3:29,4:70,5:237}, C:{3:24,4:60,5:177},
-    A:{3:11,4:29,5:89}, K:{3:11,4:29,5:89}, Q:{3:5,4:24,5:60}, J:{3:5,4:24,5:60}, T:{3:5,4:18,5:48}
+    F:{3:51,4:172,5:642}, P:{3:35,4:107,5:342}, S:{3:25,4:78,5:257}, B:{3:21,4:51,5:172}, C:{3:17,4:44,5:128},
+    A:{3:8,4:21,5:65}, K:{3:8,4:21,5:65}, Q:{3:4,4:17,5:44}, J:{3:4,4:17,5:44}, T:{3:4,4:13,5:35}
   };
   const BASE_W = {F:3,P:5,S:6,B:7,C:8,A:10,K:10,Q:12,J:12,T:12,W:3,O:13.3,M:14};
   const MOON_REELS = [0,1,2,3,4]; // moons can land on any reel
@@ -21,6 +21,7 @@ const ENGINE = (() => {
   const grandChance = bet => Math.min(1, GRAND_K*bet/GRAND_SEED/HOLD_SPIN_RATE);
   let rng = Math.random;
   const HOLD_SNOW = 0;
+  const JP_BOOST = 2;
   // orb prizes are whole credits: UNIT = the denomination (value of one credit) set by the game
   let UNIT = 0.01;
   // orb prizes come in steps of bet/5: 10 credits x the bet multiplier, so every total is a multiple of 10 credits
@@ -36,9 +37,11 @@ const ENGINE = (() => {
   }
   function orbValue(bet, allowBig){
     const r=rng();
-    if(allowBig && r<0.002) return {jp:'MAJOR'};
-    if(r<0.0116) return {jp:'MINOR'};
-    if(r<0.0316) return {jp:'MINI'};
+    // MINOR and MAJOR orbs twice as common as before (JP_BOOST)
+    const pMaj=allowBig?0.002*JP_BOOST:0, pMin=(allowBig?0.0096:0.0116)*JP_BOOST;
+    if(r<pMaj) return {jp:'MAJOR'};
+    if(r<pMaj+pMin) return {jp:'MINOR'};
+    if(r<pMaj+pMin+0.02) return {jp:'MINI'};
     const mult=[0.5,0.5,1,1,1,2,2,3,5,8][Math.floor(rng()*10)]*1.8;
     return {cash:money(cashOf(mult*bet,bet))};
   }
@@ -107,7 +110,7 @@ const ENGINE = (() => {
     NEED:  [5,5,5,5,3,3],                                // diamonds to leave each step
     P_DIAMOND: 0.016, P_ORB: 0.04, P_PLUS: 0.15, // P_PLUS: share of diamonds that also give +1 spin
     VAL: 0.25, JPS: 0.25,  // VAL scales orb cash values, JPS scales each orb's jackpot chance
-    MIN_PAY: 0, GUARANTEE: 1, P_SNOW: 0.18, SNOW_VAL: 0.4, SNOW_ODDS: [0.08, 0.001, 0.004, 0.015]       // every Moonrise Bonus pays at least this many times the bet
+    MIN_PAY: 0, GUARANTEE: 1, P_SNOW: 0.18, SNOW_VAL: 0.4, SNOW_ODDS: [0.08, 0.002, 0.008, 0.015]       // every Moonrise Bonus pays at least this many times the bet
   };
   // The grid is a moving window: st.row/st.col = its top-left cell, size from STEPS[st.level]
   const size=st=>MOON.STEPS[st.level];
@@ -142,9 +145,10 @@ const ENGINE = (() => {
   function moonOrb(bet){
     const x=rng();
     const k=MOON.JPS;
-    if(x<0.0004*k) return {jp:'MAJOR'};
-    if(x<0.00412*k) return {jp:'MINOR'};
-    if(x<0.01562*k) return {jp:'MINI'};
+    const a=0.0004*k*JP_BOOST, b=a+0.00372*k*JP_BOOST, c=b+0.0115*k;
+    if(x<a) return {jp:'MAJOR'};
+    if(x<b) return {jp:'MINOR'};
+    if(x<c) return {jp:'MINI'};
     return {cash:money(cashOf([0.5,0.5,1,1,1,2,2,3,5,8][Math.floor(rng()*10)]*MOON.VAL*bet,bet))};
   }
   const FILL='FPSBCAKQJT';

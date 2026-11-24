@@ -32,7 +32,7 @@ python3 -m http.server 8000
 
 ## Payout
 
-The game is built to the Minnesota tribal-state compact payout rule for games not affected by skill: at least 80% and at most 95% of the amount wagered (95% used as the cap). The theoretical return is **about 93.2% at every bet**. This was measured with tens of millions of simulated spins, including the 1% of each bet that grows the MAJOR and GRAND meters. Every jackpot's odds are far inside the compacts' limits on top-award probability.
+The game is built to the Minnesota tribal-state compact payout rule for games not affected by skill: at least 80% and at most 95% of the amount wagered (95% used as the cap). The theoretical return is **about 93.3% at every bet**. This was measured with tens of millions of simulated spins, including the 1% of each bet that grows the MAJOR and GRAND meters. Every jackpot's odds are far inside the compacts' limits on top-award probability.
 
 This is a play-money game. A real-money machine needs independent lab certification and approval by the Minnesota Department of Public Safety.
 
