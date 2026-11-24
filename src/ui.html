@@ -426,7 +426,9 @@ async function spinReels(g){
   const tease=ROWS===3&&ok&&r>=1&&run>=2&&run+3*(5-r)>=4;if(tease)extra+=900;
   stops.push({t:(950+r*360+extra)*T,tease});}
  stops.forEach((s,r)=>{if(s.tease&&r>0)setTimeout(()=>SOUND.play('tease'),stops[r-1].t)});
- await Promise.all([0,1,2,3,4].map(r=>spinColumn(r,g[r],ROWS,stops[r].t,r*90*T,stops[r].tease&&r>0?stops[r-1].t:null,rnd)));
+ // moon chime only while the Moonrise can still happen: unbroken moons from reel 1, and enough reels left to reach 4
+ const moonSnd=[];{let run=0,alive=true;for(let r=0;r<5;r++){const n=g[r].filter(c=>c.s==='M').length;if(!n)alive=false;run+=n;moonSnd.push(alive&&run+3*(4-r)>=4);}}
+ await Promise.all([0,1,2,3,4].map(r=>spinColumn(r,g[r],ROWS,stops[r].t,r*90*T,stops[r].tease&&r>0?stops[r-1].t:null,rnd,moonSnd[r])));
  SOUND.spin(false);
 }
 // one spot spinning on its own (Hold & Spin): a strip of every symbol scrolling down, landing on finalHTML
@@ -456,7 +458,7 @@ function spinCell(i,finalHTML,stopAt,startDelay){
    c0.innerHTML=finalHTML;c0.classList.remove('hidec');win.remove();SOUND.play('reelStop',{i:i%5});done();})(performance.now());
  });
 }
-function spinColumn(r,final,ROWS,stopAt,startDelay,teaseAt,rnd){
+function spinColumn(r,final,ROWS,stopAt,startDelay,teaseAt,rnd,moonSnd){
  return new Promise(done=>{
   const c0=cells[r],h=c0.offsetHeight,p=ROWS>1?cells[5+r].offsetTop-c0.offsetTop:h+6,winH=(ROWS-1)*p+h,T=SF();
   const v=p*[0.021,0.026,0.031,0.036][S.speed-1];            // reel speed, px per ms
@@ -496,7 +498,7 @@ function spinColumn(r,final,ROWS,stopAt,startDelay,teaseAt,rnd){
     if(final[y].s==='O'||final[y].s==='D')cells[i].classList.add('land');}
    win.remove();SOUND.play('reelStop',{i:r});
    final.forEach(c=>{if(c.s==='O')SOUND.play('orb',{n:spinOrbN++})});
-   if(final.some(c=>c.s==='D'))SOUND.play('diamond');if(final.some(c=>c.s==='M'))SOUND.play('moon');
+   if(final.some(c=>c.s==='D'))SOUND.play('diamond');if(moonSnd)SOUND.play('moon');
    setTimeout(()=>{for(let y=0;y<ROWS;y++)cells[y*5+r].classList.remove('land')},500);
    done();
   }
