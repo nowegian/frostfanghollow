@@ -52,7 +52,6 @@ u=u[:i]+'''<div class="cab m">
   </div>
   <p class="foot">Original game for fun. Play money only: nothing to buy, nothing to win.</p>
  </div></div>
-<div class="rotate" id="rotate"><div>&#128241;</div><p>Turn your phone upright to play</p></div>
 '''+u[j:]
 R("$('refill').onclick=","""$('toDesktop').onclick=()=>{try{sessionStorage.setItem('ffh-desktop','1')}catch(e){};location.href='index.html'};
 $('menuBtn').onclick=()=>{if(!busy)$('menuM').classList.remove('hidden')};
@@ -108,6 +107,35 @@ button{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 .modal .card{max-height:calc(100dvh - 40px)}
 .rotate{display:none;position:fixed;inset:0;z-index:50;background:#0b0720f2;flex-direction:column;align-items:center;justify-content:center;text-align:center;font-size:18px}
 .rotate div{font-size:48px;animation:spinr 2s ease-in-out infinite}@keyframes spinr{50%{transform:rotate(-90deg)}}
-@media (orientation:landscape) and (max-height:500px){.rotate{display:flex}}
+/* ================= phone turned sideways: jackpots on the left, reels in the middle, controls on the right ================= */
+@media (orientation:landscape) and (max-height:500px){
+.cab.m{--side:clamp(118px,17vw,172px);--H:calc(100dvh - max(6px,env(safe-area-inset-top)) - max(6px,env(safe-area-inset-bottom)));
+ width:100%;max-width:none;height:100dvh;min-height:0;display:grid;column-gap:10px;row-gap:6px;
+ grid-template-columns:var(--side) minmax(0,1fr) var(--side);grid-template-rows:auto 1fr auto;
+ grid-template-areas:"top stage stats" "jps stage stats" "line stage bar";
+ padding:max(6px,env(safe-area-inset-top)) max(8px,env(safe-area-inset-right)) max(6px,env(safe-area-inset-bottom)) max(8px,env(safe-area-inset-left))}
+.cab.m .mtop{grid-area:top;gap:4px}
+.cab.m h1.logo{flex:1;min-width:0}
+.cab.m h1.logo img{height:auto;width:100%;max-width:100%;max-height:20dvh}
+.cab.m .menubtn{position:static;transform:none;width:34px;height:34px;font-size:18px;flex:none}
+.cab.m .jps.art{grid-area:jps;grid-template-columns:1fr;align-content:center;gap:4px}
+.cab.m .stage{grid-area:stage;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px}
+.cab.m .frame:not(.moonf){aspect-ratio:1600/1000;height:auto;width:min(100%,calc(var(--H)*1.6));margin:0}
+.cab.m .frame:not(.moonf)::after{border:none;border-image:none;background:url(img/frame_base.webp) 0 0/100% 100% no-repeat}
+.cab.m .frame:not(.moonf)>.grid{top:15.4%;bottom:21%}
+.cab.m .stage{--fw:min(100%,calc((var(--H) - 4px)*.842))}
+.cab.m .frame.moonf{width:var(--fw);margin:0}
+.cab.m .stage>.meter{position:absolute;top:50%;left:min(calc(50% + var(--fw)/2 + 6px),calc(100% - 78px));transform:translateY(-50%);width:78px;margin:0;padding:5px 4px;z-index:6}
+.cab.m .stage>.meter .dots{flex-wrap:wrap;max-width:80px;margin:0 auto}
+.cab.m .stage>.meter .dots span{width:14px;height:14px}
+.cab.m .stage>.meter small{font-size:9.5px}
+.cab.m .frame>.banner span{font-size:11px;padding:2px 10px;white-space:nowrap}
+.cab.m .win-line{grid-area:line;font-size:11px;min-height:0}
+.cab.m .mstats{grid-area:stats;grid-template-columns:1fr;align-content:center}
+.cab.m .mstats .box{padding:4px 6px}
+.cab.m .mbar{grid-area:bar;grid-template-columns:1fr 1fr;gap:6px;margin:0}
+.cab.m .mbar #spin{grid-column:1/-1;grid-row:1;justify-self:center;width:clamp(74px,11vw,96px);font-size:clamp(17px,2.6vw,21px)}
+.cab.m .mbar .tg{padding:8px 2px;font-size:11px;white-space:nowrap}
+}
 """+u[i:]
 open('src/ui_mobile.html','w').write(u)
