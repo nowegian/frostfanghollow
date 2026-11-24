@@ -46,7 +46,6 @@ u=u[:i]+'''<div class="cab m">
   <div class="mgrid">
     <button class="tg" id="sound">SOUND: OFF</button>
     <button class="tg" id="info">PAYS &amp; RULES</button>
-    <button class="tg test" id="testBtn">TEST BONUS</button>
     <button class="tg cash" id="refill">ADD $100</button>
     <button class="tg" id="toDesktop">DESKTOP VERSION</button>
   </div>
@@ -54,13 +53,11 @@ u=u[:i]+'''<div class="cab m">
  </div></div>
 <div class="rotate" id="rotate"><div>&#128241;</div><p>Turn your phone upright to play</p></div>
 '''+u[j:]
-R("$('testBtn').onclick=","""$('toDesktop').onclick=()=>{try{sessionStorage.setItem('ffh-desktop','1')}catch(e){};location.href='index.html'};
+R("$('refill').onclick=","""$('toDesktop').onclick=()=>{try{sessionStorage.setItem('ffh-desktop','1')}catch(e){};location.href='index.html'};
 $('menuBtn').onclick=()=>{if(!busy)$('menuM').classList.remove('hidden')};
 $('menuClose').onclick=()=>$('menuM').classList.add('hidden');
 $('menuM').onclick=e=>{if(e.target.id==='menuM'||e.target.closest('.mgrid button'))$('menuM').classList.add('hidden')};
-$('testBtn').onclick=""")
-R("$('testBtn').classList.add('armed');","$('testBtn').classList.add('armed');$('menuBtn').classList.add('armed');")
-R("$('testBtn').classList.remove('armed');","$('testBtn').classList.remove('armed');$('menuBtn').classList.remove('armed');")
+$('refill').onclick=""")
 i=u.rindex("</style>")
 u=u[:i]+"""
 /* ================= phone layout ================= */
@@ -104,6 +101,7 @@ button{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 .msheet{max-width:420px}
 .mgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0}
 .mgrid .tg{padding:14px 6px;font-size:14px}
+.mgrid #refill{grid-column:span 2}
 .mgrid #toDesktop{grid-column:span 2;font-size:12px;opacity:.85}
 .msheet .foot{margin-top:8px}
 .modal .card{max-height:calc(100dvh - 40px)}

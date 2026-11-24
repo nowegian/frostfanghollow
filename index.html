@@ -244,7 +244,7 @@ button{font-family:inherit;cursor:pointer;border:none;color:#fff;font-weight:700
       <button class="tg" id="speed">SPEED 1</button>
       <button class="tg" id="sound">SOUND: OFF</button>
       <button class="tg" id="info">PAYS</button>
-      <button class="tg test" id="testBtn">TEST BONUS</button>
+      
       <button class="tg cash" id="refill">ADD $100</button>
       
     </div>
@@ -260,15 +260,7 @@ button{font-family:inherit;cursor:pointer;border:none;color:#fff;font-weight:700
   <p style="opacity:.6;font-size:12px;margin-top:10px">All sounds are made live in your browser. Real recordings added later will replace them automatically.</p>
  </div></div>
 
-<div class="modal hidden" id="testM"><div class="card">
-  <button class="close" id="testClose">Close</button><h3>Test a bonus</h3>
-  <p>Pick a bonus and the game spins straight into it. Each test costs one normal bet, but it's play money, so test as much as you like.</p>
-  <div class="tchoices">
-   <button class="tc" data-t="moon">🌕 Moonrise Bonus<small>3 moons, normal odds inside the bonus</small></button>
-   <button class="tc" data-t="hold">🔮 Hold &amp; Spin<small>6 orbs, normal odds inside the bonus</small></button>
-  </div>
-  <p style="opacity:.6;font-size:12px">Test spins don't reflect the real odds. The payout figures on the pays screen apply to normal play only.</p>
- </div></div>
+
 <div class="modal hidden" id="pays"><div class="card" id="payCard"></div></div>
 <script>
 // ===== Frostfang Hollow Link — game engine (pure logic, no DOM) =====
@@ -1334,9 +1326,6 @@ async function play(){
  S.credit-=bet();jpAdd(0.006,bet()*0.004);setWin(0);drawMeters();
  $('winLine').textContent='Good luck…';
  const g=E.spinGrid(bet(),false);let hot=false;
- if(rig){const t=rig;rig=null;$('testBtn').classList.remove('armed');$('testBtn').textContent='TEST BONUS';
-  if(t==='hold'){g.forEach(col=>col.forEach((c,y)=>{if(c.s==='M')col[y]={s:'T'}}));const spots=[...Array(15).keys()].sort(()=>Math.random()-.5).slice(0,6);spots.forEach(i=>{g[i%5][Math.floor(i/5)]={s:'O',orb:E.orbValue(bet(),false)}});}
-  else{g.forEach(col=>col.forEach((c,y)=>{if(c.s==='O'||c.s==='M')col[y]={s:'T'}}));[0,1,2,3].forEach(r=>{g[r][Math.floor(Math.random()*3)]={s:'M'}});}}
  await spinReels(g);
  const ev=E.evaluate(g,bet());let total=ev.total;
  if(ev.total>0){await showWins(ev,g);await countUp($('win'),0,ev.total,Math.min(1500,300+ev.total/bet()*60));}
@@ -1482,15 +1471,9 @@ $('chatter').onchange=e=>{SOUND.set('voice',e.target.checked);if(e.target.checke
 $('soundClose').onclick=()=>$('soundM').classList.add('hidden');
 $('soundM').onclick=e=>{if(e.target.id==='soundM')$('soundM').classList.add('hidden')};
 drawSound();
-$('testBtn').onclick=()=>{if(busy)return;$('testM').classList.remove('hidden')};
-$('testClose').onclick=()=>$('testM').classList.add('hidden');
-$('testM').onclick=e=>{if(e.target.id==='testM')$('testM').classList.add('hidden')};
-document.querySelectorAll('.tc').forEach(b=>b.onclick=()=>{rig=b.dataset.t;$('testM').classList.add('hidden');
- $('testBtn').classList.add('armed');$('testBtn').textContent='ARMED: SPIN!';say(rig==='hold'?'Orbs incoming!':'Full moon tonight!');
- if(S.credit<bet()){S.credit+=START;save();drawMeters();}play();});
 $('refill').onclick=()=>{if(busy)return;S.credit=Math.round((S.credit+START)*100)/100;save();drawMeters();say('+$100. Fresh snow, fresh credits!')};
 
-document.addEventListener('keydown',e=>{if(e.code==='Space'&&$('pays').classList.contains('hidden')&&$('testM').classList.contains('hidden')&&$('soundM').classList.contains('hidden')){e.preventDefault();$('spin').click()}});
+document.addEventListener('keydown',e=>{if(e.code==='Space'&&$('pays').classList.contains('hidden')&&$('soundM').classList.contains('hidden')){e.preventDefault();$('spin').click()}});
 $('info').onclick=()=>{const u=bet()/25;let pt='';for(const s of ['F','P','S','B','C','A','K','Q','J','T']){const p=E.PAY[s];pt+=`<div>${ART[s]}<br>5: ${fmt(p[5]*u)}<br>4: ${fmt(p[4]*u)}<br>3: ${fmt(p[3]*u)}</div>`}
  $('payCard').innerHTML=`<button class="close" onclick="document.getElementById('pays').classList.add('hidden')">Close</button><h3>How to play</h3>
  <p>243 ways to win. Match symbols on adjacent reels from the left. Pays shown per way at your current bet of ${fmt(bet())}.</p>
