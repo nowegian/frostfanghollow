@@ -231,7 +231,7 @@ button{font-family:inherit;cursor:pointer;border:none;color:#fff;font-weight:700
     </div>
     <div class="meter hidden" id="meter"></div>
   </div>
-  <div class="win-line" id="winLine">6 or more glowing orbs start the Hold &amp; Spin. Moons on reels 1, 3 and 5 start the Moonrise Bonus.</div>
+  <div class="win-line" id="winLine">6 or more glowing orbs start the Hold &amp; Spin. 4+ moons on touching reels from reel 1 start the Moonrise Bonus.</div>
   <div class="panel">
     <div class="box bank" id="bankBox" title="Tap to switch between dollars and credits"><small>CREDIT <span class="unit" id="bankUnit"><b class="d">$</b><b class="c">CR</b></span></small><div id="credit">$0</div><small id="creditCr" class="cr"></small></div>
     <div class="box betbox"><small>DENOMINATION</small><div class="denoms" id="denoms"></div>
@@ -351,7 +351,8 @@ const fmtBank=v=>S.bank==='cr'?fmtCr(v)+' CR':fmt(v);
 let winAmt=0;const setWin=v=>{winAmt=v;$('win').textContent=fmtBank(v)};
 const bet=()=>Math.round(50*mult()*denom()*100)/100;
 const fmt=v=>'$'+(Math.round(v*100)/100).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
-const jpVals=()=>({MINI:E.JP.MINI*bet(),MINOR:E.JP.MINOR*bet(),MAJOR:(E.JP.MAJOR+S.acc.MAJORX)*bet(),GRAND:E.GRAND_SEED+S.acc.GRAND});
+const r10=v=>{const s=10*denom();return Math.round(Math.floor(v/s+1e-9)*s*100)/100};
+const jpVals=()=>({MINI:E.JP.MINI*bet(),MINOR:E.JP.MINOR*bet(),MAJOR:r10((E.JP.MAJOR+S.acc.MAJORX)*bet()),GRAND:r10(E.GRAND_SEED+S.acc.GRAND)});
 const sleep=ms=>new Promise(r=>setTimeout(r,ms*SF()));
 function drawMeters(){const j=jpVals();for(const k in j)$('jp'+k).querySelector('i').textContent=fmt(j[k]);
  const crs=Math.floor(S.credit/denom()+1e-6).toLocaleString();
@@ -395,7 +396,7 @@ function banner(t,ice){$('banner').classList.toggle('hidden',!t);$('banner').cla
 function say(t,ms=1800){SOUND.say(t);const b=$('bubble');b.textContent=t;b.classList.add('on');clearTimeout(say.t);say.t=setTimeout(()=>b.classList.remove('on'),ms)}
 function showMsg(html){const m=$('msg');m.innerHTML=html;m.classList.remove('hidden')}
 function hideMsg(){$('msg').classList.add('hidden')}
-async function countUp(el,from,to,ms){const st=performance.now();ms=ms*SF();return new Promise(res=>{function f(t){const p=Math.min(1,(t-st)/ms);const cv=from+(to-from)*p;if(el.id==='win'){winAmt=cv;el.textContent=fmtBank(cv)}else el.textContent=fmt(cv);if(p<1){if(Math.random()<.3)sfx.tick();requestAnimationFrame(f)}else res()}requestAnimationFrame(f)})}
+async function countUp(el,from,to,ms){const st=performance.now();ms=ms*SF();return new Promise(res=>{function f(t){const p=Math.min(1,(t-st)/ms);const cv=from+(to-from)*p;if(el.id==='win'){winAmt=cv;el.textContent=fmtBank(cv)}else el.textContent=['hw','fw','bw'].includes(el.id)?fmtBank(cv):fmt(cv);if(p<1){if(Math.random()<.3)sfx.tick();requestAnimationFrame(f)}else res()}requestAnimationFrame(f)})}
 function clearMarks(){cells.forEach(c=>c.classList.remove('win','dim'))}
 async function flyGem(fromIdx,plus){const be=$('beast');pose(FIMG.grab?'grab':'throw');
  const a=cells[fromIdx].getBoundingClientRect(),b=be.getBoundingClientRect();const gem=document.createElement('div');gem.className='ball gem';gem.innerHTML=gemHTML(plus);document.body.appendChild(gem);
@@ -421,7 +422,8 @@ async function spinReels(g){
  // stop times: one reel at a time, left to right; tease the later reels when 2+ moons are already showing
  const stops=[];let extra=0;
  for(let r=0;r<5;r++){let moons=0;for(let k=0;k<r;k++)g[k].forEach(c=>{if(c.s==='M')moons++});
-  const tease=ROWS===3&&r===4&&g[0].some(c=>c.s==='M')&&g[2].some(c=>c.s==='M');if(tease)extra+=900;
+  let run=0,ok=true;for(let k=0;k<r;k++){const n=g[k].filter(c=>c.s==='M').length;if(!n){ok=false;break}run+=n}
+  const tease=ROWS===3&&ok&&r>=1&&run>=2&&run+3*(5-r)>=4;if(tease)extra+=900;
   stops.push({t:(950+r*360+extra)*T,tease});}
  stops.forEach((s,r)=>{if(s.tease&&r>0)setTimeout(()=>SOUND.play('tease'),stops[r-1].t)});
  await Promise.all([0,1,2,3,4].map(r=>spinColumn(r,g[r],ROWS,stops[r].t,r*90*T,stops[r].tease&&r>0?stops[r-1].t:null,rnd)));
@@ -519,7 +521,7 @@ async function play(){
  const g=E.spinGrid(bet(),false);let hot=false;
  if(rig){const t=rig;rig=null;$('testBtn').classList.remove('armed');$('testBtn').textContent='TEST BONUS';
   if(t==='hold'){g.forEach(col=>col.forEach((c,y)=>{if(c.s==='M')col[y]={s:'T'}}));const spots=[...Array(15).keys()].sort(()=>Math.random()-.5).slice(0,6);spots.forEach(i=>{g[i%5][Math.floor(i/5)]={s:'O',orb:E.orbValue(bet(),false)}});}
-  else{g.forEach(col=>col.forEach((c,y)=>{if(c.s==='O'||c.s==='M')col[y]={s:'T'}}));[0,2,4].forEach(r=>{g[r][Math.floor(Math.random()*3)]={s:'M'}});}}
+  else{g.forEach(col=>col.forEach((c,y)=>{if(c.s==='O'||c.s==='M')col[y]={s:'T'}}));[0,1,2,3].forEach(r=>{g[r][Math.floor(Math.random()*3)]={s:'M'}});}}
  await spinReels(g);
  const ev=E.evaluate(g,bet());let total=ev.total;
  if(ev.total>0){await showWins(ev,g);await countUp($('win'),0,ev.total,Math.min(1500,300+ev.total/bet()*60));}
@@ -639,10 +641,6 @@ async function moonBonus(){
    lab(view.level,pot);}
   shown=st.spins;lab();await sleep(ev.collected.length||ev.path.length?500:200);
  }
- {const before=st.pot,add=E.moonFinish(st,bet());
-  if(add>0){banner(`MINIMUM WIN: ${M.MIN_PAY}× YOUR BET`,true);say(`Here, a little something!`,2200);SOUND.play('plus');cheer(1800);
-   showMsg(`<h2>MINIMUM WIN</h2><p>Every Moonrise Bonus pays at least ${M.MIN_PAY}× your bet.<br>Frostfang tops up the pot.</p><div class="big">${fmt(before)} → ${fmt(st.pot)}</div>`);
-   await countUp($('win'),before,st.pot,900);await sleep(1900);hideMsg();}}
  banner('');const won=Math.round(st.pot*100)/100;
  showMsg(`<h2>MOONRISE WIN</h2><p>Final grid ${STEPN(st.level)}</p><div class="big" id="fw">$0.00</div>`);SOUND.play('winBig');cheer(3200);await countUp($('fw'),0,won,1800);await sleep(1400);hideMsg();
  SOUND.music('base');grid.classList.remove('moon');sizeFrame();cells.forEach(c=>c.classList.remove('zone','zgrow','fizzle','got'));for(let i=15;i<40;i++)cells[i].innerHTML='';$('meter').classList.add('hidden');
@@ -687,17 +685,17 @@ $('info').onclick=()=>{const u=bet()/25;let pt='';for(const s of ['F','P','S','B
  <div class="pt">${pt}</div>
  <h4>Wild</h4><p>${ART.W.replace('<svg','<svg width="40" height="36"')} Appears on reels 2–5 and substitutes for all pay symbols.</p>
  <h4>Hold &amp; Spin</h4><p>Land <b>6 or more orbs</b>. Orbs lock, you get 3 spins, and each new orb resets the count to 3. Orbs carry cash or the MINI, MINOR or MAJOR jackpot.<br>Every empty spot spins on its own on each Hold &amp; Spin spin. <b>GRAND orb:</b> a rare orb that wins the GRAND. Bigger bets make it more likely (see Jackpots below).<br><b>Full screen:</b> fill all 15 spots and your Hold &amp; Spin win is <b>doubled</b>. A GRAND won in the same round is paid once, not doubled.</p>
- <h4>Moonrise Bonus</h4><p>Moons only land on <b>reels 1, 3 and 5</b>. A moon on all three starts the Moonrise Bonus and pays 1× the bet (4 moons pay 3×, 5 or more pay 10×). The reels grow to <b>8 rows by 5 reels</b>, and a glowing grid starts at 2×2.<br>
+ <h4>Moonrise Bonus</h4><p>Count the moons on touching reels starting from <b>reel 1</b>, stopping at the first reel with no moon. <b>4 or more</b> start the Moonrise Bonus and pay 1× the bet (5 pay 3×, 6 or more pay 10×). Example: moons on reels 1, 2 and 3 adding up to 4 trigger it; moons on reels 2 to 5 don't, because reel 1 has none. The reels grow to <b>8 rows by 5 reels</b>, and a glowing grid starts at 2×2.<br>
  <img src="${IMG.D}" alt="" width="34" height="34" style="vertical-align:middle;object-fit:contain"> <b>Diamonds</b> can land anywhere. After each spin the grid travels to every diamond, nearest first, to collect it, and the next spin starts wherever it stops. Diamonds grow the grid: 2×2 → 3×3 → 4×4 → 5×5 needs 5 diamonds per step, then 5×5 → 6×5 → 7×5 → 8×5 needs 3 per step.<br>
  Orbs landing <b>inside the grid</b> add their cash or MINI, MINOR or MAJOR jackpot to the pot. Orbs outside the grid don't count.<br>
- The grid is one glowing shape that starts in a random spot. Inside it you only see orbs, diamonds and +1 SPIN cubes. <b>Every spin, at least one orb lands inside the grid</b>, so the pot always grows. <b>Frostfang lives inside the grid</b> and grows with it. On some spins he throws 1 or 2 snowballs onto spots inside his grid; each becomes a cash orb, a MINI, MINOR or MAJOR jackpot, or a <b>+1 SPIN</b> ice cube. The bonus starts with <b>3 spins</b>, and every diamond <b>resets the spins to 3</b>. Gold <b>+1 SPIN</b> diamonds also add an extra spin on top. Orbs don't reset the spins. At the full <b>8×5</b> grid every orb on the reels counts. The pot pays when the spins run out, and <b>every Moonrise Bonus pays at least 5× your bet</b>. The GRAND can only be won in the Hold &amp; Spin.</p>
+ The grid is one glowing shape that starts in a random spot. Inside it you only see orbs, diamonds and +1 SPIN cubes. <b>Every spin, at least one orb lands inside the grid</b>, so the pot always grows. <b>Frostfang lives inside the grid</b> and grows with it. On some spins he throws 1 or 2 snowballs onto spots inside his grid; each becomes a cash orb, a MINI, MINOR or MAJOR jackpot, or a <b>+1 SPIN</b> ice cube. The bonus starts with <b>3 spins</b>, and every diamond <b>resets the spins to 3</b>. Gold <b>+1 SPIN</b> diamonds also add an extra spin on top. Orbs don't reset the spins. At the full <b>8×5</b> grid every orb on the reels counts. The pot pays when the spins run out. The GRAND can only be won in the Hold &amp; Spin.</p>
  <h4>Bets</h4><p>Pick a denomination (1¢, 2¢ or 5¢), then a bet of 1×, 2×, 3×, 5× or 10× (50 to 500 credits). Bets run from $0.50 to $25.00. You start each session with $100. Use <b>ADD $100</b> to top up, or <b>RESET</b> to start a new session.</p>
  <h4>Jackpots</h4><p>MINI is ${E.JP.MINI}× the bet and MINOR is ${E.JP.MINOR}× the bet. MAJOR starts at ${E.JP.MAJOR}× the bet and grows with every spin. At your bet of ${fmt(bet())} that's ${fmt(E.JP.MINI*bet())}, ${fmt(E.JP.MINOR*bet())} and ${fmt(E.JP.MAJOR*bet())}+.<br>
  <b>GRAND starts at ${fmt(E.GRAND_SEED)} at every bet</b> and grows with every spin. It's won by the rare GRAND orb in the Hold &amp; Spin. Your chance grows with your bet: about 1 in ${Math.round(E.GRAND_SEED/(E.GRAND_K*bet())).toLocaleString()} spins at your bet of ${fmt(bet())}, from 1 in 450,000 at $0.50 to 1 in 9,000 at $25.00.</p>
  <h4>Payout &amp; odds (Minnesota standard)</h4>
  <p>Built to the payout rule in Minnesota's tribal-state compacts for video games of chance: a game not affected by player skill must return at least 80% and no more than 95% of the amount wagered.</p>
  <ul><li><b>Theoretical return: 93.5% at every bet.</b> Measured over 60 million simulated spins, plus the GRAND's fixed 4% share, which is the same at every bet because its odds scale with the bet. This includes the 1% of each bet that grows the MAJOR and GRAND meters.</li>
- <li>Odds per spin: MINI about 1 in 380, MINOR about 1 in 1,050, MAJOR about 1 in 9,400, GRAND about 1 in 225,000 ÷ your bet in dollars. Hold &amp; Spin about 1 in 205, Moonrise Bonus about 1 in 51. A Moonrise Bonus averages 14 spins and about 18× the bet, and the full 8×5 grid is reached in about 1 of every 15.</li>
+ <li>Odds per spin: MINI about 1 in 370, MINOR about 1 in 1,030, MAJOR about 1 in 9,000, GRAND about 1 in 225,000 ÷ your bet in dollars. Hold &amp; Spin about 1 in 207, Moonrise Bonus about 1 in 49. A Moonrise Bonus averages 14 spins and about 18× the bet, and the full 8×5 grid is reached in about 1 of every 15.</li>
  <li>Even at the smallest bet ($0.50, about 1 in 450,000), the GRAND is far more likely than the compacts' 1 in 17,000,000 limit, and every advertised award hits much more often than once in 100 million games.</li>
  <li>Every spin is independent. Past results never change the odds.</li></ul>
  <p style="opacity:.6">Play money only. A real-money machine needs independent lab certification and approval by the Minnesota Department of Public Safety.</p>`;$('pays').classList.remove('hidden')};

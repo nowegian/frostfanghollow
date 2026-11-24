@@ -27,7 +27,7 @@ u=u[:i]+'''<div class="cab m">
     </div>
     <div class="meter hidden" id="meter"></div>
   </div>
-  <div class="win-line" id="winLine">6+ orbs start the Hold &amp; Spin. Moons on reels 1, 3, 5 start the Moonrise.</div>
+  <div class="win-line" id="winLine">6+ orbs start the Hold &amp; Spin. 4+ moons in a row from reel 1 start the Moonrise.</div>
   <div class="mstats">
     <div class="box bank" id="bankBox"><small>CREDIT <span class="unit" id="bankUnit"><b class="d">$</b><b class="c">CR</b></span></small><div id="credit">$0</div><small id="creditCr" class="cr"></small></div>
     <div class="box betbox"><div class="denoms" id="denoms"></div>

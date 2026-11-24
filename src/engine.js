@@ -7,23 +7,24 @@ const ENGINE = (() => {
   };
   // pay per way, as multiple of (bet / 25)
   const PAY = {
-    F:{3:57,4:194,5:726}, P:{3:39,4:121,5:387}, S:{3:29,4:88,5:291}, B:{3:24,4:57,5:194}, C:{3:20,4:49,5:145},
-    A:{3:9,4:24,5:73}, K:{3:9,4:24,5:73}, Q:{3:4,4:20,5:49}, J:{3:4,4:20,5:49}, T:{3:4,4:15,5:39}
+    F:{3:70,4:237,5:886}, P:{3:48,4:148,5:472}, S:{3:35,4:107,5:355}, B:{3:29,4:70,5:237}, C:{3:24,4:60,5:177},
+    A:{3:11,4:29,5:89}, K:{3:11,4:29,5:89}, Q:{3:5,4:24,5:60}, J:{3:5,4:24,5:60}, T:{3:5,4:18,5:48}
   };
-  const BASE_W = {F:3,P:5,S:6,B:7,C:8,A:10,K:10,Q:12,J:12,T:12,W:3,O:12.4,M:11};
-  const MOON_REELS = [0,2,4];   // moons only land on reels 1, 3 and 5
+  const BASE_W = {F:3,P:5,S:6,B:7,C:8,A:10,K:10,Q:12,J:12,T:12,W:3,O:13.3,M:14};
+  const MOON_REELS = [0,1,2,3,4]; // moons can land on any reel
   const FREE_W = Object.assign({}, BASE_W, {W:4, M:1});
   const JP = {MINI:20, MINOR:50, MAJOR:300}; // x bet seeds (MAJOR also grows)
   const GRAND_SEED = 9000;           // dollars, same at every bet, grows from here
   const GRAND_K = 0.04;              // share of every bet paid back through the GRAND, at any bet size
-  const HOLD_SPIN_RATE = 1/46.5;      // Hold & Spin spins played per base-game spin (measured; set by calibration)
+  const HOLD_SPIN_RATE = 1/48.2;      // Hold & Spin spins played per base-game spin (measured; set by calibration)
   // chance a GRAND orb lands on one Hold & Spin spin: proportional to the bet, so every bet has the same payback
   const grandChance = bet => Math.min(1, GRAND_K*bet/GRAND_SEED/HOLD_SPIN_RATE);
   let rng = Math.random;
   const HOLD_SNOW = 0;
   // orb prizes are whole credits: UNIT = the denomination (value of one credit) set by the game
   let UNIT = 0.01;
-  const cashOf = v => Math.max(UNIT, Math.round(v / UNIT) * UNIT);
+  // orb prizes come in steps of bet/5: 10 credits x the bet multiplier, so every total is a multiple of 10 credits
+  const cashOf = (v, bet) => { const step = bet / 5; return Math.max(step, Math.round(v / step) * step); };
   const money = v => Math.round(v * 100) / 100;
 
   function pick(weights, reel){
@@ -39,7 +40,7 @@ const ENGINE = (() => {
     if(r<0.0116) return {jp:'MINOR'};
     if(r<0.0316) return {jp:'MINI'};
     const mult=[0.5,0.5,1,1,1,2,2,3,5,8][Math.floor(rng()*10)]*1.8;
-    return {cash:money(cashOf(mult*bet))};
+    return {cash:money(cashOf(mult*bet,bet))};
   }
   // grid[reel][row]
   function spinGrid(bet, free){
@@ -62,8 +63,10 @@ const ENGINE = (() => {
     }
     let orbs=0, moons=0;
     g.forEach(col=>col.forEach(c=>{ if(c.s==='O') orbs++; if(c.s==='M') moons++; }));
-    const moonTrig=MOON_REELS.every(r=>g[r].some(c=>c.s==='M'));
-    let scatterPay=0; if(moonTrig) { scatterPay=bet*(moons===3?1:moons===4?3:10); total+=scatterPay; }
+    // Moonrise: moons on touching reels starting from reel 1, no gaps; 4+ moons in that run trigger
+    let runMoons=0; for(let r=0;r<5;r++){ const n=g[r].filter(c=>c.s==='M').length; if(!n) break; runMoons+=n; }
+    const moonTrig=runMoons>=4; moons=runMoons;
+    let scatterPay=0; if(moonTrig) { scatterPay=bet*(moons===4?1:moons===5?3:10); total+=scatterPay; }
     return {total:Math.round(total*100)/100, wins, orbs, moons, scatterPay,
       holdTrigger: orbs>=6, freeTrigger: moonTrig};
   }
@@ -85,7 +88,7 @@ const ENGINE = (() => {
         else if(r<0.105) v={jp:"MAJOR"};
         else if(r<0.129) v={jp:"MINOR"};
         else if(r<0.179) v={jp:"MINI"};
-        else v={cash:money(cashOf([1,2,2,3,5][Math.floor(rng()*5)]*1.8*bet))};
+        else v={cash:money(cashOf([1,2,2,3,5][Math.floor(rng()*5)]*1.8*bet,bet))};
         cells[i]=Object.assign(v,{snow:true}); events.push({i,type:'snow'});
       }
     }
@@ -104,7 +107,7 @@ const ENGINE = (() => {
     NEED:  [5,5,5,5,3,3],                                // diamonds to leave each step
     P_DIAMOND: 0.016, P_ORB: 0.04, P_PLUS: 0.15, // P_PLUS: share of diamonds that also give +1 spin
     VAL: 0.25, JPS: 0.25,  // VAL scales orb cash values, JPS scales each orb's jackpot chance
-    MIN_PAY: 5, GUARANTEE: 1, P_SNOW: 0.18, SNOW_VAL: 0.4, SNOW_ODDS: [0.08, 0.001, 0.004, 0.015]       // every Moonrise Bonus pays at least this many times the bet
+    MIN_PAY: 0, GUARANTEE: 1, P_SNOW: 0.18, SNOW_VAL: 0.4, SNOW_ODDS: [0.08, 0.001, 0.004, 0.015]       // every Moonrise Bonus pays at least this many times the bet
   };
   // The grid is a moving window: st.row/st.col = its top-left cell, size from STEPS[st.level]
   const size=st=>MOON.STEPS[st.level];
@@ -142,7 +145,7 @@ const ENGINE = (() => {
     if(x<0.0004*k) return {jp:'MAJOR'};
     if(x<0.00412*k) return {jp:'MINOR'};
     if(x<0.01562*k) return {jp:'MINI'};
-    return {cash:money(cashOf([0.5,0.5,1,1,1,2,2,3,5,8][Math.floor(rng()*10)]*MOON.VAL*bet))};
+    return {cash:money(cashOf([0.5,0.5,1,1,1,2,2,3,5,8][Math.floor(rng()*10)]*MOON.VAL*bet,bet))};
   }
   const FILL='FPSBCAKQJT';
   function moonGrid(bet){
@@ -167,7 +170,7 @@ const ENGINE = (() => {
       else if(x<pP+pMaj) c={s:'O',orb:{jp:'MAJOR'}};
       else if(x<pP+pMaj+pMin) c={s:'O',orb:{jp:'MINOR'}};
       else if(x<pP+pMaj+pMin+pMini) c={s:'O',orb:{jp:'MINI'}};
-      else c={s:'O',orb:{cash:money(cashOf([1,2,2,3,5][Math.floor(rng()*5)]*MOON.SNOW_VAL*bet))}};
+      else c={s:'O',orb:{cash:money(cashOf([1,2,2,3,5][Math.floor(rng()*5)]*MOON.SNOW_VAL*bet,bet))}};
       g[r][y]=Object.assign(c,{snow:true}); out.push({r,y,was,c});
     }
     return out;
