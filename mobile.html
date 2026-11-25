@@ -277,8 +277,9 @@ button{font-family:inherit;cursor:pointer;border:none;color:#fff;font-weight:700
 #beast{z-index:4;border-radius:0;background:transparent;box-shadow:none;overflow:visible}
 #beast img.ffimg{opacity:1}
 .grid.moon .cell.zone{background:linear-gradient(#1a1240,#0e0828);box-shadow:none;opacity:.55}
-.grid.moon .cell.zone[data-s="O"],.grid.moon .cell.zone[data-s="D"],.grid.moon .cell.zone[data-s="X"]{z-index:5;opacity:1;background:linear-gradient(#1a12408c,#0e08288c)}
+.grid.moon .cell.zone[data-s="O"],.grid.moon .cell.zone[data-s="D"],.grid.moon .cell.zone[data-s="X"]{z-index:5;opacity:1;background:none!important}
 .grid.moon .cell.zone.got{z-index:5}
+.grid.moon .cell.zone:empty{z-index:1;background:linear-gradient(#1a1240,#0e0828);opacity:.55}
 .grid.moon .cell[data-s="O"],.grid.moon .cell[data-s="D"]{opacity:1}
 .grid.moon .cell:not(.zone)[data-s="O"],.grid.moon .cell:not(.zone)[data-s="D"]{background:linear-gradient(#1a12408c,#0e08288c)}
 .grid.moon .cell .val.gemv,.grid.moon .tile .val.gemv{inset:auto 0 3%!important;top:auto!important;transform:none;font-size:clamp(10px,1.9vw,16px);color:#e8fbff;text-shadow:0 0 6px #2a7bd6,0 2px 0 #06204a,0 0 3px #000}
