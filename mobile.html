@@ -64,6 +64,7 @@ h1 span{background:linear-gradient(180deg,#ffe08a,var(--pump));-webkit-backgroun
 .peekbox img.W{bottom:-6.5%}
 .peekbox img.B.out,.peekbox img.W.out{transform:translateY(105%)}
 .peekbox img.out{transition-timing-function:ease-in}
+.frame.holdf .peekbox img.L,.frame.holdf .peekbox img.R{height:68%;bottom:-7%}
 .frame.moonf::after{background-image:url(img/frame_bonus.webp)}
 .frame.moonf>.grid{left:11.6%;right:11.6%;top:8.6%;bottom:11.8%;grid-template-rows:repeat(8,1fr)}
 .grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;background:#0a0620e6;border-radius:6px;padding:6px;position:relative;overflow:hidden}
@@ -91,6 +92,16 @@ h1 span{background:linear-gradient(180deg,#ffe08a,var(--pump));-webkit-backgroun
 .grid.moon .tile .val{inset:auto 0 30%;font-size:clamp(9px,1.9vw,15px)}
 .tile .val.plus1{color:#ffd34d;inset:auto 0 6%;font-size:clamp(8px,1.6vw,13px)}
 .grid:not(.moon) .xrow{display:none}
+.grid.hold:not(.moon) .xrow:not(.x8){display:flex}
+/* Hold & Spin: 5 rows. Taller frame drawn as a 9-slice (skull corners keep their shape, the pillars stretch); --fwp = frame width in px, set by sizeFrame */
+.frame.holdf{aspect-ratio:1600/1250}
+.frame.holdf::after{background:none;border-style:solid;border-color:transparent;
+ border-width:calc(var(--fwp)*.1875) calc(var(--fwp)*.21875) calc(var(--fwp)*.2) calc(var(--fwp)*.21875);
+ border-image:url(img/frame_base.webp) 30% 21.875% 32% 21.875% fill stretch}
+.frame.holdf>.grid{top:calc(var(--fwp)*.096);bottom:calc(var(--fwp)*.131);grid-template-rows:repeat(5,1fr)}
+.plusfx{position:absolute;left:0;right:0;top:8%;text-align:center;font-weight:700;font-size:clamp(12px,1.6vw,18px);color:#bfe9ff;text-shadow:0 0 6px #6cc8ff,0 2px 0 #000;z-index:6;pointer-events:none;animation:plusfx 1.2s ease-out forwards}
+@keyframes plusfx{0%{transform:translateY(10px) scale(.6);opacity:0}20%{transform:translateY(0) scale(1.25);opacity:1}100%{transform:translateY(-18px) scale(1);opacity:0}}
+.cell.snowhit{animation:snowhit .5s ease-out}@keyframes snowhit{0%{filter:brightness(3) saturate(0)}100%{filter:none}}
 .grid.moon{gap:4px}
 .grid.moon .cell{aspect-ratio:1/0.5;border-radius:7px;opacity:.55;background:linear-gradient(#1a1240,#0e0828)}
 .grid.moon .cell svg,.grid.moon .cell img.symimg{width:auto;height:94%}
@@ -200,7 +211,8 @@ button{font-family:inherit;cursor:pointer;border:none;color:#fff;font-weight:700
 .cab:not(.m) h1.logo img{height:clamp(52px,11vh,130px)}
 /* desktop Moonrise: smaller logo and the diamond meter beside the frame, so the tall bonus frame gets more of the screen */
 .cab:not(.m) h1.logo img{transition:height .4s}
-.cab:not(.m):has(.frame.moonf) h1.logo img{height:clamp(40px,6vh,72px)}
+.cab:not(.m):has(.frame.moonf) h1.logo img,.cab:not(.m):has(.frame.holdf) h1.logo img{height:clamp(40px,6vh,72px)}
+.cab:not(.m) .frame.holdf{width:min(100%,1000px,calc((100vh - 262px)*1.28))}
 .cab:not(.m) .stage:has(.frame.moonf){--fw:min(100%,780px,calc((100vh - 262px)*0.842))}
 .cab:not(.m) .frame.moonf{width:var(--fw)}
 .cab:not(.m) .stage:has(.frame.moonf)>.meter{position:absolute;top:50%;left:calc(50% + var(--fw)/2 + 8px);transform:translateY(-50%);width:max-content;max-width:150px;margin:0;padding:8px 10px}
@@ -258,6 +270,7 @@ button{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
  border-width:calc(var(--W)*.1875) calc(var(--W)*.21875) calc(var(--W)*.2) calc(var(--W)*.21875);
  border-image:url(img/frame_base.webp) 30% 21.875% 32% 21.875% fill stretch}
 .cab.m .frame:not(.moonf)>.grid{top:calc(var(--W)*.096);bottom:calc(var(--W)*.131)}
+.cab.m .frame.holdf:not(.moonf){height:calc(var(--W)*.98)}
 .cab.m .stage>.meter .dots span{width:15px;height:15px}
 .cab.m .frame>.bubble{font-size:12px}
 .cab.m .win-line{margin:0;min-height:18px;font-size:12.5px}
@@ -297,6 +310,11 @@ button{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 .cab.m .frame:not(.moonf){aspect-ratio:1600/1000;height:auto;width:min(100%,calc(var(--H)*1.6));margin:0}
 .cab.m .frame:not(.moonf)::after{border:none;border-image:none;background:url(img/frame_base.webp) 0 0/100% 100% no-repeat}
 .cab.m .frame:not(.moonf)>.grid{top:15.4%;bottom:21%}
+.cab.m .frame.holdf:not(.moonf){aspect-ratio:1600/1250;height:auto;width:min(100%,calc(var(--H)*1.28))}
+.cab.m .frame.holdf:not(.moonf)::after{background:none;border-style:solid;border-color:transparent;
+ border-width:calc(var(--fwp)*.1875) calc(var(--fwp)*.21875) calc(var(--fwp)*.2) calc(var(--fwp)*.21875);
+ border-image:url(img/frame_base.webp) 30% 21.875% 32% 21.875% fill stretch}
+.cab.m .frame.holdf:not(.moonf)>.grid{top:calc(var(--fwp)*.096);bottom:calc(var(--fwp)*.131)}
 .cab.m .stage{--fw:min(100%,calc((var(--H) - 4px)*.842))}
 .cab.m .frame.moonf{width:var(--fw);margin:0}
 .cab.m .stage>.meter{position:absolute;top:50%;left:min(calc(50% + var(--fw)/2 + 6px),calc(100% - 78px));transform:translateY(-50%);width:78px;margin:0;padding:5px 4px;z-index:6}
@@ -389,11 +407,13 @@ const ENGINE = (() => {
   const JP = {MINI:20, MINOR:50, MAJOR:300}; // x bet seeds (MAJOR also grows)
   const GRAND_SEED = 9000;           // dollars, same at every bet, grows from here
   const GRAND_K = 0.04;              // share of every bet paid back through the GRAND, at any bet size
-  const HOLD_SPIN_RATE = 1/48.2;      // Hold & Spin spins played per base-game spin (measured; set by calibration)
+  const HOLD_SPIN_RATE = 1/31.7;      // Hold & Spin spins played per base-game spin (measured; set by calibration)
   // chance a GRAND orb lands on one Hold & Spin spin: proportional to the bet, so every bet has the same payback
   const grandChance = bet => Math.min(1, GRAND_K*bet/GRAND_SEED/HOLD_SPIN_RATE);
   let rng = Math.random;
-  const HOLD_SNOW = 0;
+  // Hold & Spin: 5 rows x 5 reels (25 spots). The 3 reel rows bring their orbs in, 2 empty rows are added below.
+  const HOLD = {ROWS:5, SPINS:3, P_LAND:0.022, INIT_K:1.0, LAND_K:1.6,
+    P_SNOW:0.3, SNOW_ADD:[0.2,0.2,0.4,0.4,0.6,1,1,2]}; // Frostfang's snowballs add credits to orbs already showing numbers
   const JP_BOOST = 2;
   // orb prizes are whole credits: UNIT = the denomination (value of one credit) set by the game
   let UNIT = 0.01;
@@ -415,7 +435,7 @@ const ENGINE = (() => {
     if(r<pMaj) return {jp:'MAJOR'};
     if(r<pMaj+pMin) return {jp:'MINOR'};
     if(r<pMaj+pMin+0.02) return {jp:'MINI'};
-    const mult=[0.5,0.5,1,1,1,2,2,3,5,8][Math.floor(rng()*10)]*1.8;
+    const mult=[0.5,0.5,1,1,1,2,2,3,5,8][Math.floor(rng()*10)]*(allowBig?HOLD.LAND_K:HOLD.INIT_K);
     return {cash:money(cashOf(mult*bet,bet))};
   }
   // grid[reel][row]
@@ -446,31 +466,25 @@ const ENGINE = (() => {
     return {total:Math.round(total*100)/100, wins, orbs, moons, scatterPay,
       holdTrigger: orbs>=6, freeTrigger: moonTrig};
   }
-  // Hold & Spin step: cells = 15-array of null or {cash|jp|plus}; returns events
+  // Hold & Spin step: cells = 25-array (5 rows x 5) of null or {cash|jp}; returns events
+  // {i,type:'orb'} = a new orb landed (resets the spins); {i,type:'snow',add} = a snowball added credits to a cash orb
   function holdStep(cells, bet){
-    const events=[];
+    const events=[], N=cells.length;
     // the rare GRAND orb: more likely at bigger bets
-    { const e=[]; for(let i=0;i<15;i++) if(!cells[i]) e.push(i);
+    { const e=[]; for(let i=0;i<N;i++) if(!cells[i]) e.push(i);
       if(e.length && rng()<grandChance(bet)){ const i=e[Math.floor(rng()*e.length)]; cells[i]={jp:'GRAND'}; events.push({i,type:'orb',grand:true}); } }
-    for(let i=0;i<15;i++){ if(!cells[i] && rng()<0.022){ cells[i]=orbValue(bet,true); events.push({i,type:'orb'}); } }
-    // (snowball prizes now live in the Moonrise Bonus; HOLD_SNOW keeps the old toss available)
-    let empties=[]; for(let i=0;i<15;i++) if(!cells[i]) empties.push(i);
-    if(HOLD_SNOW && empties.length && rng()<0.10){
-      const n=1+Math.floor(rng()*Math.min(3,empties.length));
-      for(let k=0;k<n;k++){
-        const j=Math.floor(rng()*empties.length), i=empties.splice(j,1)[0];
-        const r=rng(); let v;
-        if(r<0.10) v={plus:1};
-        else if(r<0.105) v={jp:"MAJOR"};
-        else if(r<0.129) v={jp:"MINOR"};
-        else if(r<0.179) v={jp:"MINI"};
-        else v={cash:money(cashOf([1,2,2,3,5][Math.floor(rng()*5)]*1.8*bet,bet))};
-        cells[i]=Object.assign(v,{snow:true}); events.push({i,type:'snow'});
-      }
+    for(let i=0;i<N;i++){ if(!cells[i] && rng()<HOLD.P_LAND){ cells[i]=orbValue(bet,true); events.push({i,type:'orb'}); } }
+    // Frostfang throws 1 or 2 snowballs at numbers already on the screen
+    const nums=[]; for(let i=0;i<N;i++) if(cells[i] && cells[i].cash!=null) nums.push(i);
+    if(nums.length && rng()<HOLD.P_SNOW){
+      const n=Math.min(nums.length, rng()<0.35?2:1);
+      for(let k=0;k<n;k++){ const i=nums.splice(Math.floor(rng()*nums.length),1)[0];
+        const add=money(cashOf(HOLD.SNOW_ADD[Math.floor(rng()*HOLD.SNOW_ADD.length)]*bet,bet));
+        cells[i].cash=money(cells[i].cash+add); events.push({i,type:'snow',add}); }
     }
     return events;
   }
-  // all 15 spots filled doubles the win (a GRAND is paid once, not doubled)
+  // every spot filled doubles the win (a GRAND is paid once, not doubled)
   function holdTotal(cells, bet, jpVals){
     let t=0, g=0; cells.forEach(c=>{ if(!c) return; if(c.cash) t+=c.cash; if(c.jp==='GRAND') g+=jpVals.GRAND; else if(c.jp) t+=jpVals[c.jp]; });
     if(cells.every(c=>c)) t*=2;
@@ -599,7 +613,7 @@ const ENGINE = (() => {
     const min=Math.round(MOON.MIN_PAY*bet*100)/100, add=Math.max(0, Math.round((min-st.pot)*100)/100);
     st.pot=Math.round((st.pot+add)*100)/100; return add;
   }
-  return {setUnit:u=>{UNIT=u}, moonEnsure, moonSnow, moonFinish,SYM,PAY,JP,GRAND_SEED,GRAND_K,HOLD_SPIN_RATE,grandChance,MOON,inZone,moonStart,moonGrid,moonResolve,spinGrid,evaluate,holdStep,holdTotal,orbValue,setRng:f=>rng=f};
+  return {HOLD,setUnit:u=>{UNIT=u}, moonEnsure, moonSnow, moonFinish,SYM,PAY,JP,GRAND_SEED,GRAND_K,HOLD_SPIN_RATE,grandChance,MOON,inZone,moonStart,moonGrid,moonResolve,spinGrid,evaluate,holdStep,holdTotal,orbValue,setRng:f=>rng=f};
 })();
 if(typeof module!=='undefined') module.exports=ENGINE;
 
@@ -1288,11 +1302,13 @@ SOUND.music('base');
 
 // ---------- frame sizing ----------
 // border widths as a share of the reel width, from each frame image's measured opening
-function sizeFrame(){const fr=document.querySelector('.frame');if(fr)fr.classList.toggle('moonf',grid.classList.contains('moon'));}
+function sizeFrame(){const fr=document.querySelector('.frame');if(!fr)return;fr.classList.toggle('moonf',grid.classList.contains('moon'));
+ fr.classList.toggle('holdf',grid.classList.contains('hold')&&!grid.classList.contains('moon'));fr.style.setProperty('--fwp',fr.offsetWidth+'px');}
+try{new ResizeObserver(()=>{const fr=document.querySelector('.frame');if(fr)fr.style.setProperty('--fwp',fr.offsetWidth+'px')}).observe(document.querySelector('.frame'))}catch(e){}
 addEventListener('resize',sizeFrame);
 // ---------- grid ----------
 const grid=$('grid'), cells=[];
-for(let i=0;i<40;i++){const d=document.createElement('div');d.className='cell'+(i>=15?' xrow':'');grid.appendChild(d);cells.push(d);}
+for(let i=0;i<40;i++){const d=document.createElement('div');d.className='cell'+(i>=15?' xrow':'')+(i>=25?' x8':'');grid.appendChild(d);cells.push(d);}
 const RAND='WFPSBCAKQJTOM'.split(''),MRAND='FPSBCAKQJTOOD'.split('');
 function symHTML(c){if(!c)return '';
  if(c.s==='O'&&c.orb) return orbHTML(c.orb);
@@ -1309,15 +1325,15 @@ function banner(t,ice){$('banner').classList.toggle('hidden',!t);$('banner').cla
 // ---------- Frostfang peeks around the frame (base game only) ----------
 // kinds: L/R = from behind a side pillar, T = hanging upside down from the top stone, B = sneaking up over the bottom ledge, W = popping up to cheer a win
 const PEEKIMG={L:'peek_side',R:'peek_side',T:'peek_top',B:'peek_bottom',W:'peek_top'};
-function peek(kind,ms,over){
- const box=$('peekbox');if(!box||grid.classList.contains('moon')||inHold)return;
+function peek(kind,ms,over,force){
+ const box=$('peekbox');if(!box||grid.classList.contains('moon')||(inHold&&!force))return;
  box.style.left=grid.offsetLeft+'px';box.style.top=grid.offsetTop+'px';box.style.width=grid.offsetWidth+'px';box.style.height=grid.offsetHeight+'px';
  box.classList.toggle('over',!!over);box.innerHTML='';clearTimeout(peek.t);
  const im=new Image();im.src='img/'+PEEKIMG[kind]+'.webp';im.className=kind+' out';im.alt='';
  if(kind!=='L'&&kind!=='R'){ // keep him fully inside the window, toward the left or right side
   const gw=grid.offsetWidth,gh=grid.offsetHeight,w=gh*(kind==='T'||kind==='W'?.54*720/464:.52*720/418),room=Math.max(0,gw-w-gw*.08);
   const f=Math.random()<.5?Math.random()*.3:.7+Math.random()*.3;im.style.left=(gw*.04+room*f)+'px';}
- box.appendChild(im);void im.offsetWidth;
+ box.appendChild(im);void im.offsetWidth;peek.im=im;
  requestAnimationFrame(()=>im.classList.remove('out'));
  peek.t=setTimeout(()=>{im.classList.add('out');peek.t=setTimeout(()=>{if(im.parentNode)im.remove()},320)},Math.max(250,ms));
 }
@@ -1338,6 +1354,23 @@ async function flyBall(toIdx){SOUND.play('throw');const be=$('beast');be.classLi
  const x0=a.left+a.width*lp[0]-13,y0=a.top+a.height*lp[1]-13,x1=b.left+b.width/2-13,y1=b.top+b.height/2-13,dur=520*SF(),st=performance.now();
  await new Promise(res=>{function f(t){const p=Math.min(1,(t-st)/dur);const x=x0+(x1-x0)*p,y=y0+(y1-y0)*p-Math.sin(p*Math.PI)*120;ball.style.left=x+'px';ball.style.top=y+'px';ball.style.transform=`scale(${1+p*.4}) rotate(${p*540}deg)`;if(p<1)requestAnimationFrame(f);else res()}requestAnimationFrame(f)});
  ball.remove();be.classList.remove('throw');be.classList.add('idle');pose('idle');}
+
+// Hold & Spin: Frostfang leans out from the pillar farthest from the targets and throws snowballs that add credits to orbs
+async function holdSnowballs(snows,H){
+ const cols=snows.map(e=>e.i%5),side=cols.reduce((a,b)=>a+b,0)/cols.length<=2?'R':'L';
+ peek(side,99999,false,true);say('Snowball!!',1400);await sleep(380*SF()+80);
+ for(const e of snows){const im=peek.im;if(!im)break;
+  const a=im.getBoundingClientRect(),b=cells[e.i].getBoundingClientRect();SOUND.play('throw');
+  const ball=document.createElement('div');ball.className='ball';ball.innerHTML=XIMG.SNOW?imgTag(XIMG.SNOW):ART2.snowball;document.body.appendChild(ball);
+  const x0=a.left+a.width*(side==='L'?0.82:0.18)-17,y0=a.top+a.height*0.42-17,x1=b.left+b.width/2-17,y1=b.top+b.height/2-17,dur=560*SF(),st=performance.now();
+  await new Promise(res=>{function f(t){const p=Math.min(1,(t-st)/dur);ball.style.left=(x0+(x1-x0)*p)+'px';ball.style.top=(y0+(y1-y0)*p-Math.sin(p*Math.PI)*90)+'px';ball.style.transform=`scale(${.8+p*.5}) rotate(${p*540}deg)`;if(p<1)requestAnimationFrame(f);else res()}requestAnimationFrame(f)});
+  ball.remove();SOUND.play('impact');
+  H[e.i].cash=Math.round((H[e.i].cash+e.add)*100)/100;paintHold(e.i,H[e.i]);const c=cells[e.i];c.classList.remove('snowhit');void c.offsetWidth;c.classList.add('snowhit');
+  const fx=document.createElement('div');fx.className='plusfx';fx.textContent='+'+fmtCr(e.add);c.appendChild(fx);setTimeout(()=>fx.remove(),1300);
+  await sleep(260*SF());}
+ await sleep(250*SF());clearTimeout(peek.t);if(peek.im){const im=peek.im;im.classList.add('out');setTimeout(()=>{if(im.parentNode)im.remove()},320);}
+ await sleep(300);
+}
 
 // ---------- base spin ----------
 // ---- real reel strips: each reel scrolls down, reels start a beat apart and stop one at a time ----
@@ -1472,41 +1505,45 @@ async function holdAndSpin(g,fromFree){
  inHold=true;SOUND.play('feature');SOUND.music('hold');say('Hold & Spin! Lock those orbs!',2400);
  showMsg(`<h2>HOLD &amp; SPIN!</h2>`);
  await sleep(1800);hideMsg();clearMarks();
- const H=Array(15).fill(null);g.forEach((col,r)=>col.forEach((c,y)=>{if(c.s==='O')H[y*5+r]=Object.assign({},c.orb)}));
+ const N=25,H=Array(N).fill(null);g.forEach((col,r)=>col.forEach((c,y)=>{if(c.s==='O')H[y*5+r]=Object.assign({},c.orb)}));
  const dead=()=>{const s='FPSBCAKQJTW'[Math.floor(Math.random()*11)];return `<div class="dead">${ART[s]}</div>`};
- grid.classList.add('hold');for(let i=0;i<15;i++){if(H[i])paintHold(i,H[i]);else{cells[i].classList.remove('locked');cells[i].innerHTML=dead();}}
- let spins=3;banner(`SPINS LEFT: ${spins}`,true);
+ grid.classList.add('hold');sizeFrame();for(let i=0;i<N;i++){cells[i].classList.remove('zone','zgrow','fizzle','got','win','dim');if(H[i])paintHold(i,H[i]);else{cells[i].classList.remove('locked');cells[i].innerHTML=dead();}}
+ await sleep(350);
+ let spins=E.HOLD.SPINS;banner(`SPINS LEFT: ${spins}`,true);
  while(spins>0&&H.some(c=>!c)){
   await sleep(450);spins--;banner(`SPINS LEFT: ${spins}`,true);
-  const empty=[];for(let i=0;i<15;i++)if(!H[i])empty.push(i);
+  const empty=[];for(let i=0;i<N;i++)if(!H[i])empty.push(i);
   const ev=E.holdStep(H,bet());
+  // snowballs are shown after the spin: hold back their credits until they hit
+  const snows=ev.filter(e=>e.type==='snow');for(let k=snows.length-1;k>=0;k--){const e=snows[k];H[e.i].cash=Math.round((H[e.i].cash-e.add)*100)/100;}
   // every empty spot spins as its own little reel; they stop one after another, left to right
   const order=empty.slice().sort((a,b)=>(a%5)-(b%5)||a-b);
   SOUND.play('spinStart');SOUND.spin(true,Math.round(55*SF()));
   await Promise.all(order.map((i,k)=>{const e=ev.find(x=>x.i===i);
-   return spinCell(i,e?orbHTML(H[i]):dead(),(650+k*120)*SF(),(k%5)*40*SF()).then(()=>{
-    if(e){paintHold(i,H[i]);cells[i].classList.add('land');SOUND.play('lock',{n:H.filter(Boolean).length});}});}));
+   return spinCell(i,e&&e.type==='orb'?orbHTML(H[i]):dead(),(650+k*120)*SF(),(k%5)*40*SF()).then(()=>{
+    if(e&&e.type==='orb'){paintHold(i,H[i]);cells[i].classList.add('land');SOUND.play('lock',{n:H.filter(Boolean).length});}});}));
   SOUND.spin(false);
+  if(snows.length)await holdSnowballs(snows,H);
   for(const e of ev){if(!e.grand)continue;const i=e.i;
    cells[i].classList.add('grandorb');$('jpGRAND').classList.add('flash');SOUND.play('jackpot',{level:'GRAND'});say('THE GRAND ORB!!!',2600);banner('GRAND ORB!',true);await sleep(1800);$('jpGRAND').classList.remove('flash');}
   setTimeout(()=>cells.forEach(c=>c.classList.remove('land')),500);
-  if(ev.length){spins=3;say(['Locked in!','Ooh, shiny!','Another one!','Hee hee!'][Math.floor(Math.random()*4)],1200);}
+  if(ev.some(e=>e.type==='orb')){spins=E.HOLD.SPINS;say(['Locked in!','Ooh, shiny!','Another one!','Hee hee!'][Math.floor(Math.random()*4)],1200);}
   banner(`SPINS LEFT: ${spins}`,true);
  }
  await sleep(700);banner('COLLECTING');
  const jv=jpVals();let sum=0;
- for(let i=0;i<15;i++){const v=H[i];if(!v)continue;const amt=v.jp?jv[v.jp]:v.cash;cells[i].classList.add('collect');
+ for(let i=0;i<N;i++){const v=H[i];if(!v)continue;const amt=v.jp?jv[v.jp]:v.cash;cells[i].classList.add('collect');
   if(v.jp){$('jp'+v.jp).classList.add('flash');setTimeout(()=>$('jp'+v.jp).classList.remove('flash'),2200);SOUND.play('jackpot',{level:v.jp});if(v.jp==='MAJOR'||v.jp==='GRAND')jpWon(v.jp);}
   else sfx.tick();
   const from=sum;sum+=amt;await countUp($('win'),from,sum,v.jp?900:220);cells[i].classList.remove('collect');}
  const gAmt=H.filter(c=>c&&c.jp==='GRAND').length*jv.GRAND;
  if(H.every(c=>c)){const base=sum-gAmt;SOUND.play('full');cheer(3200);
-  showMsg(`<h2>FULL SCREEN!</h2><p>All 15 spots filled: your win is doubled</p><div class="big">${fmt(base)} → ${fmt(base*2)}</div>`);
+  showMsg(`<h2>FULL SCREEN!</h2><p>All 25 spots filled: your win is doubled</p><div class="big">${fmt(base)} → ${fmt(base*2)}</div>`);
   await countUp($('win'),sum,sum+base,1400);sum+=base;await sleep(2200);hideMsg();}
  if(gAmt){showMsg(`<h2>GRAND!!!</h2><p>The GRAND orb pays</p><div class="big">${fmt(gAmt)}</div>`);SOUND.play('grand');cheer(3200);await sleep(3400);hideMsg();}
  sum=Math.round(sum*100)/100;
  showMsg(`<h2>FEATURE WIN</h2><div class="big" id="hw">$0.00</div>`);SOUND.play('winBig');cheer(3200);await countUp($('hw'),0,sum,1800);await sleep(1400);hideMsg();
- grid.classList.remove('hold');banner(fromFree||'');for(let i=0;i<15;i++)cells[i].classList.remove('locked','grandorb');
+ grid.classList.remove('hold');sizeFrame();banner(fromFree||'');for(let i=0;i<N;i++)cells[i].classList.remove('locked','grandorb','snowhit');for(let i=15;i<N;i++)cells[i].innerHTML='';
  g.forEach((col,r)=>col.forEach((c,y)=>paint(y*5+r,c)));inHold=false;SOUND.music('base');drawMeters();
  return sum;
 }
@@ -1611,7 +1648,7 @@ $('info').onclick=()=>{const u=bet()/25;let pt='';for(const s of ['F','P','S','B
  <p>243 ways to win. Match symbols on adjacent reels from the left. Pays shown per way at your current bet of ${fmt(bet())}.</p>
  <div class="pt">${pt}</div>
  <h4>Wild</h4><p>${ART.W.replace('<svg','<svg width="40" height="36"')} Appears on reels 2–5 and substitutes for all pay symbols.</p>
- <h4>Hold &amp; Spin</h4><p>Land <b>6 or more orbs</b>. Orbs lock, you get 3 spins, and each new orb resets the count to 3. Orbs carry cash or the MINI, MINOR or MAJOR jackpot.<br>Every empty spot spins on its own on each Hold &amp; Spin spin. <b>GRAND orb:</b> a rare orb that wins the GRAND. Bigger bets make it more likely (see Jackpots below).<br><b>Full screen:</b> fill all 15 spots and your Hold &amp; Spin win is <b>doubled</b>. A GRAND won in the same round is paid once, not doubled.</p>
+ <h4>Hold &amp; Spin</h4><p>Land <b>6 or more orbs</b>. The reels grow to <b>5 rows</b> (25 spots): your orbs lock in the top 3 rows and 2 empty rows are added below. You get 3 spins, and each new orb resets the count to 3. Orbs carry cash or the MINI, MINOR or MAJOR jackpot.<br>Every empty spot spins on its own on each Hold &amp; Spin spin. <b>Snowballs:</b> on some spins Frostfang leans out from behind the frame and throws 1 or 2 snowballs at orbs showing numbers, adding credits to them. <b>GRAND orb:</b> a rare orb that wins the GRAND. Bigger bets make it more likely (see Jackpots below).<br><b>Full screen:</b> fill all 25 spots and your Hold &amp; Spin win is <b>doubled</b>. A GRAND won in the same round is paid once, not doubled.</p>
  <h4>Moonrise Bonus</h4><p>Count the moons on touching reels starting from <b>reel 1</b>, stopping at the first reel with no moon. <b>4 or more</b> start the Moonrise Bonus and pay 1× the bet (5 pay 3×, 6 or more pay 10×). Example: moons on reels 1, 2 and 3 adding up to 4 trigger it; moons on reels 2 to 5 don't, because reel 1 has none. The reels grow to <b>8 rows by 5 reels</b>, and a glowing grid starts at 2×2.<br>
  <img src="${IMG.D}" alt="" width="34" height="34" style="vertical-align:middle;object-fit:contain"> <b>Diamonds</b> can land anywhere. After each spin the grid travels to every diamond, nearest first, to collect it, and the next spin starts wherever it stops. Diamonds grow the grid: 2×2 → 3×3 → 4×4 → 5×5 needs 5 diamonds per step, then 5×5 → 6×5 → 7×5 → 8×5 needs 3 per step.<br>
  Orbs landing <b>inside the grid</b> add their cash or MINI, MINOR or MAJOR jackpot to the pot. Orbs outside the grid don't count.<br>

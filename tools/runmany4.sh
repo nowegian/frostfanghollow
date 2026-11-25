@@ -1,7 +1,7 @@
 #!/bin/bash
 # runmany4.sh perProc procs bet [engine] [moonCfg]
-P=$1;K=$2;B=$3;E=${4:-$(dirname $0)/../src/engine.js};C=$5
-for i in $(seq 1 $K); do node $(dirname $0)/sim4.js $P $B $E "$C" & done | python3 -c "
+P=$1;K=$2;B=$3;E=${4:-./engine.js};C=$5
+for i in $(seq 1 $K); do node sim4.js $P $B $E "$C" & done | python3 -c "
 import sys,json,math
 t=None
 for l in sys.stdin:
@@ -14,5 +14,6 @@ N=t['N'];b=t['bet'];m=t['won']/N/b;sd=math.sqrt(t['sq']/N-(t['won']/N)**2)/b;se=
 pp=t['parts']
 print(f'bet \${b}: {N:,} spins  TOTAL RTP {m*100+1:.2f}% (incl 1% meter growth)  CI +/-{1.96*se*100:.2f}')
 print('  split: '+'  '.join(f'{k} {v/N/b*100:.1f}%' for k,v in pp.items())+f'   hold spins per base spin 1/{N/t[\"holdSpins\"]:.1f}')
+print('  hold features 1 in %d, %.2f spins each' % (N/t['holds'], t['holdSpins']/t['holds']))
 print('  1 in: '+', '.join(f'{k} {N/v:,.0f}' for k,v in t['cnt'].items() if v))
 "

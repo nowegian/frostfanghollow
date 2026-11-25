@@ -16,11 +16,13 @@ const ENGINE = (() => {
   const JP = {MINI:20, MINOR:50, MAJOR:300}; // x bet seeds (MAJOR also grows)
   const GRAND_SEED = 9000;           // dollars, same at every bet, grows from here
   const GRAND_K = 0.04;              // share of every bet paid back through the GRAND, at any bet size
-  const HOLD_SPIN_RATE = 1/48.2;      // Hold & Spin spins played per base-game spin (measured; set by calibration)
+  const HOLD_SPIN_RATE = 1/31.7;      // Hold & Spin spins played per base-game spin (measured; set by calibration)
   // chance a GRAND orb lands on one Hold & Spin spin: proportional to the bet, so every bet has the same payback
   const grandChance = bet => Math.min(1, GRAND_K*bet/GRAND_SEED/HOLD_SPIN_RATE);
   let rng = Math.random;
-  const HOLD_SNOW = 0;
+  // Hold & Spin: 5 rows x 5 reels (25 spots). The 3 reel rows bring their orbs in, 2 empty rows are added below.
+  const HOLD = {ROWS:5, SPINS:3, P_LAND:0.022, INIT_K:1.0, LAND_K:1.6,
+    P_SNOW:0.3, SNOW_ADD:[0.2,0.2,0.4,0.4,0.6,1,1,2]}; // Frostfang's snowballs add credits to orbs already showing numbers
   const JP_BOOST = 2;
   // orb prizes are whole credits: UNIT = the denomination (value of one credit) set by the game
   let UNIT = 0.01;
@@ -42,7 +44,7 @@ const ENGINE = (() => {
     if(r<pMaj) return {jp:'MAJOR'};
     if(r<pMaj+pMin) return {jp:'MINOR'};
     if(r<pMaj+pMin+0.02) return {jp:'MINI'};
-    const mult=[0.5,0.5,1,1,1,2,2,3,5,8][Math.floor(rng()*10)]*1.8;
+    const mult=[0.5,0.5,1,1,1,2,2,3,5,8][Math.floor(rng()*10)]*(allowBig?HOLD.LAND_K:HOLD.INIT_K);
     return {cash:money(cashOf(mult*bet,bet))};
   }
   // grid[reel][row]
@@ -73,31 +75,25 @@ const ENGINE = (() => {
     return {total:Math.round(total*100)/100, wins, orbs, moons, scatterPay,
       holdTrigger: orbs>=6, freeTrigger: moonTrig};
   }
-  // Hold & Spin step: cells = 15-array of null or {cash|jp|plus}; returns events
+  // Hold & Spin step: cells = 25-array (5 rows x 5) of null or {cash|jp}; returns events
+  // {i,type:'orb'} = a new orb landed (resets the spins); {i,type:'snow',add} = a snowball added credits to a cash orb
   function holdStep(cells, bet){
-    const events=[];
+    const events=[], N=cells.length;
     // the rare GRAND orb: more likely at bigger bets
-    { const e=[]; for(let i=0;i<15;i++) if(!cells[i]) e.push(i);
+    { const e=[]; for(let i=0;i<N;i++) if(!cells[i]) e.push(i);
       if(e.length && rng()<grandChance(bet)){ const i=e[Math.floor(rng()*e.length)]; cells[i]={jp:'GRAND'}; events.push({i,type:'orb',grand:true}); } }
-    for(let i=0;i<15;i++){ if(!cells[i] && rng()<0.022){ cells[i]=orbValue(bet,true); events.push({i,type:'orb'}); } }
-    // (snowball prizes now live in the Moonrise Bonus; HOLD_SNOW keeps the old toss available)
-    let empties=[]; for(let i=0;i<15;i++) if(!cells[i]) empties.push(i);
-    if(HOLD_SNOW && empties.length && rng()<0.10){
-      const n=1+Math.floor(rng()*Math.min(3,empties.length));
-      for(let k=0;k<n;k++){
-        const j=Math.floor(rng()*empties.length), i=empties.splice(j,1)[0];
-        const r=rng(); let v;
-        if(r<0.10) v={plus:1};
-        else if(r<0.105) v={jp:"MAJOR"};
-        else if(r<0.129) v={jp:"MINOR"};
-        else if(r<0.179) v={jp:"MINI"};
-        else v={cash:money(cashOf([1,2,2,3,5][Math.floor(rng()*5)]*1.8*bet,bet))};
-        cells[i]=Object.assign(v,{snow:true}); events.push({i,type:'snow'});
-      }
+    for(let i=0;i<N;i++){ if(!cells[i] && rng()<HOLD.P_LAND){ cells[i]=orbValue(bet,true); events.push({i,type:'orb'}); } }
+    // Frostfang throws 1 or 2 snowballs at numbers already on the screen
+    const nums=[]; for(let i=0;i<N;i++) if(cells[i] && cells[i].cash!=null) nums.push(i);
+    if(nums.length && rng()<HOLD.P_SNOW){
+      const n=Math.min(nums.length, rng()<0.35?2:1);
+      for(let k=0;k<n;k++){ const i=nums.splice(Math.floor(rng()*nums.length),1)[0];
+        const add=money(cashOf(HOLD.SNOW_ADD[Math.floor(rng()*HOLD.SNOW_ADD.length)]*bet,bet));
+        cells[i].cash=money(cells[i].cash+add); events.push({i,type:'snow',add}); }
     }
     return events;
   }
-  // all 15 spots filled doubles the win (a GRAND is paid once, not doubled)
+  // every spot filled doubles the win (a GRAND is paid once, not doubled)
   function holdTotal(cells, bet, jpVals){
     let t=0, g=0; cells.forEach(c=>{ if(!c) return; if(c.cash) t+=c.cash; if(c.jp==='GRAND') g+=jpVals.GRAND; else if(c.jp) t+=jpVals[c.jp]; });
     if(cells.every(c=>c)) t*=2;
@@ -226,6 +222,6 @@ const ENGINE = (() => {
     const min=Math.round(MOON.MIN_PAY*bet*100)/100, add=Math.max(0, Math.round((min-st.pot)*100)/100);
     st.pot=Math.round((st.pot+add)*100)/100; return add;
   }
-  return {setUnit:u=>{UNIT=u}, moonEnsure, moonSnow, moonFinish,SYM,PAY,JP,GRAND_SEED,GRAND_K,HOLD_SPIN_RATE,grandChance,MOON,inZone,moonStart,moonGrid,moonResolve,spinGrid,evaluate,holdStep,holdTotal,orbValue,setRng:f=>rng=f};
+  return {HOLD,setUnit:u=>{UNIT=u}, moonEnsure, moonSnow, moonFinish,SYM,PAY,JP,GRAND_SEED,GRAND_K,HOLD_SPIN_RATE,grandChance,MOON,inZone,moonStart,moonGrid,moonResolve,spinGrid,evaluate,holdStep,holdTotal,orbValue,setRng:f=>rng=f};
 })();
 if(typeof module!=='undefined') module.exports=ENGINE;
