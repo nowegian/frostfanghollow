@@ -917,7 +917,7 @@ drawSound();
 $('refill').onclick=()=>{if(busy)return;S.credit=Math.round((S.credit+START)*100)/100;save();drawMeters();say('+$100. Fresh snow, fresh credits!')};
 
 document.addEventListener('keydown',e=>{if(e.code==='Space'&&$('pays').classList.contains('hidden')&&$('soundM').classList.contains('hidden')){e.preventDefault();$('spin').click()}});
-$('info').onclick=()=>{const u=bet()/25*E.LINE.K;let pt='';for(const s of ['P','S','B','C','A','K','Q','J','T']){const p=E.PAY[s];pt+=`<div>${ART[s]}<br>5: ${fmt(p[5]*u)}<br>4: ${fmt(p[4]*u)}<br>3: ${fmt(p[3]*u)}</div>`}
+$('info').onclick=()=>{const u=bet()/50;let pt='';for(const s of ['P','S','B','C','A','K','Q','J','T']){const p=E.PAY[s];pt+=`<div>${ART[s]}<br>5: ${fmt(p[5]*u)}<br>4: ${fmt(p[4]*u)}<br>3: ${fmt(p[3]*u)}</div>`}
  $('payCard').innerHTML=`<button class="close" onclick="document.getElementById('pays').classList.add('hidden')">Close</button><h3>How to play</h3>
  <p>243 ways to win. Match symbols on adjacent reels from the left. Pays shown per way at your current bet of ${fmt(bet())}.</p>
  <div class="pt">${pt}</div>

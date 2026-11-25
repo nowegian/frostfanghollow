@@ -6,9 +6,10 @@ const ENGINE = (() => {
     O:{name:'Orb'}, M:{name:'Moon'}
   };
   // pay per way, as multiple of (bet / 25)
+  // pays in credits at the 1x bet (50 credits), always in steps of 10, so every win is a whole number of 10-credit steps
   const PAY = {
-    P:{3:35,4:107,5:342}, S:{3:25,4:78,5:257}, B:{3:21,4:51,5:172}, C:{3:17,4:44,5:128},
-    A:{3:8,4:21,5:65}, K:{3:8,4:21,5:65}, Q:{3:4,4:17,5:44}, J:{3:4,4:17,5:44}, T:{3:4,4:13,5:35}
+    P:{3:50,4:160,5:500}, S:{3:40,4:120,5:380}, B:{3:30,4:80,5:250}, C:{3:20,4:60,5:190},
+    A:{3:10,4:30,5:90}, K:{3:10,4:30,5:90}, Q:{3:10,4:30,5:60}, J:{3:10,4:30,5:60}, T:{3:10,4:20,5:50}
   };
   // Regular spins: no orbs. Frostfang (F) is a bonus symbol on reels 1, 3 and 5 only; moons (M) on any reel.
   // At most one moon and one Frostfang per reel.
@@ -77,7 +78,7 @@ const ENGINE = (() => {
     return {cash:money(cashOf(v*bet,bet))};
   }
   function evaluate(g, bet, mult){
-    mult=mult||1; const unit=bet/25*mult*LINE.K, wins=[]; let total=0;
+    mult=mult||1; const unit=bet/50*mult, wins=[]; let total=0;   // bet/50 = dollars per credit at this bet
     for(const s in PAY){
       let ways=1, n=0; const cells=[];
       for(let r=0;r<5;r++){
@@ -86,7 +87,7 @@ const ENGINE = (() => {
         ways*=hits.length; n++; hits.forEach(y=>cells.push([r,y]));
       }
       if(n>=3 && g[0].some(c=>c.s===s)){
-        const amt=PAY[s][n]*ways*unit; total+=amt; wins.push({s,n,ways,amt,cells});
+        const amt=Math.round(PAY[s][n]*ways*unit*100)/100; total+=amt; wins.push({s,n,ways,amt,cells});
       }
     }
     let orbs=0; g.forEach(col=>col.forEach(c=>{ if(c.s==='O') orbs++; }));
