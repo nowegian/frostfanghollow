@@ -272,12 +272,12 @@ button{font-family:inherit;cursor:pointer;border:none;color:#fff;font-weight:700
 
 #creditCr{display:none}
 
-/* ---- Moonrise grid = one solid shape; inside it only orbs, diamonds and +1 SPIN cubes show ---- */
-#beast{z-index:4;border-radius:12px;background:#0a0620;
- box-shadow:0 0 0 2px #d6f3ff,0 0 18px #6cc8ffcc,inset 0 0 24px #0b123acc;overflow:hidden}
+/* ---- Diamond Hunt: the grid is invisible. Only Frostfang shows, sized to the grid and moving with it;
+   the spots under him look like every other spot, and orbs, diamonds and +1 SPIN cubes sit in front of him ---- */
+#beast{z-index:4;border-radius:0;background:transparent;box-shadow:none;overflow:visible}
 #beast img.ffimg{opacity:1}
-.grid.moon .cell.zone{background:transparent;box-shadow:none;opacity:1}
-.grid.moon .cell.zone[data-s="O"],.grid.moon .cell.zone[data-s="D"],.grid.moon .cell.zone[data-s="X"]{z-index:5;background:transparent}
+.grid.moon .cell.zone{background:linear-gradient(#1a1240,#0e0828);box-shadow:none;opacity:.55}
+.grid.moon .cell.zone[data-s="O"],.grid.moon .cell.zone[data-s="D"],.grid.moon .cell.zone[data-s="X"]{z-index:5;opacity:1;background:linear-gradient(#1a12408c,#0e08288c)}
 .grid.moon .cell.zone.got{z-index:5}
 .grid.moon .cell[data-s="O"],.grid.moon .cell[data-s="D"]{opacity:1}
 .grid.moon .cell:not(.zone)[data-s="O"],.grid.moon .cell:not(.zone)[data-s="D"]{background:linear-gradient(#1a12408c,#0e08288c)}
@@ -1292,7 +1292,7 @@ for(const k of 'WFPSBCAKQJTOMXD')ART[k]=ART2[k];
 const IMG={F:'img/sym_frostfang.webp',B:'img/sym_bat.webp',S:'img/sym_skull.webp',P:'img/sym_pumpkin.webp',K:'img/sym_K.webp',A:'img/sym_A.webp',C:'img/sym_candles.webp',W:'img/sym_wild.webp',O:'img/sym_orb.webp',T:'img/sym_10.webp',J:'img/sym_J.webp',Q:'img/sym_Q.webp',M:'img/sym_moon.webp',D:'img/sym_diamond.webp',X:'img/bonus_plus1.webp'};
 for(const k in IMG){ART[k]=`<img class="symimg${k==='O'?' orbimg':''}" src="${IMG[k]}" alt="" draggable="false">`;const pre=new Image();pre.src=IMG[k];}
 // extra artwork that isn't a plain reel symbol: jackpot orbs (shown instead of orb + label) and the +1 diamond
-const XIMG={PICK:'img/snowball_pick.webp',SPLAT:'img/splat.webp',CRACK:'img/ice_crack.webp',SMASH:'img/frostfang_smash.webp',T_SNOW:'img/title_snowball_fight.webp',T_HUNT:'img/title_diamond_hunt.webp',T_FREE:'img/title_free_games.webp',MINI:'img/orb_mini.webp',MINOR:'img/orb_minor.webp',MAJOR:'img/orb_major.webp',GRAND:'img/orb_grand.webp',DPLUS:'img/sym_diamond_plus.webp',SNOW:'img/fx_snowball.webp'};
+const XIMG={PICK:'img/snowball_pick.webp',SPLAT:'img/splat.webp',CRACK:'img/ice_crack.webp',SMASH:'img/frostfang_smash.webp',T_SNOW:'img/title_snowball_fight.webp',T_HUNT:'img/title_diamond_hunt.webp',T_FREE:'img/title_free_games.webp',T_LINK:'img/title_frost_link.webp',MINI:'img/orb_mini.webp',MINOR:'img/orb_minor.webp',MAJOR:'img/orb_major.webp',GRAND:'img/orb_grand.webp',DPLUS:'img/sym_diamond_plus.webp',SNOW:'img/fx_snowball.webp'};
 for(const k in XIMG){const pre=new Image();pre.src=XIMG[k];}
 const imgTag=src=>`<img class="symimg" src="${src}" alt="" draggable="false">`;
 const orbHTML=v=>v&&v.jp&&XIMG[v.jp]?imgTag(XIMG[v.jp]):ART.O+valHTML(v);
@@ -1615,7 +1615,7 @@ async function bigWin(total){SOUND.play('winBig');cheer(3500);peek('W',3200,true
 // ---------- Frost Link (the orb bonus, 5 rows x 5) ----------
 async function holdAndSpin(g,fromFree){
  inHold=true;SOUND.play('feature');SOUND.music('hold');say('Frost Link! Lock those orbs!',2400);
- showMsg(`<h2>FROST LINK!</h2>`);
+ showMsg(`<img class="ttl" src="${XIMG.T_LINK}" alt="Frost Link Bonus">`);
  await sleep(1800);hideMsg();clearMarks();
  const N=25,H=Array(N).fill(null);g.forEach((col,r)=>col.forEach((c,y)=>{if(c.s==='O')H[y*5+r]=Object.assign({},c.orb)}));
  const dead=()=>{const s='FPSBCAKQJTW'[Math.floor(Math.random()*11)];return `<div class="dead">${ART[s]}</div>`};
