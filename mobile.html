@@ -50,6 +50,41 @@ h1 span{background:linear-gradient(180deg,#ffe08a,var(--pump));-webkit-backgroun
 .frame>.grid{position:absolute;z-index:1;left:10%;right:10.2%;top:15.4%;bottom:21%;grid-template-rows:repeat(3,1fr);border-radius:4px}
 .frame>.grid .cell,.frame>.grid.moon .cell{aspect-ratio:auto;min-height:0}
 .frame.moonf{aspect-ratio:1600/1900}
+/* free games: the frame glows moonlight blue */
+.frame.freef::after{filter:drop-shadow(0 8px 18px #000c) drop-shadow(0 0 16px #8fd3ff) hue-rotate(-12deg) brightness(1.08)}
+.frame.freef>.grid{box-shadow:0 0 30px #6cc8ff66 inset}
+/* Ice Crack */
+.crack{position:absolute;left:50%;top:48%;width:78%;height:76%;object-fit:contain;transform:translate(-50%,-50%);z-index:9;pointer-events:none;filter:drop-shadow(0 0 6px #9fe3ff) brightness(1.15);animation:crackin .22s ease-out}
+@keyframes crackin{from{transform:translate(-50%,-50%) scale(.15);opacity:.4}to{transform:translate(-50%,-50%) scale(1);opacity:1}}
+.crack.fade{transition:opacity .6s;opacity:0}
+/* Frostfang punches the glass: his fist (73% across, 55% down the picture) lands on the centre of the reels */
+.smash{position:absolute;left:50%;top:48%;height:92%;transform:translate(-73%,-55%) scale(1);transform-origin:73% 55%;z-index:10;pointer-events:none;
+ filter:drop-shadow(0 10px 20px #000c);animation:smashin .52s cubic-bezier(.5,0,.75,0) both}
+@keyframes smashin{from{transform:translate(-73%,-55%) scale(.35);opacity:0}60%{opacity:1}to{transform:translate(-73%,-55%) scale(1.08);opacity:1}}
+.smash.away{transition:opacity .45s,transform .45s;opacity:0;transform:translate(-73%,-40%) scale(.9)}
+.frame.shake{animation:fshake .45s}@keyframes fshake{20%{transform:translate(-6px,3px)}40%{transform:translate(5px,-4px)}60%{transform:translate(-4px,-2px)}80%{transform:translate(3px,3px)}}
+/* Snowball Fight */
+.splat{position:absolute;left:50%;top:45%;width:62%;transform:translate(-50%,-50%) scale(.2);z-index:9;pointer-events:none;
+ filter:drop-shadow(0 0 10px #bfe9ff);animation:splat .9s ease-out forwards}
+.msg img.ttl{display:block;width:min(86%,560px);height:auto;max-height:46%;object-fit:contain;filter:drop-shadow(0 8px 16px #000c);animation:ttlin .5s cubic-bezier(.3,1.5,.5,1)}
+.msg img.ttl.ttls{width:min(70%,380px);max-height:30%}
+@keyframes ttlin{from{transform:scale(.3);opacity:0}to{transform:scale(1);opacity:1}}
+.sfball{position:relative}
+.sfball .sfsplat{position:absolute;inset:-25%;width:150%;height:150%;object-fit:contain;opacity:0;pointer-events:none;animation:sfsplat .6s ease-out}
+@keyframes sfsplat{0%{opacity:1;transform:scale(.4)}100%{opacity:0;transform:scale(1.1)}}
+.sfball>.symimg{position:relative}
+@keyframes splat{0%{transform:translate(-50%,-50%) scale(.2)}25%{transform:translate(-50%,-50%) scale(1.1)}70%{opacity:1}100%{transform:translate(-50%,-50%) scale(1.15);opacity:0}}
+.msg.sf{background:#0b0720e8}
+.ball.flyorb{position:fixed}.ball.flyorb .val{position:absolute;inset:auto 0 auto 0;top:40%;transform:translateY(-50%);text-align:center;font-weight:700;font-size:clamp(12px,2vw,20px);color:#fff;text-shadow:0 2px 0 #2a0b5c,0 0 6px #000}
+.sfgrid{display:grid;grid-template-columns:repeat(6,1fr);gap:clamp(4px,1vw,10px);width:min(94%,620px);margin-top:10px}
+.sfball{aspect-ratio:1;border-radius:50%;padding:2%;background:radial-gradient(circle at 40% 35%,#3a2f7a,#140c33);border:2px solid #bfe9ff55;display:flex;align-items:center;justify-content:center;transition:transform .15s}
+.sfball:not(.open):hover{transform:scale(1.08);border-color:#bfe9ff}
+.sfball img,.sfball svg{width:100%;height:100%;object-fit:contain}
+.sfball.open{background:radial-gradient(circle,#2b4fae,#121a4a);animation:land .35s}
+.sfball.two{box-shadow:0 0 0 3px var(--gold)}
+.sfball.won{box-shadow:0 0 0 3px #7dff9a,0 0 18px #7dff9a;transform:scale(1.08)}
+.sfball.rest{opacity:.35}
+.sfx{font-weight:700;font-size:clamp(14px,2.6vw,24px);color:#fff;line-height:1;text-align:center}.sfx small{display:block;font-size:.5em;opacity:.85;margin-top:2px}
 /* Frostfang peeking into the reel window: a clipped box over the reels, behind the stone frame, so his cut-off body hides under the stone */
 .peekbox{position:absolute;z-index:2;overflow:hidden;pointer-events:none;border-radius:4px}
 .peekbox.over{z-index:11}
@@ -238,12 +273,15 @@ button{font-family:inherit;cursor:pointer;border:none;color:#fff;font-weight:700
 #creditCr{display:none}
 
 /* ---- Moonrise grid = one solid shape; inside it only orbs, diamonds and +1 SPIN cubes show ---- */
-#beast{z-index:4;border-radius:12px;background:radial-gradient(ellipse at 50% 40%,#3d64d6,#1d2f86 70%,#14205e);
+#beast{z-index:4;border-radius:12px;background:#0a0620;
  box-shadow:0 0 0 2px #d6f3ff,0 0 18px #6cc8ffcc,inset 0 0 24px #0b123acc;overflow:hidden}
-#beast img.ffimg{opacity:.85}
+#beast img.ffimg{opacity:1}
 .grid.moon .cell.zone{background:transparent;box-shadow:none;opacity:1}
 .grid.moon .cell.zone[data-s="O"],.grid.moon .cell.zone[data-s="D"],.grid.moon .cell.zone[data-s="X"]{z-index:5;background:transparent}
 .grid.moon .cell.zone.got{z-index:5}
+.grid.moon .cell[data-s="O"],.grid.moon .cell[data-s="D"]{opacity:1}
+.grid.moon .cell:not(.zone)[data-s="O"],.grid.moon .cell:not(.zone)[data-s="D"]{background:linear-gradient(#1a12408c,#0e08288c)}
+.grid.moon .cell .val.gemv,.grid.moon .tile .val.gemv{inset:auto 0 3%!important;top:auto!important;transform:none;font-size:clamp(10px,1.9vw,16px);color:#e8fbff;text-shadow:0 0 6px #2a7bd6,0 2px 0 #06204a,0 0 3px #000}
 #beast.zgrow{animation:zgrow .7s ease-out}
 
 /* ================= phone layout ================= */
@@ -328,6 +366,8 @@ button{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 .cab.m .mbar{grid-area:bar;grid-template-columns:1fr 1fr;gap:6px;margin:0}
 .cab.m .mbar #spin{grid-column:1/-1;grid-row:1;justify-self:center;width:clamp(74px,11vw,96px);font-size:clamp(17px,2.6vw,21px)}
 .cab.m .mbar .tg{padding:8px 2px;font-size:11px;white-space:nowrap}
+.cab.m .msg h2{font-size:clamp(22px,9dvh,40px)}.cab.m .msg img.ttl{max-height:38%}.cab.m .msg img.ttl.ttls{max-height:24%}.cab.m .msg .big{font-size:clamp(20px,8dvh,34px)}.cab.m .msg p{font-size:13px;margin-top:4px}
+.cab.m .sfgrid{width:min(96%,calc((var(--H) - 110px)*3.2));margin-top:6px}
 }
 </style>
 </head>
@@ -345,7 +385,7 @@ button{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
     <div class="jp mini" id="jpMINI"><b>MINI</b><i>$0</i></div>
   </div>
   <div class="stage">
-    <div class="frame">
+    <div class="frame" id="frameEl">
       <div class="banner hidden" id="banner"><span id="bannerTxt"></span></div>
       <div class="grid" id="grid"><div id="beast" class="idle"></div></div>
       <div class="peekbox" id="peekbox"></div>
@@ -354,7 +394,7 @@ button{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
     </div>
     <div class="meter hidden" id="meter"></div>
   </div>
-  <div class="win-line" id="winLine">6+ orbs start the Hold &amp; Spin. 4+ moons in a row from reel 1 start the Moonrise.</div>
+  <div class="win-line" id="winLine">3 moons in a row from reel 1 = free games. Frostfang on 1, 3, 5 = Diamond Hunt.</div>
   <div class="mstats">
     <div class="box bank" id="bankBox"><small>CREDIT <span class="unit" id="bankUnit"><b class="d">$</b><b class="c">CR</b></span></small><div id="credit">$0</div><small id="creditCr" class="cr"></small></div>
     <div class="box betbox"><div class="denoms" id="denoms"></div>
@@ -398,16 +438,24 @@ const ENGINE = (() => {
   };
   // pay per way, as multiple of (bet / 25)
   const PAY = {
-    F:{3:51,4:172,5:642}, P:{3:35,4:107,5:342}, S:{3:25,4:78,5:257}, B:{3:21,4:51,5:172}, C:{3:17,4:44,5:128},
+    P:{3:35,4:107,5:342}, S:{3:25,4:78,5:257}, B:{3:21,4:51,5:172}, C:{3:17,4:44,5:128},
     A:{3:8,4:21,5:65}, K:{3:8,4:21,5:65}, Q:{3:4,4:17,5:44}, J:{3:4,4:17,5:44}, T:{3:4,4:13,5:35}
   };
-  const BASE_W = {F:3,P:5,S:6,B:7,C:8,A:10,K:10,Q:12,J:12,T:12,W:3,O:13.3,M:14};
-  const MOON_REELS = [0,1,2,3,4]; // moons can land on any reel
-  const FREE_W = Object.assign({}, BASE_W, {W:4, M:1});
+  // Regular spins: no orbs. Frostfang (F) is a bonus symbol on reels 1, 3 and 5 only; moons (M) on any reel.
+  // At most one moon and one Frostfang per reel.
+  const BASE_W = {F:7,P:5,S:6,B:7,C:8,A:10,K:10,Q:12,J:12,T:12,W:3,M:7};
+  const MOON_REELS = [0,1,2,3,4];
+  const F_REELS = {base:[0,2,4], free:[4]};    // in free games Frostfang only lands on reel 5, where he collects orbs
+  const FREE_W = Object.assign({}, BASE_W, {W:6, M:3.5, O:14, F:10});
+  const LINE = {K:0.75};                           // scales every line pay
+  const FREE_GAMES = {3:6, 4:8, 5:10};          // moons on touching reels from reel 1
+  const FG = {COLLECT_STEP:4, MAX_MULT:3, ORB_K:1.8};  // every 4 collections raise the orb multiplier (x2, then x3)
+  const RANDOM = {CRACK:1/230, SNOWBALL:1/700};  // surprise features on regular spins
+  const SNOWFIGHT = {MINI:0.60, X1:0.12, X2:0.10, X3:0.08, MINOR:0.08, MAJOR:0.02};
   const JP = {MINI:20, MINOR:50, MAJOR:300}; // x bet seeds (MAJOR also grows)
   const GRAND_SEED = 9000;           // dollars, same at every bet, grows from here
   const GRAND_K = 0.04;              // share of every bet paid back through the GRAND, at any bet size
-  const HOLD_SPIN_RATE = 1/31.7;      // Hold & Spin spins played per base-game spin (measured; set by calibration)
+  const HOLD_SPIN_RATE = 1/32.5;      // Hold & Spin spins played per base-game spin (measured; set by calibration)
   // chance a GRAND orb lands on one Hold & Spin spin: proportional to the bet, so every bet has the same payback
   const grandChance = bet => Math.min(1, GRAND_K*bet/GRAND_SEED/HOLD_SPIN_RATE);
   let rng = Math.random;
@@ -421,8 +469,8 @@ const ENGINE = (() => {
   const cashOf = (v, bet) => { const step = bet / 5; return Math.max(step, Math.round(v / step) * step); };
   const money = v => Math.round(v * 100) / 100;
 
-  function pick(weights, reel){
-    const skip=k=>(k==='W'&&reel===0)||(k==='M'&&!MOON_REELS.includes(reel));
+  function pick(weights, reel, mode){
+    const skip=k=>(k==='W'&&reel===0)||(k==='M'&&!MOON_REELS.includes(reel))||(k==='F'&&!F_REELS[mode||'base'].includes(reel));
     let tot=0; for(const k in weights){ if(skip(k)) continue; tot+=weights[k]; }
     let r=rng()*tot;
     for(const k in weights){ if(skip(k)) continue; r-=weights[k]; if(r<0) return k; }
@@ -438,14 +486,29 @@ const ENGINE = (() => {
     const mult=[0.5,0.5,1,1,1,2,2,3,5,8][Math.floor(rng()*10)]*(allowBig?HOLD.LAND_K:HOLD.INIT_K);
     return {cash:money(cashOf(mult*bet,bet))};
   }
-  // grid[reel][row]
-  function spinGrid(bet, free){
-    const w = free?FREE_W:BASE_W, g=[];
-    for(let r=0;r<5;r++){ const col=[]; for(let y=0;y<3;y++){ const s=pick(w,r); col.push(s==='O'?{s,orb:orbValue(bet,false)}:{s}); } g.push(col); }
+  // grid[reel][row]; free = free games (orbs land, Frostfang only on reel 5); fs = free-game state (orb multiplier)
+  const FILL5='PSBCAKQJT';
+  function spinGrid(bet, free, fs){
+    const w = free?FREE_W:BASE_W, mode=free?'free':'base', g=[];
+    for(let r=0;r<5;r++){ const col=[]; let m=0,f=0;
+      for(let y=0;y<3;y++){ let s=pick(w,r,mode);
+        if((s==='M'&&m)||(s==='F'&&f)) s=FILL5[Math.floor(rng()*FILL5.length)];
+        if(s==='M') m=1; if(s==='F') f=1;
+        col.push(s==='O'?{s,orb:freeOrb(bet,fs)}:{s}); }
+      g.push(col); }
     return g;
   }
+  // orbs in free games: cash (raised by the collection multiplier) or now and then a jackpot
+  function freeOrb(bet, fs){
+    const r=rng(), mult=fs?fs.mult:1;
+    if(r<0.0008*JP_BOOST) return {jp:'MAJOR'};
+    if(r<0.0008*JP_BOOST+0.004*JP_BOOST) return {jp:'MINOR'};
+    if(r<0.0008*JP_BOOST+0.004*JP_BOOST+0.012) return {jp:'MINI'};
+    const v=[0.5,0.5,1,1,1,2,2,3,5,8][Math.floor(rng()*10)]*FG.ORB_K*mult;
+    return {cash:money(cashOf(v*bet,bet))};
+  }
   function evaluate(g, bet, mult){
-    mult=mult||1; const unit=bet/25*mult, wins=[]; let total=0;
+    mult=mult||1; const unit=bet/25*mult*LINE.K, wins=[]; let total=0;
     for(const s in PAY){
       let ways=1, n=0; const cells=[];
       for(let r=0;r<5;r++){
@@ -457,14 +520,52 @@ const ENGINE = (() => {
         const amt=PAY[s][n]*ways*unit; total+=amt; wins.push({s,n,ways,amt,cells});
       }
     }
-    let orbs=0, moons=0;
-    g.forEach(col=>col.forEach(c=>{ if(c.s==='O') orbs++; if(c.s==='M') moons++; }));
-    // Moonrise: moons on touching reels starting from reel 1, no gaps; 4+ moons in that run trigger
-    let runMoons=0; for(let r=0;r<5;r++){ const n=g[r].filter(c=>c.s==='M').length; if(!n) break; runMoons+=n; }
-    const moonTrig=runMoons>=4; moons=runMoons;
-    let scatterPay=0; if(moonTrig) { scatterPay=bet*(moons===4?1:moons===5?3:10); total+=scatterPay; }
-    return {total:Math.round(total*100)/100, wins, orbs, moons, scatterPay,
-      holdTrigger: orbs>=6, freeTrigger: moonTrig};
+    let orbs=0; g.forEach(col=>col.forEach(c=>{ if(c.s==='O') orbs++; }));
+    // free games: moons on touching reels starting from reel 1 (one per reel); 3, 4, 5 reels = 6, 8, 10 free games
+    let run=0; for(let r=0;r<5;r++){ if(g[r].some(c=>c.s==='M')) run++; else break; }
+    const freeGames=FREE_GAMES[run]||0;
+    // Diamond Hunt: Frostfang on reels 1, 3 and 5 pays 2x the bet
+    const fr=[0,2,4].filter(r=>g[r].some(c=>c.s==='F')).length;
+    const huntTrigger=fr===3; let scatterPay=0; if(huntTrigger){ scatterPay=bet*2; total+=scatterPay; }
+    return {total:Math.round(total*100)/100, wins, orbs, moons:run, freeGames, freeTrigger:freeGames>0, huntTrigger, scatterPay,
+      holdTrigger: orbs>=6};
+  }
+  // ===== Moonrise Free Games =====
+  function freeStart(n){ return {left:n, played:0, collects:0, mult:1, total:0}; }
+  // one free game: returns the grid, its line result, extra games, Frostfang's collection, and whether Frost Link starts
+  function freeSpin(fs, bet){
+    fs.left--; fs.played++;
+    const g=spinGrid(bet,true,fs), ev=evaluate(g,bet);
+    const out={g, ev, more:ev.freeGames, link:ev.orbs>=6, collect:null, multUp:false};
+    fs.left+=ev.freeGames;
+    if(!out.link && ev.orbs && g[4].some(c=>c.s==='F')){
+      const list=[]; g.forEach((col,r)=>col.forEach((c,y)=>{ if(c.s==='O') list.push({r,y,orb:c.orb}); }));
+      out.collect=list; fs.collects++;
+      const m=Math.min(FG.MAX_MULT, 1+Math.floor(fs.collects/FG.COLLECT_STEP));
+      if(m>fs.mult){ fs.mult=m; out.multUp=true; }
+    }
+    return out;
+  }
+  // ===== surprise features on regular spins =====
+  const crackRoll=()=>rng()<RANDOM.CRACK;
+  // Ice Crack: Frostfang smashes the glass and 6 to 9 orbs appear, starting Frost Link
+  function crackOrbs(g, bet){
+    const n=[6,6,6,7,7,8,9][Math.floor(rng()*7)], spots=[]; for(let i=0;i<15;i++) spots.push(i);
+    const out=[]; for(let k=0;k<n;k++){ const i=spots.splice(Math.floor(rng()*spots.length),1)[0], r=i%5, y=Math.floor(i/5);
+      g[r][y]={s:'O',orb:orbValue(bet,false)}; out.push({r,y}); }
+    return out;
+  }
+  const snowRoll=()=>rng()<RANDOM.SNOWBALL;
+  // Snowball Fight: pick snowballs until one prize shows 3 times. Returns the prize and the order the picks reveal.
+  function snowFight(){
+    const keys=Object.keys(SNOWFIGHT); let x=rng(), prize=keys[keys.length-1];
+    for(const k of keys){ if((x-=SNOWFIGHT[k])<0){ prize=k; break; } }
+    const others=[]; keys.forEach(k=>{ if(k!==prize){ others.push(k,k); } });
+    const nOther=Math.floor(rng()*Math.min(9,others.length+1));
+    const seq=[prize,prize]; for(let k=0;k<nOther;k++) seq.push(others.splice(Math.floor(rng()*others.length),1)[0]);
+    for(let k=seq.length-1;k>0;k--){ const j=Math.floor(rng()*(k+1)); [seq[k],seq[j]]=[seq[j],seq[k]]; }
+    seq.push(prize);
+    return {prize, seq};
   }
   // Hold & Spin step: cells = 25-array (5 rows x 5) of null or {cash|jp}; returns events
   // {i,type:'orb'} = a new orb landed (resets the spins); {i,type:'snow',add} = a snowball added credits to a cash orb
@@ -492,11 +593,13 @@ const ENGINE = (() => {
   }
   // ===== Moonrise bonus: 8 rows x 5 reels, growing collection grid =====
   const MOON = {
-    ROWS: 8, START_SPINS: 3, RESET_SPINS: 3, GROW_SPINS: 0,
+    ROWS: 8, START_SPINS: 5,
+    GRID_SPINS: [2,3,4], GRID_SPINS_W: [0.45,0.35,0.20],   // finishing a grid (it grows) adds 2-4 spins at random
     STEPS: [[2,2],[3,3],[4,4],[5,5],[6,5],[7,5],[8,5]], // [rows, cols]
-    NEED:  [5,5,5,5,3,3],                                // diamonds to leave each step
-    P_DIAMOND: 0.016, P_ORB: 0.04, P_PLUS: 0.15, // P_PLUS: share of diamonds that also give +1 spin
-    VAL: 0.25, JPS: 0.25,  // VAL scales orb cash values, JPS scales each orb's jackpot chance
+    NEED:  [5,4,3,3,3,3],                                // diamonds to finish each grid: 2x2 needs 5, 3x3 needs 4, then 3 each
+    P_DIAMOND: 0.021, P_ORB: 0.04, P_PLUS: 0.22, // P_PLUS: share of diamonds that also give +1 spin
+    VAL: 0.18, JPS: 0.25,  // VAL scales orb cash values, JPS scales each orb's jackpot chance
+    DVAL: 0.19,            // regular diamonds carry credits too (scaled like orbs); +1 SPIN diamonds carry none
     MIN_PAY: 0, GUARANTEE: 1, P_SNOW: 0.18, SNOW_VAL: 0.4, SNOW_ODDS: [0.08, 0.002, 0.008, 0.015]       // every Moonrise Bonus pays at least this many times the bet
   };
   // The grid is a moving window: st.row/st.col = its top-left cell, size from STEPS[st.level]
@@ -543,7 +646,7 @@ const ENGINE = (() => {
     const g=[];
     for(let r=0;r<5;r++){ const col=[]; for(let y=0;y<MOON.ROWS;y++){
       const x=rng();
-      if(x<MOON.P_DIAMOND) col.push(rng()<MOON.P_PLUS?{s:'D',plus:1}:{s:'D'});
+      if(x<MOON.P_DIAMOND) col.push(rng()<MOON.P_PLUS?{s:'D',plus:1}:{s:'D',cash:money(cashOf([0.5,1,1,2,2,3,5][Math.floor(rng()*7)]*MOON.DVAL*bet,bet))});
       else if(x<MOON.P_DIAMOND+MOON.P_ORB) col.push({s:'O',orb:moonOrb(bet)});
       else col.push({s:FILL[Math.floor(rng()*FILL.length)]});
     } g.push(col); }
@@ -583,7 +686,7 @@ const ENGINE = (() => {
       if(c.s==='O'){ if(inZone(st,r,y)){ const v=c.orb.jp?jpVals[c.orb.jp]:c.orb.cash; st.pot+=v; ev.collected.push({r,y,v,jp:c.orb.jp}); } else ev.missed.push({r,y}); }
     }));
     ev.plus=0; g.forEach((col,r)=>col.forEach((c,y)=>{ if(c.s==='X' && inZone(st,r,y)){ st.spins++; ev.plus++; } }));
-    const left=[]; g.forEach((col,r)=>col.forEach((c,y)=>{ if(c.s==='D') left.push({r,y,plus:c.plus||0}); }));
+    const left=[]; g.forEach((col,r)=>col.forEach((c,y)=>{ if(c.s==='D') left.push({r,y,plus:c.plus||0,cash:c.cash||0}); }));
     while(left.length){
       // nearest diamond to the grid; ties go to the one higher up, then further left
       let bi=0; for(let i=1;i<left.length;i++){
@@ -592,14 +695,17 @@ const ENGINE = (() => {
       }
       const d=left.splice(bi,1)[0];
       moveTo(st,d.r,d.y);
-      // every diamond resets the spins to 3; a +1 diamond adds one more on top
-      st.spins=Math.max(st.spins,MOON.RESET_SPINS)+d.plus;
-      const step={r:d.r,y:d.y,row:st.row,col:st.col,level:st.level,grew:false,plus:d.plus,spins:st.spins};
+      // diamonds no longer reset the spins: a +1 diamond adds one spin, the others pay their credits into the pot
+      st.spins+=d.plus; if(d.cash) st.pot+=d.cash;
+      const step={r:d.r,y:d.y,row:st.row,col:st.col,level:st.level,grew:false,plus:d.plus,cash:d.cash,spins:st.spins};
       if(st.level<MOON.STEPS.length-1){
         st.gems++;
         if(st.gems>=MOON.NEED[st.level]){
           st.gems=0; st.level++; growAround(st);
-          Object.assign(step,{grew:true,growRow:st.row,growCol:st.col,growLevel:st.level});
+          // finishing a grid adds 2-4 spins
+          let x=rng()*MOON.GRID_SPINS_W.reduce((a,b)=>a+b,0),k=0; while(k<MOON.GRID_SPINS.length-1 && (x-=MOON.GRID_SPINS_W[k])>=0) k++;
+          const add=MOON.GRID_SPINS[k]; st.spins+=add;
+          Object.assign(step,{grew:true,growRow:st.row,growCol:st.col,growLevel:st.level,addSpins:add,spins:st.spins});
           if(st.level===MOON.STEPS.length-1){ ev.full=true; step.full=true; } // full 8x5 grid: every orb counts from here on (no GRAND)
         }
       }
@@ -613,7 +719,7 @@ const ENGINE = (() => {
     const min=Math.round(MOON.MIN_PAY*bet*100)/100, add=Math.max(0, Math.round((min-st.pot)*100)/100);
     st.pot=Math.round((st.pot+add)*100)/100; return add;
   }
-  return {HOLD,setUnit:u=>{UNIT=u}, moonEnsure, moonSnow, moonFinish,SYM,PAY,JP,GRAND_SEED,GRAND_K,HOLD_SPIN_RATE,grandChance,MOON,inZone,moonStart,moonGrid,moonResolve,spinGrid,evaluate,holdStep,holdTotal,orbValue,setRng:f=>rng=f};
+  return {LINE,BASE_W,FREE_W,HOLD,FG,RANDOM,SNOWFIGHT,FREE_GAMES,freeStart,freeSpin,crackRoll,crackOrbs,snowRoll,snowFight,setUnit:u=>{UNIT=u}, moonEnsure, moonSnow, moonFinish,SYM,PAY,JP,GRAND_SEED,GRAND_K,HOLD_SPIN_RATE,grandChance,MOON,inZone,moonStart,moonGrid,moonResolve,spinGrid,evaluate,holdStep,holdTotal,orbValue,setRng:f=>rng=f};
 })();
 if(typeof module!=='undefined') module.exports=ENGINE;
 
@@ -1185,11 +1291,11 @@ for(const k of 'WFPSBCAKQJTOMXD')ART[k]=ART2[k];
 const IMG={F:'img/sym_frostfang.webp',B:'img/sym_bat.webp',S:'img/sym_skull.webp',P:'img/sym_pumpkin.webp',K:'img/sym_K.webp',A:'img/sym_A.webp',C:'img/sym_candles.webp',W:'img/sym_wild.webp',O:'img/sym_orb.webp',T:'img/sym_10.webp',J:'img/sym_J.webp',Q:'img/sym_Q.webp',M:'img/sym_moon.webp',D:'img/sym_diamond.webp',X:'img/bonus_plus1.webp'};
 for(const k in IMG){ART[k]=`<img class="symimg${k==='O'?' orbimg':''}" src="${IMG[k]}" alt="" draggable="false">`;const pre=new Image();pre.src=IMG[k];}
 // extra artwork that isn't a plain reel symbol: jackpot orbs (shown instead of orb + label) and the +1 diamond
-const XIMG={MINI:'img/orb_mini.webp',MINOR:'img/orb_minor.webp',MAJOR:'img/orb_major.webp',GRAND:'img/orb_grand.webp',DPLUS:'img/sym_diamond_plus.webp',SNOW:'img/fx_snowball.webp'};
+const XIMG={PICK:'img/snowball_pick.webp',SPLAT:'img/splat.webp',CRACK:'img/ice_crack.webp',SMASH:'img/frostfang_smash.webp',T_SNOW:'img/title_snowball_fight.webp',T_HUNT:'img/title_diamond_hunt.webp',T_FREE:'img/title_free_games.webp',MINI:'img/orb_mini.webp',MINOR:'img/orb_minor.webp',MAJOR:'img/orb_major.webp',GRAND:'img/orb_grand.webp',DPLUS:'img/sym_diamond_plus.webp',SNOW:'img/fx_snowball.webp'};
 for(const k in XIMG){const pre=new Image();pre.src=XIMG[k];}
 const imgTag=src=>`<img class="symimg" src="${src}" alt="" draggable="false">`;
 const orbHTML=v=>v&&v.jp&&XIMG[v.jp]?imgTag(XIMG[v.jp]):ART.O+valHTML(v);
-const gemHTML=plus=>plus&&XIMG.DPLUS?imgTag(XIMG.DPLUS):ART.D;
+const gemHTML=(plus,cash)=>plus&&XIMG.DPLUS?imgTag(XIMG.DPLUS):ART.D+(cash?`<div class="val gemv">${fmtCr(cash)}</div>`:'');
 const FIMG={idle:'img/frostfang_idle.webp',throw:'img/frostfang_throw.webp',cheer:'img/frostfang_cheer.webp',grab:'img/frostfang_grab.webp'};
 for(const k in FIMG){const pre=new Image();pre.src=FIMG[k];}
 let poseNow='';
@@ -1263,7 +1369,7 @@ async function jpWon(k){const f=k==='GRAND'?'g':'m',ef=f==='g'?'ge':'me';
  db.collection('jpc').onSnapshot(s=>{NET.docs=s.docs;sumOthers();if(!busy)drawMeters();},()=>{});
  setInterval(()=>{if(!busy)drawMeters()},4000);
 }catch(e){NET.on=false;}})();
-let rig=null,busy=false, auto=false, inHold=false;
+let rig=null,busy=false, auto=false, inHold=false, inFree=false;
 // spin speed 1-4: 1 is the relaxed default, 4 is fastest. SF() scales every animation time.
 if(![1,2,3,4].includes(S.speed))S.speed=1;
 const SF=()=>[1.3,1,0.7,0.45][S.speed-1];
@@ -1309,10 +1415,10 @@ addEventListener('resize',sizeFrame);
 // ---------- grid ----------
 const grid=$('grid'), cells=[];
 for(let i=0;i<40;i++){const d=document.createElement('div');d.className='cell'+(i>=15?' xrow':'')+(i>=25?' x8':'');grid.appendChild(d);cells.push(d);}
-const RAND='WFPSBCAKQJTOM'.split(''),MRAND='FPSBCAKQJTOOD'.split('');
+const RAND='WFPSBCAKQJTM'.split(''),FRAND='WFPSBCAKQJTOOM'.split(''),MRAND='FPSBCAKQJTOOD'.split('');
 function symHTML(c){if(!c)return '';
  if(c.s==='O'&&c.orb) return orbHTML(c.orb);
- if(c.s==='D') return gemHTML(c.plus);
+ if(c.s==='D') return gemHTML(c.plus,c.cash);
  return ART[c.s]||'';}
 function paint(i,c){cells[i].innerHTML=symHTML(c);cells[i].dataset.s=c?c.s:'';}
 function valHTML(v){if(v.plus) return ''; if(v.jp) return `<div class="val jpv">${v.jp}</div>`; if(v.cash!=null) return `<div class="val">${fmtCr(v.cash)}</div>`; return ''}
@@ -1375,21 +1481,23 @@ async function holdSnowballs(snows,H){
 // ---------- base spin ----------
 // ---- real reel strips: each reel scrolls down, reels start a beat apart and stop one at a time ----
 const easeBack=x=>{const c1=1.70158,c3=c1+1;return 1+c3*Math.pow(x-1,3)+c1*Math.pow(x-1,2)}; // ends with a small bounce
-async function spinReels(g){
+async function spinReels(g,free){
  clearMarks();
- const ROWS=g[0].length,POOL=ROWS>3?MRAND:RAND,T=SF();
+ const ROWS=g[0].length,POOL=ROWS>3?MRAND:free?FRAND:RAND,T=SF();
  cells.forEach(c=>c.classList.remove('fizzle','got','land'));
  spinOrbN=0;SOUND.play('spinStart');SOUND.spin(true,Math.round(55*SF()));
  const rnd=()=>{const s=POOL[Math.floor(Math.random()*POOL.length)];return {s,orb:s==='O'?null:undefined}};
- // stop times: one reel at a time, left to right; tease the later reels when 2+ moons are already showing
+ // stop times: one reel at a time, left to right. Tease a reel when it can start a feature:
+ // moons on every reel so far (2+ in a row from reel 1), or Frostfang on reels 1 and 3 with reel 5 still to come
+ const has=(r,s)=>g[r].some(c=>c.s===s);
  const stops=[];let extra=0;
- for(let r=0;r<5;r++){let moons=0;for(let k=0;k<r;k++)g[k].forEach(c=>{if(c.s==='M')moons++});
-  let run=0,ok=true;for(let k=0;k<r;k++){const n=g[k].filter(c=>c.s==='M').length;if(!n){ok=false;break}run+=n}
-  const tease=ROWS===3&&ok&&r>=1&&run>=2&&run+3*(5-r)>=4;if(tease)extra+=900;
+ for(let r=0;r<5;r++){let run=0;while(run<r&&has(run,'M'))run++;
+  const tease=ROWS===3&&r>=2&&run===r||(ROWS===3&&!free&&r===4&&has(0,'F')&&has(2,'F'));if(tease)extra+=900;
   stops.push({t:(950+r*360+extra)*T,tease});}
  stops.forEach((s,r)=>{if(s.tease&&r>0)setTimeout(()=>SOUND.play('tease'),stops[r-1].t)});
- // moon chime only while the Moonrise can still happen: unbroken moons from reel 1, and enough reels left to reach 4
- const moonSnd=[];{let run=0,alive=true;for(let r=0;r<5;r++){const n=g[r].filter(c=>c.s==='M').length;if(!n)alive=false;run+=n;moonSnd.push(alive&&run+3*(4-r)>=4);}}
+ // chime only while a feature is still possible: moons unbroken from reel 1, or Frostfang on 1, then 3, then 5
+ const moonSnd=[];{let alive=true;for(let r=0;r<5;r++){if(!has(r,'M'))alive=false;
+  const ff=!free&&ROWS===3&&has(r,'F')&&[0,2,4].filter(k=>k<=r).every(k=>has(k,'F'));moonSnd.push((alive&&ROWS===3)||ff);}}
  // Frostfang peeks: a gasp from the right pillar when the moon tease starts, otherwise now and then a quick peek before reel 1 lands
  if(ROWS===3&&!inHold){const tr=stops.findIndex((s,r)=>s.tease&&r>0);
   if(tr>0){const a=stops[tr-1].t,d=stops[tr].t-a-380;if(d>300)setTimeout(()=>peek('R',d),a);}
@@ -1474,10 +1582,10 @@ function spinColumn(r,final,ROWS,stopAt,startDelay,teaseAt,rnd,moonSnd){
 async function showWins(ev,g,label){
  if(!ev.wins.length&&!ev.scatterPay)return;
  const all=new Set();ev.wins.forEach(w=>w.cells.forEach(([r,y])=>all.add(y*5+r)));
- if(ev.scatterPay)g.forEach((col,r)=>col.forEach((c,y)=>{if(c.s==='M')all.add(y*5+r)}));
+ if(ev.scatterPay)g.forEach((col,r)=>col.forEach((c,y)=>{if(c.s==='F')all.add(y*5+r)}));
  cells.forEach((c,i)=>c.classList.add(all.has(i)?'win':'dim'));
  const best=ev.wins.sort((a,b)=>b.amt-a.amt)[0];
- $('winLine').textContent=(best?`${best.n} × ${E.SYM[best.s].name}, ${best.ways} way${best.ways>1?'s':''}: ${fmt(best.amt)}`:'')+(ev.wins.length>1?`  (+${ev.wins.length-1} more)`:'')+(ev.scatterPay?`  Moons pay ${fmt(ev.scatterPay)}`:'')+(label||'');
+ $('winLine').textContent=(best?`${best.n} × ${E.SYM[best.s].name}, ${best.ways} way${best.ways>1?'s':''}: ${fmt(best.amt)}`:'')+(ev.wins.length>1?`  (+${ev.wins.length-1} more)`:'')+(ev.scatterPay?`  Frostfang pays ${fmt(ev.scatterPay)}`:'')+(label||'');
  {const x=ev.total/bet();SOUND.play(x>=20?'winBig':x>=5?'winMed':'winSmall');}
 }
 
@@ -1486,24 +1594,27 @@ async function play(){
  busy=true;$('spin').disabled=true;hideMsg();
  S.credit-=bet();jpAdd(0.006,bet()*0.004);setWin(0);drawMeters();
  $('winLine').textContent='Good luck…';
- const g=E.spinGrid(bet(),false);let hot=false;
+ const g=E.spinGrid(bet(),false);
  await spinReels(g);
- const ev=E.evaluate(g,bet());let total=ev.total;
- if(ev.total>0){if(ev.total>=bet()*8&&ev.total<bet()*20&&!ev.holdTrigger&&!ev.freeTrigger)setTimeout(()=>peek('W',1900),250);await showWins(ev,g);await countUp($('win'),0,ev.total,Math.min(1500,300+ev.total/bet()*60));}
- else $('winLine').textContent=ev.orbs>=6?`${ev.orbs} orbs! Hold & Spin!`:ev.orbs>=4?`${ev.orbs} orbs… so close! 6 starts the Hold & Spin.`:' ';
- if(ev.holdTrigger){await sleep(600);total+=await holdAndSpin(g,null);}
- if(ev.freeTrigger){await sleep(700);total+=await moonBonus();}
- S.credit+=total;if(total>=bet()*20&&!ev.holdTrigger&&!ev.freeTrigger)await bigWin(total);
+ const ev=E.evaluate(g,bet());let total=ev.total,feat=ev.freeTrigger||ev.huntTrigger;
+ if(ev.total>0){if(ev.total>=bet()*8&&ev.total<bet()*20&&!feat)setTimeout(()=>peek('W',1900),250);await showWins(ev,g);await countUp($('win'),0,ev.total,Math.min(1500,300+ev.total/bet()*60));}
+ else $('winLine').textContent=ev.moons===2?'2 moons… 3 in a row from reel 1 start the free games!':' ';
+ if(ev.huntTrigger){await sleep(600);total+=await moonBonus();}
+ if(ev.freeTrigger){await sleep(700);total+=await freeGames(ev.freeGames);}
+ // surprise features on regular spins
+ if(!feat){if(E.crackRoll()){feat=true;await sleep(300);await iceCrack(g);total+=await holdAndSpin(g,null);}
+  else if(E.snowRoll()){feat=true;await sleep(300);total+=await snowballFight();}}
+ S.credit+=total;if(total>=bet()*20&&!feat)await bigWin(total);
  setWin(total);save();busy=false;$('spin').disabled=false;drawMeters();
  if(auto){await sleep(total>0?900:350);if(auto)play();}
 }
 async function cheer(ms){pose('cheer');setTimeout(()=>pose('idle'),ms)}
 async function bigWin(total){SOUND.play('winBig');cheer(3500);peek('W',3200,true);showMsg(`<h2>${total>=bet()*50?'MONSTER WIN!':'BIG WIN!'}</h2><div class="big" id="bw">$0.00</div>`);await countUp($('bw'),0,total,2200);await sleep(1300);hideMsg();}
 
-// ---------- Hold & Spin ----------
+// ---------- Frost Link (the orb bonus, 5 rows x 5) ----------
 async function holdAndSpin(g,fromFree){
- inHold=true;SOUND.play('feature');SOUND.music('hold');say('Hold & Spin! Lock those orbs!',2400);
- showMsg(`<h2>HOLD &amp; SPIN!</h2>`);
+ inHold=true;SOUND.play('feature');SOUND.music('hold');say('Frost Link! Lock those orbs!',2400);
+ showMsg(`<h2>FROST LINK!</h2>`);
  await sleep(1800);hideMsg();clearMarks();
  const N=25,H=Array(N).fill(null);g.forEach((col,r)=>col.forEach((c,y)=>{if(c.s==='O')H[y*5+r]=Object.assign({},c.orb)}));
  const dead=()=>{const s='FPSBCAKQJTW'[Math.floor(Math.random()*11)];return `<div class="dead">${ART[s]}</div>`};
@@ -1548,7 +1659,7 @@ async function holdAndSpin(g,fromFree){
  return sum;
 }
 
-// ---------- Moonrise Bonus (8 rows, growing grid) ----------
+// ---------- Diamond Hunt (8 rows, growing grid) ----------
 const M=E.MOON, STEPN=s=>`${M.STEPS[s][0]}×${M.STEPS[s][1]}`;
 function placePet(v){if(!v)return;placePet.v=v;if(!grid.classList.contains('moon'))return;const be=$('beast');
  const [R,C]=M.STEPS[v.level],a=cells[v.row*5+v.col],b=cells[(v.row+R-1)*5+v.col+C-1];if(!a||!b)return;
@@ -1568,13 +1679,13 @@ function drawMeter(level,gems){const m=$('meter');m.classList.remove('hidden');
  const need=M.NEED[level];let dots='';for(let k=0;k<need;k++)dots+=`<span class="${k<gems?'on':''}">${ART.D}</span>`;
  m.innerHTML=`<div class="dots">${dots}</div><small>${gems}/${need} to grow to <b>${STEPN(level+1)}</b></small>`;}
 async function moonBonus(){
- SOUND.play('feature');SOUND.music('moon');cheer(2400);say('Moonrise! Find me diamonds!',2600);
- showMsg(`<h2>MOONRISE BONUS!</h2>`);
+ SOUND.play('feature');SOUND.music('moon');cheer(2400);say('Diamond Hunt Bonus!',2600);
+ showMsg(`<img class="ttl" src="${XIMG.T_HUNT}" alt="Diamond Hunt Bonus">`);
  await sleep(1800);hideMsg();clearMarks();
  const st=E.moonStart(), view={level:st.level,row:st.row,col:st.col};
  grid.classList.add('moon');sizeFrame();const g0=E.moonGrid(bet());g0.forEach((col,r)=>col.forEach((c,y)=>paint(y*5+r,c.s==='O'||c.s==='D'?{s:'T'}:c)));
  drawZone(view,true);drawMeter(0,0);setWin(0);
- $('winLine').textContent='Moonrise Bonus: diamonds reset the spins to 3';let shown=st.spins;const lab=(lv=st.level,pot=st.pot)=>banner(`SPINS LEFT ${shown} · GRID ${STEPN(lv)} · POT ${fmt(pot)}`,true);lab();
+ $('winLine').textContent='Diamond Hunt: diamonds pay credits · +1 SPIN diamonds and finished grids add spins';let shown=st.spins;const lab=(lv=st.level,pot=st.pot)=>banner(`SPINS LEFT ${shown} · GRID ${STEPN(lv)} · POT ${fmt(pot)}`,true);lab();
  while(st.spins>0){
   await sleep(450);st.spins--;shown=st.spins;lab();
   const g=E.moonGrid(bet());E.moonEnsure(st,g,bet());
@@ -1587,7 +1698,6 @@ async function moonBonus(){
   const pot0=st.pot,jv=jpVals();
   const ev=E.moonResolve(st,g,jv);
   if(ev.plus){shown+=ev.plus;banner(`+${ev.plus} SPIN! · SPINS LEFT ${shown}`,true);say('+1 SPIN!',1400);await sleep(800);}
-  ev.missed.forEach(m=>cells[m.y*5+m.r].classList.add('fizzle'));
   // 1) orbs inside the grid where it sits go to the pot
   let pot=pot0;
   for(const c of ev.collected){const el=cells[c.y*5+c.r];el.classList.add('collect','got');
@@ -1597,24 +1707,112 @@ async function moonBonus(){
   if(ev.path.length){say(['Shiny!','Mine! Mine!','Ooh, diamonds!','Gimme gimme!'][Math.floor(Math.random()*4)]);await sleep(300);}
   for(const p of ev.path){
    await glide(view,p.row,p.col);
-   const i=p.y*5+p.r;cells[i].classList.add('got');await flyGem(i,p.plus);cells[i].innerHTML='';cells[i].classList.remove('got');
-   const before=shown;shown=p.spins;lab(view.level,pot);
+   const i=p.y*5+p.r;cells[i].classList.add('got');
+   if(p.cash){const fx=document.createElement('div');fx.className='plusfx';fx.textContent='+'+fmtCr(p.cash);cells[i].appendChild(fx);}
+   const fly=flyGem(i,p.plus);if(p.cash){countUp($('win'),pot,pot+p.cash,300);pot+=p.cash;}
+   await fly;cells[i].innerHTML='';cells[i].classList.remove('got');
+   shown=p.spins-(p.addSpins||0);lab(view.level,pot);
    if(p.plus){SOUND.play('plus');say('+1 SPIN!',1400);banner(`+1 SPIN! · SPINS LEFT ${shown}`,true);await sleep(700);lab(view.level,pot);}
-   else if(shown>before){SOUND.play('glide',{n:16});}
    if(p.level<M.STEPS.length-1&&!p.grew)drawMeter(p.level,p.gems);
    if(p.grew){drawMeter(p.level,M.NEED[p.level]);await sleep(250);
     Object.assign(view,{level:p.growLevel,row:p.growRow,col:p.growCol});drawZone(view,true);
     SOUND.play('grow');cheer(1600);say(`BIGGER! ${STEPN(view.level)} grid!`,2000);
     banner(`GRID GROWS TO ${STEPN(view.level)}`,true);drawMeter(view.level,0);await sleep(1100);
+    shown=p.spins;SOUND.play('plus');say(`+${p.addSpins} SPINS!`,1600);banner(`GRID FINISHED · +${p.addSpins} SPINS · SPINS LEFT ${shown}`,true);await sleep(1200);
     if(p.full){SOUND.play('full');cheer(3000);showMsg(`<h2>FULL GRID!</h2><p>The grid now covers all 8×5 spots.<br>Every orb that lands counts for the rest of the bonus!</p>`);await sleep(2800);hideMsg();}}
    lab(view.level,pot);}
   shown=st.spins;lab();await sleep(ev.collected.length||ev.path.length?500:200);
  }
  banner('');const won=Math.round(st.pot*100)/100;
- showMsg(`<h2>MOONRISE WIN</h2><p>Final grid ${STEPN(st.level)}</p><div class="big" id="fw">$0.00</div>`);SOUND.play('winBig');cheer(3200);await countUp($('fw'),0,won,1800);await sleep(1400);hideMsg();
+ showMsg(`<h2>DIAMOND HUNT WIN</h2><p>Final grid ${STEPN(st.level)}</p><div class="big" id="fw">$0.00</div>`);SOUND.play('winBig');cheer(3200);await countUp($('fw'),0,won,1800);await sleep(1400);hideMsg();
  SOUND.music('base');grid.classList.remove('moon');sizeFrame();cells.forEach(c=>c.classList.remove('zone','zgrow','fizzle','got'));for(let i=15;i<40;i++)cells[i].innerHTML='';$('meter').classList.add('hidden');
  const back=E.spinGrid(bet(),false);back.forEach((col,r)=>col.forEach((c,y)=>paint(y*5+r,c)));
  return won;
+}
+
+// ---------- Moonrise Free Games ----------
+// Frostfang (only on reel 5 here) collects every orb on screen; 6+ orbs start Frost Link instead. Moons add more games.
+async function flyTo(fromIdx,toIdx,html){const a=cells[fromIdx].getBoundingClientRect(),b=cells[toIdx].getBoundingClientRect();
+ const o=document.createElement('div');o.className='ball flyorb';o.innerHTML=html;const sz=Math.min(a.width,a.height)*.9;Object.assign(o.style,{width:sz+'px',height:sz+'px'});document.body.appendChild(o);
+ const x0=a.left+a.width/2-sz/2,y0=a.top+a.height/2-sz/2,x1=b.left+b.width/2-sz/2,y1=b.top+b.height/2-sz/2,dur=420*SF(),st=performance.now();
+ await new Promise(res=>{function f(t){const p=Math.min(1,(t-st)/dur);const e=p*p*(3-2*p);o.style.left=(x0+(x1-x0)*e)+'px';o.style.top=(y0+(y1-y0)*e-Math.sin(p*Math.PI)*70)+'px';o.style.transform=`scale(${1.2-p*.5})`;if(p<1)requestAnimationFrame(f);else res()}requestAnimationFrame(f)});o.remove();}
+function drawCollect(fs){const m=$('meter');m.classList.remove('hidden');
+ if(fs.mult>=E.FG.MAX_MULT){m.innerHTML=`<b>ORBS ×${fs.mult}</b><small>${fs.collects} collections</small>`;return}
+ const step=E.FG.COLLECT_STEP,k=fs.collects%step;let dots='';for(let i=0;i<step;i++)dots+=`<span class="${i<k?'on':''}">${ART.O}</span>`;
+ m.innerHTML=`<div class="dots">${dots}</div><small>${k}/${step} collections to orbs <b>×${fs.mult+1}</b></small>`;}
+async function freeGames(n){
+ inFree=true;SOUND.play('feature');SOUND.music('moon');cheer(2400);say('Moonrise free games!',2400);
+ showMsg(`<img class="ttl" src="${XIMG.T_FREE}" alt="Moonrise Free Games"><div class="big">${n} FREE GAMES</div><p>Orbs land in free games. Frostfang on reel 5 collects them all!</p>`);
+ await sleep(2600);hideMsg();clearMarks();$('frameEl').classList.add('freef');
+ const fs=E.freeStart(n);let tot=0;setWin(0);
+ const lab=()=>banner(`FREE GAME ${fs.played} OF ${fs.played+fs.left} · WIN ${fmt(tot)}`,true);
+ $('winLine').textContent='Moonrise Free Games: Frostfang on reel 5 collects every orb';drawCollect(fs);
+ while(fs.left>0){
+  await sleep(450);const o=E.freeSpin(fs,bet());lab();
+  await spinReels(o.g,true);
+  if(o.ev.total>0){await showWins(o.ev,o.g);await countUp($('win'),tot,tot+o.ev.total,Math.min(1200,300+o.ev.total/bet()*50));tot+=o.ev.total;lab();}
+  if(o.more){SOUND.play('plus');cheer(1400);say('More free games!',1600);banner(`+${o.more} FREE GAMES!`,true);await sleep(1400);lab();}
+  if(o.link){await sleep(500);const w=await holdAndSpin(o.g,' ');tot+=w;SOUND.music('moon');setWin(tot);lab();}
+  else if(o.collect){const fi=o.g[4].findIndex(c=>c.s==='F')*5+4;cells[fi].classList.add('win');say("I'll take those!",1400);await sleep(350);
+   const jv=jpVals();
+   for(const c of o.collect){const i=c.y*5+c.r,v=c.orb.jp?jv[c.orb.jp]:c.orb.cash;cells[i].classList.add('got');
+    const fly=flyTo(i,fi,orbHTML(c.orb));
+    if(c.orb.jp){$('jp'+c.orb.jp).classList.add('flash');setTimeout(()=>$('jp'+c.orb.jp).classList.remove('flash'),2200);SOUND.play('jackpot',{level:c.orb.jp});if(c.orb.jp==='MAJOR')jpWon('MAJOR');}
+    else SOUND.play('lock',{n:4});
+    await fly;cells[i].innerHTML='';cells[i].classList.remove('got');
+    await countUp($('win'),tot,tot+v,c.orb.jp?800:220);tot+=v;lab();}
+   cells[fi].classList.remove('win');
+   if(o.multUp){SOUND.play('grow');cheer(1600);say(`Orbs times ${fs.mult}!`,1600);banner(`ORBS NOW ×${fs.mult}!`,true);await sleep(1400);lab();}
+   drawCollect(fs);}
+  await sleep(250);
+ }
+ banner('');$('meter').classList.add('hidden');$('frameEl').classList.remove('freef');tot=Math.round(tot*100)/100;
+ showMsg(`<h2>FREE GAMES WIN</h2><p>${fs.played} free games played</p><div class="big" id="fw">$0.00</div>`);SOUND.play('winBig');cheer(3200);await countUp($('fw'),0,tot,1800);await sleep(1400);hideMsg();
+ SOUND.music('base');inFree=false;
+ const back=E.spinGrid(bet(),false);back.forEach((col,r)=>col.forEach((c,y)=>paint(y*5+r,c)));
+ return tot;
+}
+
+// ---------- Ice Crack: a surprise Frost Link on a regular spin ----------
+async function iceCrack(g){
+ const fr=$('frameEl'),ck=document.createElement('img');ck.className='crack';ck.src=XIMG.CRACK;ck.alt='';
+ const sm=document.createElement('img');sm.className='smash';sm.src=XIMG.SMASH;sm.alt='';fr.appendChild(sm);SOUND.play('throw');
+ await sleep(520);SOUND.play('impact');SOUND.play('impact');fr.appendChild(ck);fr.classList.add('shake');say('Orbs incoming!',1600);
+ await sleep(450);fr.classList.remove('shake');sm.classList.add('away');setTimeout(()=>sm.remove(),500);
+ const spots=E.crackOrbs(g,bet());
+ for(const s of spots){const i=s.y*5+s.r;paint(i,g[s.r][s.y]);cells[i].classList.add('land');SOUND.play('orb',{n:spotsN(s)});await sleep(160*SF()+60);}
+ function spotsN(s){return spots.indexOf(s)}
+ await sleep(500);ck.classList.add('fade');setTimeout(()=>ck.remove(),700);cells.forEach(c=>c.classList.remove('land'));
+}
+
+// ---------- Snowball Fight: pick snowballs until one prize shows 3 times ----------
+const SF_LABEL={MINI:'MINI',MINOR:'MINOR',MAJOR:'MAJOR',X1:'1× BET',X2:'2× BET',X3:'3× BET'};
+function sfTile(k){if(k[0]==='X')return `<div class="sfx">${k[1]}×<small>${fmt((+k[1])*bet())}</small></div>`;return XIMG[k]?imgTag(XIMG[k]):`<b>${k}</b>`;}
+async function snowballFight(){
+ peek('L',1800,false,true);await sleep(450);SOUND.play('throw');await sleep(250);SOUND.play('impact');
+ const fr=$('frameEl'),sp=document.createElement('img');sp.className='splat';sp.src=XIMG.SPLAT;sp.alt='';fr.appendChild(sp);say('Snowball fight!',2000);SOUND.play('feature');
+ await sleep(900);sp.remove();
+ const f=E.snowFight(),seq=f.seq.slice();let picks=0;const count={};
+ showMsg(`<img class="ttl ttls" src="${XIMG.T_SNOW}" alt="Snowball Fight"><p>Pick snowballs. Match 3 to win that prize!</p><div class="sfgrid" id="sfgrid">${Array.from({length:12},(_,i)=>`<button class="sfball" data-i="${i}">${imgTag(XIMG.PICK)}</button>`).join('')}</div>`);
+ $('msg').classList.add('sf');
+ const prize=await new Promise(done=>{let idle;
+  const pickOne=btn=>{if(!btn||btn.disabled||!seq.length)return;clearTimeout(idle);btn.disabled=true;const k=seq.shift();picks++;count[k]=(count[k]||0)+1;
+   btn.classList.add('open');btn.innerHTML=`<img class="sfsplat" src="${XIMG.SPLAT}" alt="">`+sfTile(k);btn.dataset.k=k;SOUND.play(count[k]===3?'jackpot':'lock',{level:k[0]==='X'?'MINI':k,n:count[k]+2});
+   if(count[k]===2)btn.parentNode.querySelectorAll(`.sfball[data-k="${k}"]`).forEach(b=>b.classList.add('two'));
+   if(!seq.length){btn.parentNode.querySelectorAll(`.sfball[data-k="${k}"]`).forEach(b=>b.classList.add('won'));btn.parentNode.querySelectorAll('.sfball:not(.open)').forEach(b=>b.classList.add('rest'));setTimeout(()=>done(k),1400);return}
+   arm();};
+  const auto1=()=>pickOne([...document.querySelectorAll('#sfgrid .sfball:not(.open)')].sort(()=>Math.random()-.5)[0]);
+  const arm=()=>{clearTimeout(idle);idle=setTimeout(auto1,auto?650:9000);};
+  document.querySelectorAll('#sfgrid .sfball').forEach(b=>b.onclick=()=>pickOne(b));arm();
+  say('Pick a snowball!',1600);});
+ const jv=jpVals(),amt=prize[0]==='X'?Math.round((+prize[1])*bet()*100)/100:jv[prize];
+ if(prize==='MAJOR')jpWon('MAJOR');
+ $('msg').classList.remove('sf');
+ showMsg(`<h2>${prize[0]==='X'?'SNOWBALL WIN':prize+' JACKPOT!'}</h2><p>${SF_LABEL[prize]}</p><div class="big" id="sw">$0.00</div>`);
+ if(prize[0]!=='X'){$('jp'+prize).classList.add('flash');setTimeout(()=>$('jp'+prize).classList.remove('flash'),2600);SOUND.play('jackpot',{level:prize});say(prize==='MINI'?'Mini jackpot!':prize==='MINOR'?'Minor jackpot!':'Major jackpot!',2000);}
+ else SOUND.play('winMed');
+ cheer(2600);await countUp($('sw'),0,amt,1400);await countUp($('win'),0,amt,300);await sleep(1300);hideMsg();
+ return amt;
 }
 
 // ---------- controls ----------
@@ -1643,23 +1841,24 @@ $('menuM').onclick=e=>{if(e.target.id==='menuM'||e.target.closest('.mgrid button
 $('refill').onclick=()=>{if(busy)return;S.credit=Math.round((S.credit+START)*100)/100;save();drawMeters();say('+$100. Fresh snow, fresh credits!')};
 
 document.addEventListener('keydown',e=>{if(e.code==='Space'&&$('pays').classList.contains('hidden')&&$('soundM').classList.contains('hidden')){e.preventDefault();$('spin').click()}});
-$('info').onclick=()=>{const u=bet()/25;let pt='';for(const s of ['F','P','S','B','C','A','K','Q','J','T']){const p=E.PAY[s];pt+=`<div>${ART[s]}<br>5: ${fmt(p[5]*u)}<br>4: ${fmt(p[4]*u)}<br>3: ${fmt(p[3]*u)}</div>`}
+$('info').onclick=()=>{const u=bet()/25*E.LINE.K;let pt='';for(const s of ['P','S','B','C','A','K','Q','J','T']){const p=E.PAY[s];pt+=`<div>${ART[s]}<br>5: ${fmt(p[5]*u)}<br>4: ${fmt(p[4]*u)}<br>3: ${fmt(p[3]*u)}</div>`}
  $('payCard').innerHTML=`<button class="close" onclick="document.getElementById('pays').classList.add('hidden')">Close</button><h3>How to play</h3>
  <p>243 ways to win. Match symbols on adjacent reels from the left. Pays shown per way at your current bet of ${fmt(bet())}.</p>
  <div class="pt">${pt}</div>
- <h4>Wild</h4><p>${ART.W.replace('<svg','<svg width="40" height="36"')} Appears on reels 2–5 and substitutes for all pay symbols.</p>
- <h4>Hold &amp; Spin</h4><p>Land <b>6 or more orbs</b>. The reels grow to <b>5 rows</b> (25 spots): your orbs lock in the top 3 rows and 2 empty rows are added below. You get 3 spins, and each new orb resets the count to 3. Orbs carry cash or the MINI, MINOR or MAJOR jackpot.<br>Every empty spot spins on its own on each Hold &amp; Spin spin. <b>Snowballs:</b> on some spins Frostfang leans out from behind the frame and throws 1 or 2 snowballs at orbs showing numbers, adding credits to them. <b>GRAND orb:</b> a rare orb that wins the GRAND. Bigger bets make it more likely (see Jackpots below).<br><b>Full screen:</b> fill all 25 spots and your Hold &amp; Spin win is <b>doubled</b>. A GRAND won in the same round is paid once, not doubled.</p>
- <h4>Moonrise Bonus</h4><p>Count the moons on touching reels starting from <b>reel 1</b>, stopping at the first reel with no moon. <b>4 or more</b> start the Moonrise Bonus and pay 1× the bet (5 pay 3×, 6 or more pay 10×). Example: moons on reels 1, 2 and 3 adding up to 4 trigger it; moons on reels 2 to 5 don't, because reel 1 has none. The reels grow to <b>8 rows by 5 reels</b>, and a glowing grid starts at 2×2.<br>
- <img src="${IMG.D}" alt="" width="34" height="34" style="vertical-align:middle;object-fit:contain"> <b>Diamonds</b> can land anywhere. After each spin the grid travels to every diamond, nearest first, to collect it, and the next spin starts wherever it stops. Diamonds grow the grid: 2×2 → 3×3 → 4×4 → 5×5 needs 5 diamonds per step, then 5×5 → 6×5 → 7×5 → 8×5 needs 3 per step.<br>
- Orbs landing <b>inside the grid</b> add their cash or MINI, MINOR or MAJOR jackpot to the pot. Orbs outside the grid don't count.<br>
- The grid is one glowing shape that starts in a random spot. Inside it you only see orbs, diamonds and +1 SPIN cubes. <b>Every spin, at least one orb lands inside the grid</b>, so the pot always grows. <b>Frostfang lives inside the grid</b> and grows with it. On some spins he throws 1 or 2 snowballs onto spots inside his grid; each becomes a cash orb, a MINI, MINOR or MAJOR jackpot, or a <b>+1 SPIN</b> ice cube. The bonus starts with <b>3 spins</b>, and every diamond <b>resets the spins to 3</b>. Gold <b>+1 SPIN</b> diamonds also add an extra spin on top. Orbs don't reset the spins. At the full <b>8×5</b> grid every orb on the reels counts. The pot pays when the spins run out. The GRAND can only be won in the Hold &amp; Spin.</p>
+ <h4>Wild</h4><p>${ART.W.replace('<svg','<svg width="40" height="36"')} Appears on reels 2–5 and substitutes for all pay symbols, but not for moons or Frostfang.</p>
+ <h4>Moonrise Free Games</h4><p>${ART.M.replace('<svg','<svg width="40" height="36"')} Each reel shows at most one moon. Moons on touching reels starting from <b>reel 1</b> start free games: <b>3 reels = 6 free games, 4 reels = 8, 5 reels = 10</b>. Moons landing during free games add more games the same way.<br>In free games, <b>orbs land on the reels</b> and Frostfang can appear on reel 5. When he lands, he <b>collects the value of every orb on screen</b>. Every 4 collections raise the value of new orbs: ×2, then ×3. If <b>6 or more orbs</b> land at once, Frost Link starts instead.</p>
+ <h4>Diamond Hunt</h4><p>${ART.F.replace('<svg','<svg width="40" height="36"')} Frostfang is a bonus symbol that lands only on <b>reels 1, 3 and 5</b>. All three together pay <b>2× the bet</b> and start the Diamond Hunt. The reels grow to <b>8 rows by 5 reels</b>, and a glowing grid starts at 2×2.<br>
+ <img src="${IMG.D}" alt="" width="34" height="34" style="vertical-align:middle;object-fit:contain"> <b>Diamonds</b> can land anywhere. After each spin the grid travels to every diamond, nearest first, to collect it, and the next spin starts wherever it stops. Finishing the 2×2 takes 5 diamonds, the 3×3 takes 4, and every grid from 4×4 up takes 3. Regular diamonds <b>pay the credits shown on them</b>. Gold <b>+1 SPIN</b> diamonds pay no credits but add a spin.<br>
+ Orbs landing <b>inside the grid</b> add their cash or MINI, MINOR or MAJOR jackpot to the pot; orbs outside it don't count. Every spin at least one orb lands inside the grid. Frostfang lives inside the grid and sometimes throws snowballs onto it that become orbs, jackpots or +1 SPIN ice cubes. The hunt starts with <b>5 spins</b>. Spins don't reset: you get more from +1 SPIN diamonds and cubes, and <b>finishing a grid adds 2 to 4 spins</b>. The pot pays when the spins run out.</p>
+ <h4>Frost Link</h4><p>The orb bonus. It starts two ways: <b>Ice Crack</b>, when at random on a regular spin Frostfang smashes the glass and 6 to 9 orbs appear; or when <b>6 or more orbs</b> land during free games. The reels grow to <b>5 rows</b> (25 spots): orbs lock, you get 3 spins, and each new orb resets the count to 3. Orbs carry cash or the MINI, MINOR or MAJOR jackpot. On some spins Frostfang throws snowballs that add credits to orbs showing numbers. <b>GRAND orb:</b> a rare orb that wins the GRAND; bigger bets make it more likely. <b>Full screen:</b> fill all 25 spots and the win is <b>doubled</b> (a GRAND is paid once, not doubled).</p>
+ <h4>Snowball Fight</h4><p>Rarely, after a regular spin, Frostfang starts a snowball fight. Pick snowballs until one prize shows up 3 times, and you win it: the <b>MINI</b> (most often), <b>MINOR</b>, <b>MAJOR</b>, or <b>1×, 2× or 3× the bet</b>.</p>
  <h4>Bets</h4><p>Pick a denomination (1¢, 2¢ or 5¢), then a bet of 1×, 2×, 3×, 5× or 10× (50 to 500 credits). Bets run from $0.50 to $25.00. New players start with $100, and your balance is saved between visits. Use <b>ADD $100</b> to top up.</p>
  <h4>Jackpots</h4><p>MINI is ${E.JP.MINI}× the bet and MINOR is ${E.JP.MINOR}× the bet. MAJOR starts at ${E.JP.MAJOR}× the bet and grows with every spin. At your bet of ${fmt(bet())} that's ${fmt(E.JP.MINI*bet())}, ${fmt(E.JP.MINOR*bet())} and ${fmt(E.JP.MAJOR*bet())}+.<br>
- <b>GRAND starts at ${fmt(E.GRAND_SEED)} at every bet</b> and grows with every spin. It's won by the rare GRAND orb in the Hold &amp; Spin. Your chance grows with your bet: about 1 in ${Math.round(E.GRAND_SEED/(E.GRAND_K*bet())).toLocaleString()} spins at your bet of ${fmt(bet())}, from 1 in 450,000 at $0.50 to 1 in 9,000 at $25.00.</p>
+ <b>GRAND starts at ${fmt(E.GRAND_SEED)} at every bet</b> and grows with every spin. It's won by the rare GRAND orb in Frost Link. Your chance grows with your bet: about 1 in ${Math.round(E.GRAND_SEED/(E.GRAND_K*bet())).toLocaleString()} spins at your bet of ${fmt(bet())}, from 1 in 450,000 at $0.50 to 1 in 9,000 at $25.00.</p>
  <h4>Payout &amp; odds (Minnesota standard)</h4>
  <p>Built to the payout rule in Minnesota's tribal-state compacts for video games of chance: a game not affected by player skill must return at least 80% and no more than 95% of the amount wagered.</p>
- <ul><li><b>Theoretical return: 93.3% at every bet.</b> Measured over 60 million simulated spins, plus the GRAND's fixed 4% share, which is the same at every bet because its odds scale with the bet. This includes the 1% of each bet that grows the MAJOR and GRAND meters.</li>
- <li>Odds per spin: MINI about 1 in 370, MINOR about 1 in 520, MAJOR about 1 in 4,500, GRAND about 1 in 225,000 ÷ your bet in dollars. Hold &amp; Spin about 1 in 207, Moonrise Bonus about 1 in 49. A Moonrise Bonus averages 14 spins and about 18× the bet, and the full 8×5 grid is reached in about 1 of every 15.</li>
+ <ul><li><b>Theoretical return: about 93% at every bet.</b> Measured over 36 million simulated spins, plus the GRAND's fixed 4% share, which is the same at every bet because its odds scale with the bet. This includes the 1% of each bet that grows the MAJOR and GRAND meters.</li>
+ <li>Odds per spin: MINI about 1 in 370, MINOR about 1 in 600, MAJOR about 1 in 5,300, GRAND about 1 in 225,000 ÷ your bet in dollars. Moonrise Free Games about 1 in 118 (6.5 games on average), Diamond Hunt about 1 in 126, Frost Link about 1 in 210, Snowball Fight about 1 in 720.</li>
  <li>Even at the smallest bet ($0.50, about 1 in 450,000), the GRAND is far more likely than the compacts' 1 in 17,000,000 limit, and every advertised award hits much more often than once in 100 million games.</li>
  <li>Every spin is independent. Past results never change the odds.</li></ul>
  <p style="opacity:.6">Play money only. A real-money machine needs independent lab certification and approval by the Minnesota Department of Public Safety.</p>`;$('pays').classList.remove('hidden')};

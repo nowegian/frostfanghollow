@@ -20,7 +20,7 @@ u=u[:i]+'''<div class="cab m">
     <div class="jp mini" id="jpMINI"><b>MINI</b><i>$0</i></div>
   </div>
   <div class="stage">
-    <div class="frame">
+    <div class="frame" id="frameEl">
       <div class="banner hidden" id="banner"><span id="bannerTxt"></span></div>
       <div class="grid" id="grid"><div id="beast" class="idle"></div></div>
       <div class="peekbox" id="peekbox"></div>
@@ -29,7 +29,7 @@ u=u[:i]+'''<div class="cab m">
     </div>
     <div class="meter hidden" id="meter"></div>
   </div>
-  <div class="win-line" id="winLine">6+ orbs start the Hold &amp; Spin. 4+ moons in a row from reel 1 start the Moonrise.</div>
+  <div class="win-line" id="winLine">3 moons in a row from reel 1 = free games. Frostfang on 1, 3, 5 = Diamond Hunt.</div>
   <div class="mstats">
     <div class="box bank" id="bankBox"><small>CREDIT <span class="unit" id="bankUnit"><b class="d">$</b><b class="c">CR</b></span></small><div id="credit">$0</div><small id="creditCr" class="cr"></small></div>
     <div class="box betbox"><div class="denoms" id="denoms"></div>
@@ -142,6 +142,8 @@ button{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 .cab.m .mbar{grid-area:bar;grid-template-columns:1fr 1fr;gap:6px;margin:0}
 .cab.m .mbar #spin{grid-column:1/-1;grid-row:1;justify-self:center;width:clamp(74px,11vw,96px);font-size:clamp(17px,2.6vw,21px)}
 .cab.m .mbar .tg{padding:8px 2px;font-size:11px;white-space:nowrap}
+.cab.m .msg h2{font-size:clamp(22px,9dvh,40px)}.cab.m .msg img.ttl{max-height:38%}.cab.m .msg img.ttl.ttls{max-height:24%}.cab.m .msg .big{font-size:clamp(20px,8dvh,34px)}.cab.m .msg p{font-size:13px;margin-top:4px}
+.cab.m .sfgrid{width:min(96%,calc((var(--H) - 110px)*3.2));margin-top:6px}
 }
 """+u[i:]
 open('src/ui_mobile.html','w').write(u)

@@ -31,7 +31,16 @@
   "shiny",
   "snowball",
   "spin_me_up_friend",
-  "the_grand_orb"
+  "the_grand_orb",
+  "orbs_times_3",
+  "orbs_times_2",
+  "ill_take_those",
+  "pick_a_snowball",
+  "snowball_fight",
+  "frost_link",
+  "diamond_hunt_bonus",
+  "more_free_games",
+  "moonrise_free_games"
  ],
  "alias": {
   "bigger_3_3_grid": "bigger",
@@ -39,6 +48,8 @@
   "bigger_5_5_grid": "bigger",
   "bigger_6_5_grid": "bigger",
   "bigger_7_5_grid": "bigger",
-  "bigger_8_5_grid": "bigger"
+  "bigger_8_5_grid": "bigger",
+  "i_ll_take_those": "ill_take_those",
+  "frost_link_lock_those_orbs": "frost_link"
  }
 }

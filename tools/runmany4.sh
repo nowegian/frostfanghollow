@@ -7,13 +7,14 @@ t=None
 for l in sys.stdin:
   d=json.loads(l)
   if t is None: t=d; continue
-  for k in ('N','won','sq','holds','holdSpins','frees'): t[k]+=d[k]
+  for k in ('N','won','sq','holds','holdSpins','frees','moonSpins'): t[k]+=d.get(k,0)
   for k,v in d['cnt'].items(): t['cnt'][k]+=v
   for k,v in d['parts'].items(): t['parts'][k]+=v
 N=t['N'];b=t['bet'];m=t['won']/N/b;sd=math.sqrt(t['sq']/N-(t['won']/N)**2)/b;se=sd/math.sqrt(N)
 pp=t['parts']
 print(f'bet \${b}: {N:,} spins  TOTAL RTP {m*100+1:.2f}% (incl 1% meter growth)  CI +/-{1.96*se*100:.2f}')
 print('  split: '+'  '.join(f'{k} {v/N/b*100:.1f}%' for k,v in pp.items())+f'   hold spins per base spin 1/{N/t[\"holdSpins\"]:.1f}')
+print('  moonrise 1 in %d, %.2f spins each' % (N/max(1,t['frees']), t.get('moonSpins',0)/max(1,t['frees'])))
 print('  hold features 1 in %d, %.2f spins each' % (N/t['holds'], t['holdSpins']/t['holds']))
 print('  1 in: '+', '.join(f'{k} {N/v:,.0f}' for k,v in t['cnt'].items() if v))
 "
