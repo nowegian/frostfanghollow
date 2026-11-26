@@ -405,6 +405,36 @@ const save=()=>{try{localStorage.setItem('ffh-link-v2',JSON.stringify(S))}catch(
 // Signed out, or no database: everything works as before, saved in this browser only.
 const NET={db:null,uid:null,on:false,ro:false,ep:{g:0,m:0},others:{g:0,m:0},mine:{ge:0,g:0,me:0,m:0},docs:[],cBusy:false,cAgain:false,sBusy:false,sAgain:false};
 const wait=ms=>new Promise(r=>setTimeout(r,ms));
+// ---------- Public website (GitHub Pages): shared jackpots through Supabase, no player accounts ----------
+// One row in the 'jackpots' table holds the shared GRAND and MAJOR growth. Spins add to it in small batches
+// (jp_add); a win resets it for everyone (jp_win, first winner of a round only). Balances stay in this browser.
+const SB={url:'https://ngdgmikqyzydnfwwdhvq.supabase.co',key:'sb_publishable_-F8HEWHh4yR0GXOlJRWoRA_88i3Iv_h',
+ on:false,round:{g:0,m:0},base:{g:0,m:0},pend:{g:0,m:0},busy:false,again:false};
+async function sbCall(path,body){const r=await fetch(SB.url+'/rest/v1/'+path,{method:body?'POST':'GET',
+  headers:Object.assign({apikey:SB.key,Accept:'application/json'},body?{'Content-Type':'application/json'}:{}),body:body?JSON.stringify(body):undefined});
+ if(!r.ok)throw new Error('supabase '+r.status);return r.json();}
+function sbApply(){S.acc.GRAND=Math.round((SB.base.g+SB.pend.g)*10000)/10000;S.acc.MAJORX=Math.round((SB.base.m+SB.pend.m)*1e6)/1e6;}
+function sbRow(row){if(!row)return;row=Array.isArray(row)?row[0]:row;if(!row)return;
+ const gr=+row.grand_round||0,mr=+row.major_round||0;
+ if(gr>SB.round.g){SB.round.g=gr;SB.pend.g=0;} if(mr>SB.round.m){SB.round.m=mr;SB.pend.m=0;}
+ if(gr===SB.round.g)SB.base.g=Math.max(0,+row.grand_acc||0); if(mr===SB.round.m)SB.base.m=Math.max(0,+row.major_acc||0);
+ sbApply();}
+async function sbPoll(){try{sbRow(await sbCall('jackpots?id=eq.1&select=*'));if(!busy)drawMeters();}catch(e){}}
+async function sbFlush(){if(!SB.on)return;if(SB.busy){SB.again=true;return}SB.busy=true;
+ try{do{SB.again=false;await wait(2000);
+   while(SB.pend.g>0||SB.pend.m>0){const g=Math.min(SB.pend.g,2),m=Math.min(SB.pend.m,0.12),rg=SB.round.g,rm=SB.round.m;
+    const row=await sbCall('rpc/jp_add',{g,m});
+    if(SB.round.g===rg)SB.pend.g=Math.max(0,Math.round((SB.pend.g-g)*1e6)/1e6);
+    if(SB.round.m===rm)SB.pend.m=Math.max(0,Math.round((SB.pend.m-m)*1e6)/1e6);
+    sbRow(row);}
+  }while(SB.again);}catch(e){}SB.busy=false;}
+async function sbWin(k){const f=k==='GRAND'?'g':'m',round=SB.round[f];
+ SB.base[f]=0;SB.pend[f]=0;SB.round[f]=round+1;sbApply();
+ try{await sbCall('rpc/jp_win',{which:k,round});}catch(e){}
+ sbPoll();}
+async function sbStart(){try{sbRow(await sbCall('jackpots?id=eq.1&select=*'));SB.on=true;
+  try{localStorage.setItem('ffh-link-v2',JSON.stringify(S))}catch(e){}
+  drawMeters();setInterval(sbPoll,4000);}catch(e){SB.on=false;}}
 function applyAcc(){if(!NET.on)return;S.acc.GRAND=Math.round((NET.others.g+NET.mine.g)*10000)/10000;S.acc.MAJORX=Math.round((NET.others.m+NET.mine.m)*1e6)/1e6;}
 function sumOthers(){let g=0,m=0;for(const d of NET.docs){if(d.id===NET.uid)continue;const v=d.data()||{};
  if(v.ge===NET.ep.g&&typeof v.g==='number')g+=Math.max(0,Math.min(v.g,1e6));if(v.me===NET.ep.m&&typeof v.m==='number')m+=Math.max(0,Math.min(v.m,1e3));}
@@ -417,10 +447,12 @@ async function queueContrib(){if(!NET.on||NET.ro)return;if(NET.cBusy){NET.cAgain
 async function queueSave(){if(!NET.on||NET.ro)return;if(NET.sBusy){NET.sAgain=true;return}NET.sBusy=true;
  try{do{NET.sAgain=false;await wait(1500);await NET.db.doc('data/users/'+NET.uid+'/save').set({credit:S.credit,denI:S.denI,multI:S.multI,speed:S.speed,bank:S.bank||'$'});}while(NET.sAgain);}
  catch(e){if(e&&e.code==='invalid_argument')writeFailed();}NET.sBusy=false;}
-function jpAdd(m,g){if(NET.on){NET.mine.m+=m;NET.mine.g=Math.round((NET.mine.g+g)*10000)/10000;applyAcc();queueContrib();}
+function jpAdd(m,g){if(SB.on){SB.pend.m+=m;SB.pend.g=Math.round((SB.pend.g+g)*10000)/10000;sbApply();sbFlush();}
+ else if(NET.on){NET.mine.m+=m;NET.mine.g=Math.round((NET.mine.g+g)*10000)/10000;applyAcc();queueContrib();}
  else{S.acc.MAJORX+=m;S.acc.GRAND=Math.round((S.acc.GRAND+g)*10000)/10000;}}
 async function jpWon(k){const f=k==='GRAND'?'g':'m',ef=f==='g'?'ge':'me';
  if(k==='GRAND')S.acc.GRAND=0;else S.acc.MAJORX=0;
+ if(SB.on){sbWin(k);return;}
  if(!NET.on)return;
  // start the next round for everyone: everybody's old contributions stop counting
  NET.ep[f]++;syncEpochs();NET.others[f]=0;applyAcc();drawMeters();
@@ -431,7 +463,7 @@ async function jpWon(k){const f=k==='GRAND'?'g':'m',ef=f==='g'?'ge':'me';
   body[ef]=Math.max((d[ef]||0)+1,NET.ep[f]);await ref.set(body);NET.ep[f]=body[ef];syncEpochs();sumOthers();queueContrib();}
  catch(e){if(e&&e.code==='invalid_argument')writeFailed();}}
 (async()=>{try{
- const C=window.claude;if(!C||typeof C.use!=='function')return;
+ const C=window.claude;if(!C||typeof C.use!=='function'){if(/^https?:$/.test(location.protocol)&&!/claude|anthropic/.test(location.hostname))sbStart();return;}
  const [db,user]=await Promise.all([C.use('db'),C.use('user')]);if(!db||!user)return;
  const uid=await user.id();if(!uid)return;NET.db=db;NET.uid=uid;
  const [sv,mine,st]=await Promise.all([db.doc('data/users/'+uid+'/save').get(),db.doc('jpc/'+uid).get(),db.doc('jps/state').get()]);
@@ -524,7 +556,7 @@ function peek(kind,ms,over,force){
  requestAnimationFrame(()=>im.classList.remove('out'));
  peek.t=setTimeout(()=>{im.classList.add('out');peek.t=setTimeout(()=>{if(im.parentNode)im.remove()},320)},Math.max(250,ms));
 }
-window.ffPeek=peek;
+window.ffPeek=peek;window.ffDbg={get S(){return S},SB,jpWon:k=>jpWon(k)};
 function say(t,ms=1800){SOUND.say(t);const b=$('bubble');b.textContent=t;b.classList.add('on');clearTimeout(say.t);say.t=setTimeout(()=>b.classList.remove('on'),ms)}
 function showMsg(html){const m=$('msg');m.innerHTML=html;m.classList.remove('hidden')}
 function hideMsg(){$('msg').classList.add('hidden')}
