@@ -63,6 +63,8 @@ const SOUND = (() => {
     for (const n of [...(manifest.sfx || []), ...(manifest.music || [])]) {
       try { const r = await fetch('audio/' + n + '.mp3'); if (!r.ok) continue;
         files[n] = await ctx.decodeAudioData(await r.arrayBuffer()); } catch (e) {}
+      // the recorded track for the music already playing has arrived: switch to it
+      if (n === 'music_' + mode && !fileSrc) { const m = mode; mode = null; music(m); }
     }
   }
   const ready = () => ctx && prefs.on;
@@ -154,9 +156,17 @@ const SOUND = (() => {
         [0, 4, 7, 12].forEach((s, i) => bell(N(72 + r * 2 + s), t + r * 0.5 + i * 0.06, { gain: 0.1, dur: 1.4 })); } },
     glide: (t, { n = 0 } = {}) => osc('triangle', 500 + n * 25, t, 0.05, { gain: 0.05 })
   };
+  // Recorded effects: some sounds rise in pitch through a sequence (orbs landing, the grid gliding), so the
+  // file is sped up by the same musical step the built-in sound used; jackpots have one file per level.
+  const STEP = { orb: o => PENTA[Math.min(o.n || 0, 6)], lock: o => PENTA[(o.n || 0) % 7], glide: o => Math.min(o.n || 0, 14) / 2,
+                 reelStop: o => -(o.i || 0) * 0.4 };
   function play(name, opt) {
     if (!ready()) return;
-    if (files[name]) { playFile(name); return; }
+    opt = opt || {};
+    if (name === 'jackpot' && opt.level && files['jackpot_' + opt.level]) name = 'jackpot_' + opt.level;
+    if (files[name]) {
+      if (name === 'coin') { const t = ctx.currentTime; if (t - lastCoin < 0.05) return; lastCoin = t; }
+      playFile(name, sfxBus, { rate: STEP[name] ? Math.pow(2, STEP[name](opt) / 12) : 1 }); return; }
     const f = FX[name]; if (f) try { f(ctx.currentTime + 0.01, opt || {}); } catch (e) {}
   }
 
@@ -194,7 +204,7 @@ const SOUND = (() => {
         if (bar === 0) pad(ch.map(N), t, dur * 16, { gain: 0.03, cutoff: 1400 });
       } }
   };
-  let mode = null, timer = null, nextT = 0, step = 0, fileSrc = null;
+  let mode = null, timer = null, nextT = 0, step = 0, fileSrc = null, fileGain = null;
   function tick() {
     if (!ctx || !mode) return;
     const song = SONGS[mode], dur = 60 / song.bpm / 4;
@@ -207,9 +217,16 @@ const SOUND = (() => {
   function music(m) {
     if (m === mode) return;
     mode = m; clearInterval(timer); timer = null;
-    if (fileSrc) { try { fileSrc.stop(); } catch (e) {} fileSrc = null; }
+    if (fileSrc) { try { fileGain.gain.setTargetAtTime(0.0001, ctx.currentTime, 0.12); fileSrc.stop(ctx.currentTime + 0.7); } catch (e) {} fileSrc = null; }
     if (!ctx || !m) return;
-    if (files['music_' + m]) { fileSrc = playFile('music_' + m, musicBus, { loop: true }); return; }
+    if (files['music_' + m]) {
+      // loop exactly the composed length (skipping any MP3 encoder padding) so the seam is seamless
+      const buf = files['music_' + m], len = (manifest.loops || {})['music_' + m] || buf.duration;
+      const off = Math.max(0, Math.min(buf.duration - len, 1105 / buf.sampleRate));
+      const src = ctx.createBufferSource(); src.buffer = buf; src.loop = true;
+      src.loopStart = off; src.loopEnd = Math.min(buf.duration, off + len);
+      const g = ctx.createGain(); g.gain.setValueAtTime(0.0001, ctx.currentTime); g.gain.exponentialRampToValueAtTime(1, ctx.currentTime + 0.8);
+      src.connect(g).connect(musicBus); src.start(ctx.currentTime + 0.02, off); fileSrc = src; fileGain = g; return; }
     step = 0; nextT = ctx.currentTime + 0.1; timer = setInterval(tick, 30);
   }
 

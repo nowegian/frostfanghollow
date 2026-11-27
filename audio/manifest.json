@@ -1,6 +1,36 @@
 {
- "sfx": [],
- "music": [],
+ "sfx": [
+  "click",
+  "coin",
+  "diamond",
+  "feature",
+  "full",
+  "gem",
+  "glide",
+  "grand",
+  "grow",
+  "impact",
+  "jackpot",
+  "jackpot_GRAND",
+  "jackpot_MAJOR",
+  "jackpot_MINOR",
+  "lock",
+  "moon",
+  "orb",
+  "plus",
+  "reelStop",
+  "spinStart",
+  "tease",
+  "throw",
+  "winBig",
+  "winMed",
+  "winSmall"
+ ],
+ "music": [
+  "music_base",
+  "music_hold",
+  "music_moon"
+ ],
  "voice": [
   "100_fresh_snow_fresh_credits",
   "1_spin",
@@ -54,5 +84,10 @@
   "bigger_8_5_grid": "bigger",
   "i_ll_take_those": "ill_take_those",
   "frost_link_lock_those_orbs": "frost_link"
+ },
+ "loops": {
+  "music_base": 62.60868480725624,
+  "music_hold": 64.0,
+  "music_moon": 73.84614512471656
  }
 }
