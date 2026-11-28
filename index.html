@@ -349,6 +349,10 @@ button{font-family:inherit;cursor:pointer;border:none;color:#fff;font-weight:700
 .gemlist img.symimg{height:46px;width:auto}
 .pff{display:inline-block;height:56px;vertical-align:middle;aspect-ratio:1;background:url(img/sym_frostfang_bonus.webp) 0 0/800% 100% no-repeat;animation:ffsym 1.35s steps(8,jump-none) infinite;float:left;margin:0 10px 4px 0}
 .modal .card p img.symimg.gemi{height:34px;float:none;margin:0 2px;vertical-align:middle}
+#zonebox{display:none;position:absolute;z-index:6;pointer-events:none;border:3px solid #ffd34d;border-radius:10px;
+ box-shadow:0 0 10px #ffd34d,0 0 22px #ffb02ecc,inset 0 0 12px #ffd34d88;transition:left .22s ease,top .22s ease,width .45s ease,height .45s ease;animation:zglow 1.2s ease-in-out infinite alternate}
+.grid.moon #zonebox{display:block}
+@keyframes zglow{from{box-shadow:0 0 8px #ffd34d,0 0 16px #ffb02e99,inset 0 0 8px #ffd34d66}to{box-shadow:0 0 14px #ffe58a,0 0 30px #ffb02e,inset 0 0 16px #ffd34daa}}
 </style>
 </head>
 <body>
@@ -1828,7 +1832,10 @@ async function holdAndSpin(g,fromFree){
 const M=E.MOON, STEPN=s=>`${M.STEPS[s][0]}×${M.STEPS[s][1]}`;
 function placePet(v){if(!v)return;placePet.v=v;if(!grid.classList.contains('moon'))return;const be=$('beast');
  const [R,C]=M.STEPS[v.level],a=cells[v.row*5+v.col],b=cells[(v.row+R-1)*5+v.col+C-1];if(!a||!b)return;
- Object.assign(be.style,{left:a.offsetLeft+'px',top:a.offsetTop+'px',width:(b.offsetLeft+b.offsetWidth-a.offsetLeft)+'px',height:(b.offsetTop+b.offsetHeight-a.offsetTop)+'px'});}
+ const box={left:a.offsetLeft+'px',top:a.offsetTop+'px',width:(b.offsetLeft+b.offsetWidth-a.offsetLeft)+'px',height:(b.offsetTop+b.offsetHeight-a.offsetTop)+'px'};
+ Object.assign(be.style,box);
+ // glowing yellow outline around Frostfang's grid
+ let zb=$('zonebox');if(!zb){zb=document.createElement('div');zb.id='zonebox';grid.appendChild(zb);}Object.assign(zb.style,box);}
 addEventListener('resize',()=>placePet(placePet.v));
 function drawZone(v,grow){placePet(v);for(let i=0;i<40;i++){const r=i%5,y=Math.floor(i/5),z=E.inZone(v,r,y),was=cells[i].classList.contains('zone');
  cells[i].classList.toggle('zone',z);}
@@ -1837,7 +1844,7 @@ function drawZone(v,grow){placePet(v);for(let i=0;i<40;i++){const r=i%5,y=Math.f
 async function glide(v,row,col){
  while(v.row!==row||v.col!==col){
   if(v.row!==row)v.row+=Math.sign(row-v.row);else v.col+=Math.sign(col-v.col);
-  drawZone(v);SOUND.play('glide',{n:v.row+v.col});await sleep(110);}
+  drawZone(v);SOUND.play('glide',{n:v.row+v.col});await sleep(230);}
 }
 function drawMeter(level,gems){const m=$('meter');m.classList.remove('hidden');
  const mx=drawMeter.max??M.STEPS.length-1;if(level>=mx){m.innerHTML=level>=M.STEPS.length-1?`<b>FULL GRID!</b><small>8×5 reached</small>`:`<b>MAX GRID</b><small>${STEPN(level)} reached</small>`;return}
