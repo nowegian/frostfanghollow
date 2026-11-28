@@ -290,6 +290,8 @@ button{font-family:inherit;cursor:pointer;border:none;color:#fff;font-weight:700
 .grid.moon .cell.zone.got{z-index:5}
 .grid.moon .cell.zone:empty{z-index:1;background:linear-gradient(#1a1240,#0e0828);opacity:.55}
 .grid.moon .cell[data-s="O"],.grid.moon .cell[data-s="D"]{opacity:1}
+.grid.moon .cell:not(.zone)[data-s="O"],.grid.moon .cell:not(.zone)[data-s="X"]{opacity:.55}
+.grid.moon .cell.gone>*{transition:opacity .35s,transform .35s;opacity:0;transform:scale(.6)}
 .grid.moon .cell:not(.zone)[data-s="O"],.grid.moon .cell:not(.zone)[data-s="D"]{background:linear-gradient(#1a12408c,#0e08288c)}
 .grid.moon .cell .val.gemv,.grid.moon .tile .val.gemv{inset:auto 0 3%!important;top:auto!important;transform:none;font-size:clamp(10px,1.9vw,16px);color:#e8fbff;text-shadow:0 0 6px #2a7bd6,0 2px 0 #06204a,0 0 3px #000}
 #beast.zgrow{animation:zgrow .7s ease-out}
@@ -937,7 +939,15 @@ async function moonBonus(mods,gemVals){
    setTimeout(()=>cells.forEach(c=>c.classList.remove('land')),500);}
   const pot0=st.pot,jv=jpVals();
   const ev=E.moonResolve(st,g,jv);
-  if(ev.plus){shown+=ev.plus;banner(`+${ev.plus} SPIN! · SPINS LEFT ${shown}`,true);say('+1 SPIN!',1400);await sleep(800);}
+  // +1 SPIN gold coins inside the grid: each one is picked up and adds a spin
+  const vanish=async el=>{el.classList.add('gone');await sleep(380);el.innerHTML='';el.dataset.s='';el.classList.remove('gone','got','collect');};
+  if(ev.plus){let k=0;
+   for(let r=0;r<5;r++)for(let y=0;y<8;y++){const c=g[r][y];if(!(c.s==='X'||c.cplus)||!E.inZone(ev.start,r,y))continue;
+    const el=cells[y*5+r];k++;shown++;el.classList.add('collect','got');
+    const fx=document.createElement('div');fx.className='plusfx';fx.textContent='+1 SPIN';el.appendChild(fx);setTimeout(()=>fx.remove(),1300);
+    SOUND.play('plus');say('+1 SPIN!',1200);banner(`+1 SPIN! · SPINS LEFT ${shown}`,true);await sleep(650);
+    if(c.s==='X')await vanish(el);else el.classList.remove('collect');}
+   shown=st.spins-ev.path.reduce((a,p)=>a+(p.plus||0)+(p.addSpins||0),0);lab(view.level,pot0);}
   // 1) orbs inside the grid where it sits go to the pot
   let pot=pot0;
   for(const c of ev.collected){const el=cells[c.y*5+c.r];el.classList.add('collect','got');
@@ -946,7 +956,7 @@ async function moonBonus(mods,gemVals){
      const fx=document.createElement('div');fx.className='plusfx';fx.textContent=(k?'2nd coin +':'1st coin +')+(p.jp||fmtCr(p.v));el.appendChild(fx);setTimeout(()=>fx.remove(),1300);}
     if(p.jp){$('jp'+p.jp).classList.add('flash');setTimeout(()=>$('jp'+p.jp).classList.remove('flash'),2200);SOUND.play('jackpot',{level:p.jp});if(p.jp==='MAXI'||p.jp==='MAJOR'||p.jp==='GRAND')jpWon(p.jp);say({MINI:'Mini jackpot!',MINOR:'Minor jackpot!',MAXI:'Maxi jackpot!',MAJOR:'Major jackpot!',GRAND:'THE GRAND!!!'}[p.jp])}else SOUND.play('lock',{n:4+k});
     await countUp($('win'),pot,pot+p.v,p.jp?900:260);pot+=p.v;if(c.parts.length>1)await sleep(350);}
-   el.classList.remove('collect');lab(view.level,pot);}
+   el.classList.remove('collect');lab(view.level,pot);await vanish(el);}
   // 2) the grid travels to each diamond, nearest first
   if(ev.path.length){say(['Shiny!','Mine! Mine!','Ooh, diamonds!','Gimme gimme!'][Math.floor(Math.random()*4)]);await sleep(300);}
   for(const p of ev.path){
