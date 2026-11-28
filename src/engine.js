@@ -212,10 +212,11 @@ const ENGINE = (() => {
     P_DIAMOND: 0.035,  // chance per spot OUTSIDE the grid
     P_PLUS: 0.28,      // share of diamonds that are +1 SPIN diamonds (the rest pay credits)
     P_ORB: 0.04,       // gold coin chance per spot, anywhere
+    P_CPLUS: 0.003,    // +1 SPIN gold coin chance per spot INSIDE the grid
     P_MANY: 0.25,      // with a sapphire: share of diamonds and coins that come as "many" (double) symbols
-    VAL: 0.245,        // scales gold coin credit values
-    DVAL: 0.26,        // scales diamond credit values
-    JPK: 2.3,          // coin jackpot chances: JPK x each jackpot's share of the bet / its value (same payback at every bet)
+    VAL: 0.21,         // scales gold coin credit values
+    DVAL: 0.22,        // scales diamond credit values
+    JPK: 1.9,          // coin jackpot chances: JPK x each jackpot's share of the bet / its value (same payback at every bet)
     MIN_PAY: 0, GUARANTEE: 1,
     P_SNOW: 0.18, SNOW_VAL: 0.4, SNOW_PLUS: 0.08, SNOW_OUT: 0.5   // Frostfang's snowballs: chance per spin, coin value, +1 SPIN cube share, share thrown outside the grid
   };
@@ -278,11 +279,26 @@ const ENGINE = (() => {
     return c;
   }
   const diaCash=bet=>money(cashOf([0.5,1,1,2,2,3,5][Math.floor(rng()*7)]*MOON.DVAL*bet,bet));
-  // a diamond cell: +1 SPIN (plus) or credits; "many" = +2 SPINS or two independent credit values
-  function diamondCell(st, bet, many){
-    if(rng()<MOON.P_PLUS) return many?{s:'D',plus:2,many:true}:{s:'D',plus:1};
-    return many?{s:'D',cash:diaCash(bet),cash2:diaCash(bet),many:true}:{s:'D',cash:diaCash(bet)};
+  // a diamond value: credits, or now and then a jackpot (same per-value jackpot odds as gold coins)
+  function diaValue(st, bet){
+    const vals=Object.assign({MINI:JPF.MINI_CR*st.denom, MINOR:JPF.MINOR_CR*st.denom}, JPF.SEED);
+    let y=rng(); for(const k of ['GRAND','MAJOR','MAXI','MINOR','MINI']){ if((y-=MOON.JPK*JPF.SHARE[k]*bet/vals[k])<0) return {jp:k}; }
+    return {cash:diaCash(bet)};
   }
+  const v2=(v,suf)=>v.jp?{['jp'+suf]:v.jp}:{['cash'+suf]:v.cash};
+  // diamond cells:
+  //   sym_diamond            one credit value (or jackpot)          {s:'D', cash|jp}
+  //   sym_diamond_plus       +1 SPIN                                {s:'D', plus:1}
+  //   sym_many_diamonds      two independent values (sapphire)      {s:'D', many, cash|jp, cash2|jp2}
+  //   sym_many_diamond_plus  +1 SPIN and one value (sapphire)       {s:'D', many, plus:1, cash|jp}
+  function diamondCell(st, bet, many){
+    if(rng()<MOON.P_PLUS) return many?Object.assign({s:'D',plus:1,many:true},v2(diaValue(st,bet),'')):{s:'D',plus:1};
+    return many?Object.assign({s:'D',many:true},v2(diaValue(st,bet),''),v2(diaValue(st,bet),'2')):Object.assign({s:'D'},v2(diaValue(st,bet),''));
+  }
+  // gold coin cells (inside the grid only, see moonGrid):
+  //   sym_gold_coin_plus       +1 SPIN                          {s:'X'}
+  //   sym_many_gold_coin_plus  +1 SPIN and one value (sapphire) {s:'O', orb, cplus:true}
+  function coinPlusCell(st, bet, many){ return many?{s:'O', orb:coinValue(st,bet), cplus:true}:{s:'X'}; }
   const FILL='FPSBCAKQJT';
   // Spin the 8x5 board for the grid where it sits now. Diamonds are only drawn for spots outside the grid
   // (inside, that probability is left to the filler symbols), so no diamond is ever placed inside the grid.
@@ -292,6 +308,7 @@ const ENGINE = (() => {
       const out=!inZone(st,r,y), x=rng(), many=()=>st.many && rng()<MOON.P_MANY;
       if(out && x<MOON.P_DIAMOND) col.push(diamondCell(st,bet,many()));
       else if(x>=MOON.P_DIAMOND && x<MOON.P_DIAMOND+MOON.P_ORB) col.push(coinCell(st,bet,many()));
+      else if(!out && x>=MOON.P_DIAMOND+MOON.P_ORB && x<MOON.P_DIAMOND+MOON.P_ORB+MOON.P_CPLUS) col.push(coinPlusCell(st,bet,many()));
       else col.push({s:FILL[Math.floor(rng()*FILL.length)]});
     } g.push(col); }
     return g;
@@ -307,7 +324,7 @@ const ENGINE = (() => {
       const useOut=outs.length && (!ins.length || rng()<MOON.SNOW_OUT), list=useOut?outs:ins; if(!list.length) break;
       const [r,y]=list.splice(Math.floor(rng()*list.length),1)[0], was=g[r][y]; let c;
       if(useOut) c=rng()<0.6?diamondCell(st,bet,false):{s:'O',orb:coinValue(st,bet,MOON.SNOW_VAL)};
-      else c=rng()<MOON.SNOW_PLUS?{s:'X'}:{s:'O',orb:coinValue(st,bet,MOON.SNOW_VAL)};
+      else c=rng()<MOON.SNOW_PLUS?coinPlusCell(st,bet,false):{s:'O',orb:coinValue(st,bet,MOON.SNOW_VAL)};
       g[r][y]=Object.assign(c,{snow:true}); out.push({r,y,was,c});
     }
     return out;
@@ -335,8 +352,10 @@ const ENGINE = (() => {
         } else ev.missed.push({r,y});
       }
     }));
-    ev.plus=0; g.forEach((col,r)=>col.forEach((c,y)=>{ if(c.s==='X' && inZone(st,r,y)){ st.spins++; ev.plus++; } }));
-    const left=[]; g.forEach((col,r)=>col.forEach((c,y)=>{ if(c.s==='D') left.push({r,y,plus:c.plus||0,cash:c.jp?jpVals[c.jp]:(c.cash||0),cash2:c.cash2||0,many:!!c.many,jp:c.jp||null}); }));
+    ev.plus=0; g.forEach((col,r)=>col.forEach((c,y)=>{ if((c.s==='X'||c.cplus) && inZone(st,r,y)){ st.spins++; ev.plus++; } }));
+    const left=[]; g.forEach((col,r)=>col.forEach((c,y)=>{ if(c.s==='D'){
+      const parts=[]; if(c.jp||c.cash) parts.push({v:c.jp?jpVals[c.jp]:c.cash, jp:c.jp||null}); if(c.jp2||c.cash2) parts.push({v:c.jp2?jpVals[c.jp2]:c.cash2, jp:c.jp2||null});
+      left.push({r,y,plus:c.plus||0,parts,many:!!c.many}); } }));
     while(left.length){
       // nearest diamond to the grid; ties go to the one higher up, then further left
       let bi=0; for(let i=1;i<left.length;i++){
@@ -345,8 +364,8 @@ const ENGINE = (() => {
       }
       const d=left.splice(bi,1)[0];
       moveTo(st,d.r,d.y);
-      st.spins+=d.plus; const cash=Math.round((d.cash+d.cash2)*100)/100; if(cash) st.pot+=cash;
-      const step={r:d.r,y:d.y,row:st.row,col:st.col,level:st.level,grew:false,plus:d.plus,cash,jp:d.jp,cashParts:d.cash2?[d.cash,d.cash2]:(d.cash?[d.cash]:[]),many:d.many,spins:st.spins};
+      st.spins+=d.plus; const cash=Math.round(d.parts.reduce((a,p)=>a+p.v,0)*100)/100; if(cash) st.pot+=cash;
+      const step={r:d.r,y:d.y,row:st.row,col:st.col,level:st.level,grew:false,plus:d.plus,cash,parts:d.parts,jp:(d.parts[0]||{}).jp||null,cashParts:d.parts.map(p=>p.v),many:d.many,spins:st.spins};
       if(st.level<st.maxLevel){
         st.gems++;
         if(st.gems>=MOON.NEED[st.level]){

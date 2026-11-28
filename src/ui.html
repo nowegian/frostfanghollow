@@ -341,6 +341,7 @@ button{font-family:inherit;cursor:pointer;border:none;color:#fff;font-weight:700
 .cell .dbl{position:relative;height:94%;aspect-ratio:1;max-width:100%;display:flex;align-items:center;justify-content:center}
 .cell .dbl img.symimg{height:100%!important;width:100%!important}
 #grid .cell .dbl .val.v1{inset:auto!important;left:0!important;right:30%!important;top:40%!important;transform:translateY(-50%);font-size:clamp(9px,1.7vw,14px)!important}
+#grid .cell .dbl .val.vm{inset:auto!important;left:20%!important;right:12%!important;top:64%!important;transform:translateY(-50%);font-size:clamp(9px,1.7vw,14px)!important}
 #grid .cell .dbl .val.v2{inset:auto!important;left:30%!important;right:0!important;top:70%!important;transform:translateY(-50%);font-size:clamp(9px,1.7vw,14px)!important}
 #grid .cell .val.lit{color:#ffe28a;text-shadow:0 0 8px #ffb02e,0 2px 0 #000;transform:translateY(-50%) scale(1.3)}
 .gemlist{display:flex;flex-direction:column;gap:6px;margin-top:8px;align-items:center}
@@ -435,14 +436,18 @@ function beastSVG(small){
 }
 for(const k of 'WFPSBCAKQJTOMXD')ART[k]=ART2[k];
 // Finished artwork: any symbol listed here uses its image file; the rest keep the drawn art.
-const IMG={F:'img/sym_frostfang.webp',B:'img/sym_bat.webp',S:'img/sym_skull.webp',P:'img/sym_pumpkin.webp',K:'img/sym_K.webp',A:'img/sym_A.webp',C:'img/sym_candles.webp',W:'img/sym_wild.webp',O:'img/sym_gold_coin.webp',Z:'img/sym_sapphire.webp',R:'img/sym_ruby.webp',E:'img/sym_emerald.webp',T:'img/sym_10.webp',J:'img/sym_J.webp',Q:'img/sym_Q.webp',M:'img/sym_moon.webp',D:'img/sym_diamond.webp',X:'img/bonus_plus1.webp'};
+const IMG={F:'img/sym_frostfang.webp',B:'img/sym_bat.webp',S:'img/sym_skull.webp',P:'img/sym_pumpkin.webp',K:'img/sym_K.webp',A:'img/sym_A.webp',C:'img/sym_candles.webp',W:'img/sym_wild.webp',O:'img/sym_gold_coin.webp',Z:'img/sym_sapphire.webp',R:'img/sym_ruby.webp',E:'img/sym_emerald.webp',T:'img/sym_10.webp',J:'img/sym_J.webp',Q:'img/sym_Q.webp',M:'img/sym_moon.webp',D:'img/sym_diamond.webp',X:'img/sym_gold_coin_plus.webp'};
 for(const k in IMG){ART[k]=`<img class="symimg${k==='O'?' orbimg':''}" src="${IMG[k]}" alt="" draggable="false">`;const pre=new Image();pre.src=IMG[k];}
 // extra artwork that isn't a plain reel symbol: jackpot orbs (shown instead of orb + label) and the +1 diamond
-const XIMG={WIN_P:'img/sym_pumpkin_win.webp',WIN_S:'img/sym_skull_win.webp',WIN_B:'img/sym_bat_win.webp',WIN_C:'img/sym_candles_win.webp',PICK:'img/snowball_pick.webp',SPLAT:'img/splat.webp',CRACK:'img/ice_crack.webp',SMASH:'img/frostfang_smash.webp',T_SNOW:'img/title_snowball_fight.webp',T_HUNT:'img/title_diamond_hunt.webp',T_FREE:'img/title_free_games.webp',T_LINK:'img/title_frost_link.webp',MINI:'img/orb_mini.webp',MINOR:'img/orb_minor.webp',MAJOR:'img/orb_major.webp',GRAND:'img/orb_grand.webp',DPLUS:'img/sym_diamond_plus.webp',DMANY:'img/sym_many_diamonds.webp',DPLUS2:'img/sym_many_diamond_plus.webp',COIN2:'img/sym_many_gold_coin.webp',FFSYM:'img/sym_frostfang_bonus.webp',SNOW:'img/fx_snowball.webp'};
+const XIMG={WIN_P:'img/sym_pumpkin_win.webp',WIN_S:'img/sym_skull_win.webp',WIN_B:'img/sym_bat_win.webp',WIN_C:'img/sym_candles_win.webp',PICK:'img/snowball_pick.webp',SPLAT:'img/splat.webp',CRACK:'img/ice_crack.webp',SMASH:'img/frostfang_smash.webp',T_SNOW:'img/title_snowball_fight.webp',T_HUNT:'img/title_diamond_hunt.webp',T_FREE:'img/title_free_games.webp',T_LINK:'img/title_frost_link.webp',MINI:'img/orb_mini.webp',MINOR:'img/orb_minor.webp',MAJOR:'img/orb_major.webp',GRAND:'img/orb_grand.webp',DPLUS:'img/sym_diamond_plus.webp',DMANY:'img/sym_many_diamonds.webp',DPLUS2:'img/sym_many_diamond_plus.webp',COIN2:'img/sym_many_gold_coin.webp',COIN2PLUS:'img/sym_many_gold_coin_plus.webp',FFSYM:'img/sym_frostfang_bonus.webp',SNOW:'img/fx_snowball.webp'};
 for(const k in XIMG){const pre=new Image();pre.src=XIMG[k];}
 const imgTag=src=>`<img class="symimg" src="${src}" alt="" draggable="false">`;
 const orbHTML=(v,v2)=>v2?`<div class="dbl">${imgTag(XIMG.COIN2)}<div class="val v1${v.jp?' jpv':''}">${v.jp||fmtCr(v.cash)}</div><div class="val v2${v2.jp?' jpv':''}">${v2.jp||fmtCr(v2.cash)}</div></div>`:ART.O+valHTML(v);
-const gemHTML=(plus,cash,cash2)=>plus===2?imgTag(XIMG.DPLUS2):plus?imgTag(XIMG.DPLUS):cash2?`<div class="dbl">${imgTag(XIMG.DMANY)}<div class="val gemv v1">${fmtCr(cash)}</div><div class="val gemv v2">${fmtCr(cash2)}</div></div>`:ART.D+(cash?`<div class="val gemv">${fmtCr(cash)}</div>`:'');
+// value label: credits or a jackpot name
+const vLab=(cash,jp,cls)=>jp||cash?`<div class="val gemv${cls||''}${jp?' jpv':''}">${jp||fmtCr(cash)}</div>`:'';
+// diamonds: sym_diamond (value), sym_diamond_plus (+1 SPIN), sym_many_diamonds (two values), sym_many_diamond_plus (+1 SPIN and a value)
+const gemHTML=c=>c.plus&&c.many?`<div class="dbl">${imgTag(XIMG.DPLUS2)}${vLab(c.cash,c.jp,' vm')}</div>`:c.plus?imgTag(XIMG.DPLUS)
+ :c.many?`<div class="dbl">${imgTag(XIMG.DMANY)}${vLab(c.cash,c.jp,' v1')}${vLab(c.cash2,c.jp2,' v2')}</div>`:ART.D+vLab(c.cash,c.jp);
 const FIMG={idle:1,throw:1,cheer:1,grab:1};
 const FSPR={idle:8,cheer:6,throw:6,grab:6,smash:6};
 for(const k in FSPR){const pre=new Image();pre.src='img/ff_'+k+'.webp';}
@@ -627,8 +632,9 @@ const grid=$('grid'), cells=[];
 for(let i=0;i<40;i++){const d=document.createElement('div');d.className='cell'+(i>=15?' xrow':'')+(i>=25?' x8':'');grid.appendChild(d);cells.push(d);}
 const RAND='WFPSBCAKQJTM'.split(''),FRAND='WFPSBCPSBCM'.split(''),MRAND='FPSBCAKQJTOOD'.split('');
 function symHTML(c){if(!c)return '';
+ if(c.s==='O'&&c.cplus) return `<div class="dbl">${imgTag(XIMG.COIN2PLUS)}${vLab(c.orb.cash,c.orb.jp,' vm')}</div>`;
  if(c.s==='O'&&c.orb) return orbHTML(c.orb,c.many?c.orb2:null);
- if(c.s==='D') return c.jp?ART.D+`<div class="val gemv jpv">${c.jp}</div>`:gemHTML(c.plus,c.cash,c.cash2);
+ if(c.s==='D') return gemHTML(c);
  if(E.GEMS[c.s]&&c.val) return ART[c.s]+`<div class="val gemv${c.val.jp?' jpv':''}">${c.val.jp||fmtCr(c.val.cash)}</div>`;
  if(c.s==='G') return '<div class="ffsym" role="img" aria-label="Frostfang bonus"></div>';
  return ART[c.s]||'';}
@@ -893,7 +899,7 @@ function drawMeter(level,gems){const m=$('meter');m.classList.remove('hidden');
  const mx=drawMeter.max??M.STEPS.length-1;if(level>=mx){m.innerHTML=level>=M.STEPS.length-1?`<b>FULL GRID!</b><small>8×5 reached</small>`:`<b>MAX GRID</b><small>${STEPN(level)} reached</small>`;return}
  const need=M.NEED[level];let dots='';for(let k=0;k<need;k++)dots+=`<span class="${k<gems?'on':''}">${ART.D}</span>`;
  m.innerHTML=`<div class="dots">${dots}</div><small>${gems}/${need} to grow to <b>${STEPN(level+1)}</b></small>`;}
-const GEMTXT={sapphire:'SAPPHIRE: double diamonds, +2 SPIN diamonds and double gold coins',ruby:'RUBY: the grid can grow to 8×5',emerald:'EMERALD: +2 starting spins'};
+const GEMTXT={sapphire:'SAPPHIRE: double diamonds and double gold coins join the hunt',ruby:'RUBY: the grid can grow to 8×5',emerald:'EMERALD: +2 starting spins'};
 // the triggering spin: Frostfang on reel 1 and the gems light up, then the active modifiers are announced
 async function huntIntro(g,mods){
  cells.forEach((c,i)=>{const s=c.dataset.s;if(s==='G'||(E.GEMS[s]&&i%5>0))c.classList.add('wspark');});
@@ -938,15 +944,16 @@ async function moonBonus(mods,gemVals){
   for(const p of ev.path){
    await glide(view,p.row,p.col);
    const i=p.y*5+p.r;cells[i].classList.add('got');
-   const parts=p.cashParts||[];
-   if(parts.length>1){for(let k=0;k<parts.length;k++){const fx=document.createElement('div');fx.className='plusfx';fx.textContent=(k?'2nd diamond +':'1st diamond +')+fmtCr(parts[k]);cells[i].appendChild(fx);
-     SOUND.play('gem');await countUp($('win'),pot,pot+parts[k],260);pot+=parts[k];await sleep(380);}}
-   else if(p.cash){const fx=document.createElement('div');fx.className='plusfx';fx.textContent='+'+fmtCr(p.cash);cells[i].appendChild(fx);}
-   if(p.jp){$('jp'+p.jp).classList.add('flash');setTimeout(()=>$('jp'+p.jp).classList.remove('flash'),2200);SOUND.play('jackpot',{level:p.jp});if(p.jp==='MAXI'||p.jp==='MAJOR'||p.jp==='GRAND')jpWon(p.jp);say({MINI:'Mini jackpot!',MINOR:'Minor jackpot!',MAXI:'Maxi jackpot!',MAJOR:'Major jackpot!',GRAND:'THE GRAND!!!'}[p.jp]);}
-   const fly=flyGem(i,p.plus);if(p.cash&&parts.length<2){countUp($('win'),pot,pot+p.cash,p.jp?900:300);pot+=p.cash;}
+   const parts=p.parts||[];
+   const jpFx=jp=>{$('jp'+jp).classList.add('flash');setTimeout(()=>$('jp'+jp).classList.remove('flash'),2200);SOUND.play('jackpot',{level:jp});if(jp==='MAXI'||jp==='MAJOR'||jp==='GRAND')jpWon(jp);say({MINI:'Mini jackpot!',MINOR:'Minor jackpot!',MAXI:'Maxi jackpot!',MAJOR:'Major jackpot!',GRAND:'THE GRAND!!!'}[jp]);};
+   if(parts.length>1){for(let k=0;k<parts.length;k++){const q=parts[k],fx=document.createElement('div');fx.className='plusfx';fx.textContent=(k?'2nd diamond +':'1st diamond +')+(q.jp||fmtCr(q.v));cells[i].appendChild(fx);
+     cells[i].querySelectorAll('.val').forEach((v,j)=>v.classList.toggle('lit',j===k));
+     if(q.jp)jpFx(q.jp);else SOUND.play('gem');await countUp($('win'),pot,pot+q.v,q.jp?900:260);pot+=q.v;await sleep(380);}}
+   else if(parts.length){const q=parts[0],fx=document.createElement('div');fx.className='plusfx';fx.textContent='+'+(q.jp||fmtCr(q.v));cells[i].appendChild(fx);if(q.jp)jpFx(q.jp);}
+   const fly=flyGem(i,p.plus);if(parts.length===1){countUp($('win'),pot,pot+parts[0].v,parts[0].jp?900:300);pot+=parts[0].v;}
    await fly;cells[i].innerHTML='';cells[i].classList.remove('got');
    shown=p.spins-(p.addSpins||0);lab(view.level,pot);
-   if(p.plus){SOUND.play('plus');say(p.plus>1?'+2 SPINS!':'+1 SPIN!',1400);banner(`+${p.plus} SPIN${p.plus>1?'S':''}! · SPINS LEFT ${shown}`,true);await sleep(700);lab(view.level,pot);}
+   if(p.plus){SOUND.play('plus');say('+1 SPIN!',1400);banner(`+${p.plus} SPIN${p.plus>1?'S':''}! · SPINS LEFT ${shown}`,true);await sleep(700);lab(view.level,pot);}
    if(p.level<st.maxLevel&&!p.grew)drawMeter(p.level,p.gems);
    if(p.grew){drawMeter(p.level,M.NEED[p.level]);await sleep(250);
     Object.assign(view,{level:p.growLevel,row:p.growRow,col:p.growCol});drawZone(view,true);
@@ -1072,10 +1079,10 @@ $('info').onclick=()=>{const u=bet()/50;let pt='';for(const s of ['F','P','S','B
  <h4>Moonrise Free Games</h4><p>${ART.M} Moons are scatters: they count anywhere, at most one per reel. <b>3, 4 or 5 moons</b> pay <b>2×, 10× or 50× the bet</b> up front and start <b>6 free games</b>. Even 1 or 2 moons can start the free games now and then, at random. 3 or more moons during free games add 6 more games and pay again.<br>
  During free games <b>the card symbols (A, K, Q, J and 10) are taken off the reels</b>: only Frostfang, pumpkins, skulls, bats, candles, wilds and moons land.</p>
  <h4>Diamond Hunt</h4><p><span class="ffsym pff"></span> The dancing Frostfang lands only on <b>reel 1</b>; the gems ${ART.Z.replace('symimg','symimg gemi')}${ART.R.replace('symimg','symimg gemi')}${ART.E.replace('symimg','symimg gemi')} land only on <b>reels 2–5</b>. Frostfang plus <b>at least one gem</b> on the same spin starts the Diamond Hunt. Each gem type adds its own boost (two of the same gem count once):<br>
- <b>Sapphire</b>: double symbols join the hunt: double diamonds (two separate credit values), +2 SPIN diamonds and double gold coins (two separate values).<br>
+ <b>Sapphire</b>: double symbols join the hunt: double diamonds (two separate values), double +1 SPIN diamonds (+1 spin and a value), double gold coins (two separate values) and double +1 SPIN gold coins (+1 spin and a value).<br>
  <b>Ruby</b>: Frostfang's grid can grow past 5×5, all the way to 8×5.<br>
  <b>Emerald</b>: 2 extra starting spins (5 instead of 3).<br>
- The reels grow to <b>8 rows by 5 reels</b> and Frostfang's grid starts at 2×2. <b>Gold coins</b> land anywhere and pay their credits or jackpot (MINI, MINOR, MAXI, MAJOR or GRAND) only when they land <b>inside the grid</b>. <b>Diamonds</b> land only <b>outside</b> the grid: after each spin the grid travels to every diamond, nearest first, and collects it. Diamonds pay credits; <b>+1 SPIN</b> diamonds add a spin. Finishing the 2×2 takes 5 diamonds, the 3×3 takes 4, then 3 each; every finished grid adds 2 to 4 spins. The grid stops growing at 5×5 unless a ruby triggered the hunt. Every spin at least one gold coin lands inside the grid, and Frostfang sometimes throws snowballs: inside the grid they become gold coins or +1 SPIN ice cubes, outside they become diamonds he goes to get, or gold coins. The hunt starts with <b>3 spins</b> and the pot pays when the spins run out.<br>On regular spins every gem shows a <b>credit value or a jackpot</b>. It pays nothing and blocks lines on that spin, but when the Diamond Hunt starts, the gems on screen <b>turn into diamonds in the same spots</b>, keeping their value, and Frostfang goes to collect them first.</p>
+ The reels grow to <b>8 rows by 5 reels</b> and Frostfang's grid starts at 2×2. <b>Gold coins</b> land anywhere and pay their credits or jackpot (MINI, MINOR, MAXI, MAJOR or GRAND) only when they land <b>inside the grid</b>. <b>Diamonds</b> land only <b>outside</b> the grid: after each spin the grid travels to every diamond, nearest first, and collects it. Diamonds pay credits or a jackpot; <b>+1 SPIN</b> diamonds add a spin. <b>+1 SPIN gold coins</b> land only inside the grid and add a spin. Finishing the 2×2 takes 5 diamonds, the 3×3 takes 4, then 3 each; every finished grid adds 2 to 4 spins. The grid stops growing at 5×5 unless a ruby triggered the hunt. Every spin at least one gold coin lands inside the grid, and Frostfang sometimes throws snowballs: inside the grid they become gold coins or +1 SPIN gold coins, outside they become diamonds he goes to get, or gold coins. The hunt starts with <b>3 spins</b> and the pot pays when the spins run out.<br>On regular spins every gem shows a <b>credit value or a jackpot</b>. It pays nothing and blocks lines on that spin, but when the Diamond Hunt starts, the gems on screen <b>turn into diamonds in the same spots</b>, keeping their value, and Frostfang goes to collect them first.</p>
  <h4>Snowball Fight jackpot feature</h4><p>${ART.W} Any <b>wild</b> that lands on a regular spin can start the Snowball Fight at random. The more credits per line you bet, the more often it starts. The screen switches to <b>15 snowballs</b>: tap them one by one until 3 matching jackpots show, and you win that jackpot.</p>
  <h4>Bets</h4><p>50 fixed lines. Pick a denomination (1¢, 2¢ or 5¢), then 1 to 5 credits per line (50 to 250 credits). Bets run from $0.50 to $12.50. New players start with $100, and your balance is saved between visits. Use <b>ADD $100</b> to top up.</p>
  <h4>Jackpots</h4><p><b>MINI</b> (${E.JPF.MINI_CR.toLocaleString()} credits) and <b>MINOR</b> (${E.JPF.MINOR_CR.toLocaleString()} credits) are fixed credit prizes, so their dollar value follows your denomination: at ${Math.round(denom()*100)}¢ that's ${fmt(jpVals().MINI)} and ${fmt(jpVals().MINOR)}.<br>
