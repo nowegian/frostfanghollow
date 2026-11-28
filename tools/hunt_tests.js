@@ -5,17 +5,19 @@ const bet=3,DEN=0.02,MULT=3,jp=Object.assign({MINI:1000*DEN,MINOR:5000*DEN},E.JP
 const col=(...s)=>s.map(x=>({s:x}));
 const grid=(r0,r1,r2,r3,r4)=>[col(...r0),col(...r1),col(...r2),col(...r3),col(...r4)];
 const T=['T','J','Q'];
+const pk=g=>{g.peek=true;return g};
 // --- trigger
-ok(!E.evaluate(grid(['G','A','K'],T,T,T,T),bet).huntTrigger,'Frostfang without a gem does not trigger');
-ok(!E.evaluate(grid(['A','K','Q'],['Z','J','Q'],['R','J','Q'],['E','J','Q'],T),bet).huntTrigger,'gems without Frostfang do not trigger');
-for(const [s,k] of [['Z','sapphire'],['R','ruby'],['E','emerald']]){const ev=E.evaluate(grid(['G','A','K'],T,[s,'J','Q'],T,T),bet);ok(ev.huntTrigger&&ev.mods[k]&&Object.values(ev.mods).filter(Boolean).length===1,`Frostfang + ${k} triggers with only ${k} on`);}
+ok(!E.evaluate(pk(grid(['A','K','Q'],T,T,T,T)),bet).huntTrigger,'left peek without a gem does not trigger');
+ok(!E.evaluate(grid(['A','K','Q'],['Z','J','Q'],['R','J','Q'],['E','J','Q'],T),bet).huntTrigger,'gems without the left peek do not trigger');
+for(const [s,k] of [['Z','sapphire'],['R','ruby'],['E','emerald']]){const ev=E.evaluate(pk(grid(['A','K','Q'],T,[s,'J','Q'],T,T)),bet);ok(ev.huntTrigger&&ev.mods[k]&&Object.values(ev.mods).filter(Boolean).length===1,`Frostfang + ${k} triggers with only ${k} on`);}
 for(let m=1;m<8;m++){const want={sapphire:!!(m&1),ruby:!!(m&2),emerald:!!(m&4)};const reels=[T,T,T,T];let i=0;for(const [k,s] of [['sapphire','Z'],['ruby','R'],['emerald','E']])if(want[k])reels[i++]=[s,'J','Q'];
- const ev=E.evaluate(grid(['G','A','K'],...reels),bet);ok(ev.huntTrigger&&JSON.stringify(ev.mods)===JSON.stringify(want),'combination '+Object.keys(want).filter(k=>want[k]).join('+'));}
-{const ev=E.evaluate(grid(['G','A','K'],['E','J','Q'],['E','J','Q'],['E','J','Q'],['E','J','Q']),bet);const st=E.moonStart(ev.mods,DEN,MULT);ok(st.spins===5,'four emeralds still give 5 starting spins');}
+ const ev=E.evaluate(pk(grid(['A','K','Q'],...reels)),bet);ok(ev.huntTrigger&&JSON.stringify(ev.mods)===JSON.stringify(want),'combination '+Object.keys(want).filter(k=>want[k]).join('+'));}
+{const ev=E.evaluate(pk(grid(['A','K','Q'],['E','J','Q'],['E','J','Q'],['E','J','Q'],['E','J','Q'])),bet);const st=E.moonStart(ev.mods,DEN,MULT);ok(st.spins===5,'four emeralds still give 5 starting spins');}
 {const st=E.moonStart({ruby:true},DEN,MULT);ok(st.maxLevel===6&&st.spins===3,'two rubies: max 8x5, 3 spins');}
 // reel placement over many spins
-{let g0=0,gBad=0,gemBad=0,dupe=0;for(let i=0;i<300000;i++){const g=E.spinGrid(bet,false);g.forEach((c,r)=>{let n=0;c.forEach(x=>{if(x.s==='G'){if(r)gBad++;else g0++;n++}if(E.GEMS[x.s]){if(r===0)gemBad++;n++}});if(n>1)dupe++;});}
- ok(g0>0&&gBad===0,'Frostfang bonus symbol only on reel 1');ok(gemBad===0,'gems only on reels 2-5');ok(dupe===0,'at most one bonus symbol per reel');}
+{let pkN=0,gemBad=0,dupe=0,gN=0;const N=400000;for(let i=0;i<N;i++){const g=E.spinGrid(bet,false);if(g.peek)pkN++;g.forEach((c,r)=>{let n=0;c.forEach(x=>{if(x.s==='G')gN++;if(E.GEMS[x.s]){if(r===0)gemBad++;n++}});if(n>1)dupe++;});}
+ ok(gN===0,'no dancing Frostfang symbol on the reels');ok(Math.abs(pkN/N-E.RANDOM.PEEK)<0.002,'Frostfang peeks from the left on about 1 spin in '+Math.round(N/pkN));ok(gemBad===0,'gems only on reels 2-5');ok(dupe===0,'at most one gem per reel');}
+ {let bad=0;for(let i=0;i<50000;i++){if(E.spinGrid(bet,true,{mult:1}).peek)bad++;}ok(bad===0,'no peek trigger in free games');}
 {let bad=0;for(let i=0;i<50000;i++){const g=E.spinGrid(bet,true,{mult:1});g.forEach(c=>c.forEach(x=>{if(x.s==='G'||E.GEMS[x.s])bad++}));}ok(bad===0,'no Frostfang bonus symbol or gems in free games');}
 // --- grid
 for(let m=0;m<8;m++){const st=E.moonStart({sapphire:!!(m&1),ruby:!!(m&2),emerald:!!(m&4)},DEN,MULT);const [R,C]=E.MOON.STEPS[st.level];if(!(R===2&&C===2)){ok(false,'starts at 2x2');}}
@@ -50,7 +52,7 @@ r=runMany({sapphire:true},3000);ok(r.two>0&&r.twoDiff/r.two>0.5,`double gold coi
 // --- gems carry values into the hunt
 {let withVal=0,tot=0,jpS=0;for(let i=0;i<200000;i++){const g=E.spinGrid(bet,false);g.forEach(c=>c.forEach(x=>{if(E.GEMS[x.s]){tot++;if(x.val&&(x.val.cash>0||x.val.jp))withVal++;if(x.val&&x.val.jp)jpS++;}}));}
  ok(tot>0&&withVal===tot,'every gem on a regular spin carries a credit value or jackpot ('+jpS+' jackpots in '+tot+' gems)');}
-{const g=grid(['G','A','K'],T,['R','J','Q'],['Z','J','Q'],T);g[2][0].val={cash:1.2};g[3][0].val={jp:'MINI'};const ev=E.evaluate(g,bet);
+{const g=pk(grid(['A','K','Q'],T,['R','J','Q'],['Z','J','Q'],T));g[2][0].val={cash:1.2};g[3][0].val={jp:'MINI'};const ev=E.evaluate(g,bet);
  ok(ev.total===0||ev.wins.every(w=>!w.cells.some(([r,y])=>E.GEMS[g[r][y].s])),'gems block lines (no line win uses a gem)');
  ok(ev.gemVals.length===2,'trigger reports both gems with their values');
  let okAll=true;for(let t=0;t<300;t++){const st=E.moonStart(ev.mods,DEN,MULT,ev.gemVals);const cg=st.carryGrid;

@@ -11,9 +11,9 @@ const ENGINE = (() => {
     A:{3:10,4:30,5:120}, K:{3:10,4:30,5:120}, Q:{3:10,4:30,5:80}, J:{3:10,4:30,5:80}, T:{3:10,4:20,5:70}
   };
   // Regular spins: no orbs. Frostfang (F) is the top pay symbol on every reel; moons (M) are the free-games scatter, at most one per reel.
-  const BASE_W = {F:2.5,P:5,S:6,B:7,C:8,A:10,K:10,Q:12,J:12,T:12,W:2.9,M:2.75, G:0.71, E:0.88, R:0.77, Z:0.55};
-  // Diamond Hunt trigger: Frostfang's bonus symbol (G, the dancing Frostfang) lands only on reel 1; the gem modifiers
-  // (Z sapphire, R ruby, E emerald) only on reels 2-5, at most one gem per reel. G plus at least one gem starts the hunt.
+  const BASE_W = {F:2.5,P:5,S:6,B:7,C:8,A:10,K:10,Q:12,J:12,T:12,W:2.9,M:2.75, E:0.88, R:0.77, Z:0.55};
+  // Diamond Hunt trigger: Frostfang peeks in from the left (RANDOM.PEEK per regular spin) and at least one gem modifier
+  // (Z sapphire, R ruby, E emerald) lands on reels 2-5 (at most one gem per reel).
   const GEMS = {Z:'sapphire', R:'ruby', E:'emerald'};
   const MOON_REELS = [0,1,2,3,4];
   // Free games: the card symbols (A, K, Q, J, 10) are taken off the reels. No orbs (orbs are retired for now).
@@ -22,7 +22,7 @@ const ENGINE = (() => {
   const LINE = {K:0.75};                           // scales every line pay
   const FREE_GAMES = 6;                           // 3+ moons anywhere (or the lucky single-moon trigger) = 6 free games
   const FG = {COLLECT_STEP:4, MAX_MULT:3, ORB_K:1.8};  // every 4 collections raise the orb multiplier (x2, then x3)
-  const RANDOM = {CRACK:0, LUCKY:1/400};  // surprise features on regular spins; LUCKY: 1 or 2 moons start the free games anyway
+  const RANDOM = {CRACK:0, LUCKY:1/400, PEEK:1/43};   // PEEK: Frostfang peeks in from the left (Diamond Hunt attempt)  // surprise features on regular spins; LUCKY: 1 or 2 moons start the free games anyway
   const JP = {MINI:20, MINOR:50, MAJOR:300}; // x bet seeds (MAJOR also grows)
   const GRAND_SEED = 9000;           // dollars, same at every bet, grows from here
   const GRAND_K = 0.04;              // share of every bet paid back through the GRAND, at any bet size
@@ -67,6 +67,8 @@ const ENGINE = (() => {
         if(s==='M') m=1; if(s==='G'||GEMS[s]) gb=1;
         col.push(s==='O'?{s,orb:freeOrb(bet,fs)}:GEMS[s]?{s,val:gemValue(bet)}:{s}); }
       g.push(col); }
+    // Diamond Hunt: on a regular spin Frostfang may peek in from the LEFT side of the reels (whatever is on reel 1)
+    g.peek = !free && rng()<RANDOM.PEEK;
     return g;
   }
   // Gems on regular spins carry a credit value or a jackpot. On a regular spin they only block lines; when the
@@ -112,7 +114,7 @@ const ENGINE = (() => {
     // Diamond Hunt: the dancing Frostfang on reel 1 and at least one gem on reels 2-5 (each gem type is an on/off flag)
     const mods={sapphire:false, ruby:false, emerald:false}, gemVals=[];
     for(let r=1;r<5;r++) g[r].forEach((c,y)=>{ if(GEMS[c.s]){ mods[GEMS[c.s]]=true; gemVals.push({r,y,s:c.s,val:c.val||{cash:0}}); } });
-    const huntTrigger=!free && g[0].some(c=>c.s==='G') && (mods.sapphire||mods.ruby||mods.emerald);
+    const huntTrigger=!free && !!g.peek && (mods.sapphire||mods.ruby||mods.emerald);
     return {total:Math.round(total*100)/100, wins, orbs, moons, freeGames, freeTrigger:freeGames>0, lucky, huntTrigger, mods, gemVals, scatterPay,
       holdTrigger: orbs>=6};
   }

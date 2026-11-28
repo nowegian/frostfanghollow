@@ -379,7 +379,7 @@ button{font-family:inherit;cursor:pointer;border:none;color:#fff;font-weight:700
     </div>
     <div class="meter hidden" id="meter"></div>
   </div>
-  <div class="win-line" id="winLine">3+ moons anywhere start 6 Moonrise Free Games. Frostfang on reel 1 with a gem on reels 2–5 starts the Diamond Hunt.</div>
+  <div class="win-line" id="winLine">3+ moons anywhere start 6 Moonrise Free Games. Frostfang peeking from the left with a gem on reels 2–5 starts the Diamond Hunt.</div>
   <div class="panel">
     <div class="box bank" id="bankBox" title="Tap to switch between dollars and credits"><small>CREDIT <span class="unit" id="bankUnit"><b class="d">$</b><b class="c">CR</b></span></small><div id="credit">$0</div><small id="creditCr" class="cr"></small></div>
     <div class="box betbox"><small>DENOMINATION</small><div class="denoms" id="denoms"></div>
@@ -423,9 +423,9 @@ const ENGINE = (() => {
     A:{3:10,4:30,5:120}, K:{3:10,4:30,5:120}, Q:{3:10,4:30,5:80}, J:{3:10,4:30,5:80}, T:{3:10,4:20,5:70}
   };
   // Regular spins: no orbs. Frostfang (F) is the top pay symbol on every reel; moons (M) are the free-games scatter, at most one per reel.
-  const BASE_W = {F:2.5,P:5,S:6,B:7,C:8,A:10,K:10,Q:12,J:12,T:12,W:2.9,M:2.75, G:0.71, E:0.88, R:0.77, Z:0.55};
-  // Diamond Hunt trigger: Frostfang's bonus symbol (G, the dancing Frostfang) lands only on reel 1; the gem modifiers
-  // (Z sapphire, R ruby, E emerald) only on reels 2-5, at most one gem per reel. G plus at least one gem starts the hunt.
+  const BASE_W = {F:2.5,P:5,S:6,B:7,C:8,A:10,K:10,Q:12,J:12,T:12,W:2.9,M:2.75, E:0.88, R:0.77, Z:0.55};
+  // Diamond Hunt trigger: Frostfang peeks in from the left (RANDOM.PEEK per regular spin) and at least one gem modifier
+  // (Z sapphire, R ruby, E emerald) lands on reels 2-5 (at most one gem per reel).
   const GEMS = {Z:'sapphire', R:'ruby', E:'emerald'};
   const MOON_REELS = [0,1,2,3,4];
   // Free games: the card symbols (A, K, Q, J, 10) are taken off the reels. No orbs (orbs are retired for now).
@@ -434,7 +434,7 @@ const ENGINE = (() => {
   const LINE = {K:0.75};                           // scales every line pay
   const FREE_GAMES = 6;                           // 3+ moons anywhere (or the lucky single-moon trigger) = 6 free games
   const FG = {COLLECT_STEP:4, MAX_MULT:3, ORB_K:1.8};  // every 4 collections raise the orb multiplier (x2, then x3)
-  const RANDOM = {CRACK:0, LUCKY:1/400};  // surprise features on regular spins; LUCKY: 1 or 2 moons start the free games anyway
+  const RANDOM = {CRACK:0, LUCKY:1/400, PEEK:1/43};   // PEEK: Frostfang peeks in from the left (Diamond Hunt attempt)  // surprise features on regular spins; LUCKY: 1 or 2 moons start the free games anyway
   const JP = {MINI:20, MINOR:50, MAJOR:300}; // x bet seeds (MAJOR also grows)
   const GRAND_SEED = 9000;           // dollars, same at every bet, grows from here
   const GRAND_K = 0.04;              // share of every bet paid back through the GRAND, at any bet size
@@ -479,6 +479,8 @@ const ENGINE = (() => {
         if(s==='M') m=1; if(s==='G'||GEMS[s]) gb=1;
         col.push(s==='O'?{s,orb:freeOrb(bet,fs)}:GEMS[s]?{s,val:gemValue(bet)}:{s}); }
       g.push(col); }
+    // Diamond Hunt: on a regular spin Frostfang may peek in from the LEFT side of the reels (whatever is on reel 1)
+    g.peek = !free && rng()<RANDOM.PEEK;
     return g;
   }
   // Gems on regular spins carry a credit value or a jackpot. On a regular spin they only block lines; when the
@@ -524,7 +526,7 @@ const ENGINE = (() => {
     // Diamond Hunt: the dancing Frostfang on reel 1 and at least one gem on reels 2-5 (each gem type is an on/off flag)
     const mods={sapphire:false, ruby:false, emerald:false}, gemVals=[];
     for(let r=1;r<5;r++) g[r].forEach((c,y)=>{ if(GEMS[c.s]){ mods[GEMS[c.s]]=true; gemVals.push({r,y,s:c.s,val:c.val||{cash:0}}); } });
-    const huntTrigger=!free && g[0].some(c=>c.s==='G') && (mods.sapphire||mods.ruby||mods.emerald);
+    const huntTrigger=!free && !!g.peek && (mods.sapphire||mods.ruby||mods.emerald);
     return {total:Math.round(total*100)/100, wins, orbs, moons, freeGames, freeTrigger:freeGames>0, lucky, huntTrigger, mods, gemVals, scatterPay,
       holdTrigger: orbs>=6};
   }
@@ -1662,17 +1664,19 @@ async function spinReels(g,free){
  const has=(r,s)=>g[r].some(c=>c.s===s);
  const stops=[];let extra=0;
  for(let r=0;r<5;r++){let mn=0;for(let k=0;k<r;k++)if(has(k,'M'))mn++;
-  const gemSoFar=[1,2,3].some(k=>k<r&&g[k].some(c=>E.GEMS[c.s]));
-  const tease=(ROWS===3&&r>=2&&mn>=2)||(ROWS===3&&!free&&r===4&&has(0,'G')&&!gemSoFar);if(tease)extra+=900;
+  // Frostfang peeking from the left: reels 2-5 all super-spin to see if gems drop
+  const tease=(ROWS===3&&r>=2&&mn>=2)||(ROWS===3&&!free&&g.peek&&r>=1);if(tease)extra+=900;
   stops.push({t:(950+r*360+extra)*T,tease});}
  stops.forEach((s,r)=>{if(s.tease&&r>0)setTimeout(()=>SOUND.play('tease'),stops[r-1].t)});
  // chime when a moon lands while 3 moons are still possible
  const moonSnd=[];{let mn=0;for(let r=0;r<5;r++){const m=has(r,'M');if(m)mn++;moonSnd.push(ROWS===3&&m&&mn+(4-r)>=3);}}
  // Frostfang peeks: a gasp from the right pillar when the moon tease starts, otherwise now and then a quick peek before reel 1 lands
  if(ROWS===3&&!inHold){const tr=stops.findIndex((s,r)=>s.tease&&r>0);
-  if(tr>0){const a=stops[tr-1].t,d=stops[tr].t-a-380;if(d>300)setTimeout(()=>peek('R',d),a);
+  // the left-side peek means a Diamond Hunt attempt: he stays until the last reel stops
+  if(g.peek&&!free){setTimeout(()=>{peek('L',stops[4].t-200,false,true);say(['Ooh, gems?','Anything shiny?','Hmm hmm hmm...'][Math.random()*3|0],1600);},60);}
+  else if(tr>0){const a=stops[tr-1].t,d=stops[tr].t-a-380;if(d>300)setTimeout(()=>peek('B',d),a);
    if(has(0,'M')&&has(1,'M'))setTimeout(()=>say('Full moon tonight!',1600),a+120);}
-  else if(Math.random()<0.2&&stops[0].t>=650){const k='LRTB'[Math.random()*4|0];setTimeout(()=>peek(k,stops[0].t-420),60);}}
+  else if(Math.random()<0.2&&stops[0].t>=650){setTimeout(()=>peek('B',stops[0].t-420),60);}}
  await Promise.all([0,1,2,3,4].map(r=>spinColumn(r,g[r],ROWS,stops[r].t,r*90*T,stops[r].tease&&r>0?stops[r-1].t:null,rnd,moonSnd[r])));
  SOUND.spin(false);
 }
@@ -1768,7 +1772,7 @@ async function play(){
  const g=E.spinGrid(bet(),false);
  await spinReels(g);
  const ev=E.evaluate(g,bet());let total=ev.total,feat=ev.freeTrigger||ev.huntTrigger;
- if(ev.total>0){if(ev.total>=bet()*8&&ev.total<bet()*20&&!feat)setTimeout(()=>peek('W',1900),250);
+ if(ev.total>0){if(ev.total>=bet()*8&&ev.total<bet()*20&&!feat)setTimeout(()=>peek('B',1900),250);
   else if(ev.total<bet()*2&&!feat&&Math.random()<0.25)setTimeout(()=>say('Here, a little something!',1500),300);await showWins(ev,g);await countUp($('win'),0,ev.total,Math.min(1500,300+ev.total/bet()*60));}
  else $('winLine').textContent=ev.moons===2?'2 moons… 3 anywhere start the free games!':' ';
  if(ev.lucky){await sleep(300);say('The moon smiles on you!',2000);banner('LUCKY MOON!',true);await sleep(1500);}
@@ -1781,7 +1785,7 @@ async function play(){
  if(auto){await sleep(total>0?900:350);if(auto)play();}
 }
 async function cheer(ms){pose('cheer');setTimeout(()=>pose('idle'),ms)}
-async function bigWin(total){SOUND.play('winBig');cheer(3500);peek('W',3200,true);showMsg(`<h2>${total>=bet()*50?'MONSTER WIN!':'BIG WIN!'}</h2><div class="big" id="bw">$0.00</div>`);await countUp($('bw'),0,total,2200);await sleep(1300);hideMsg();}
+async function bigWin(total){SOUND.play('winBig');cheer(3500);peek('B',3200,true);showMsg(`<h2>${total>=bet()*50?'MONSTER WIN!':'BIG WIN!'}</h2><div class="big" id="bw">$0.00</div>`);await countUp($('bw'),0,total,2200);await sleep(1300);hideMsg();}
 
 // ---------- Frost Link (the orb bonus, 5 rows x 5) ----------
 async function holdAndSpin(g,fromFree){
@@ -1854,9 +1858,9 @@ function drawMeter(level,gems){const m=$('meter');m.classList.remove('hidden');
  const need=M.NEED[level];let dots='';for(let k=0;k<need;k++)dots+=`<span class="${k<gems?'on':''}">${ART.D}</span>`;
  m.innerHTML=`<div class="dots">${dots}</div><small>${gems}/${need} to grow to <b>${STEPN(level+1)}</b></small>`;}
 const GEMTXT={sapphire:'SAPPHIRE: double diamonds and double gold coins join the hunt',ruby:'RUBY: the grid can grow to 8×5',emerald:'EMERALD: +2 starting spins'};
-// the triggering spin: Frostfang on reel 1 and the gems light up, then the active modifiers are announced
+// the triggering spin: the gems light up (Frostfang peeked in from the left), then the active modifiers are announced
 async function huntIntro(g,mods){
- cells.forEach((c,i)=>{const s=c.dataset.s;if(s==='G'||(E.GEMS[s]&&i%5>0))c.classList.add('wspark');});
+ cells.forEach((c,i)=>{const s=c.dataset.s;if(E.GEMS[s]&&i%5>0)c.classList.add('wspark');});
  SOUND.play('feature');cheer(1800);await sleep(1100);
  cells.forEach(c=>c.classList.remove('wspark'));}
 async function moonBonus(mods,gemVals){
@@ -1984,7 +1988,7 @@ function sfTile(k){if(k[0]==='X')return `<div class="sfx">${k[1]}×<small>${fmt(
 async function wildSpark(){const ws=[];cells.forEach((c,i)=>{if(c.dataset.s==='W'&&i%5>0)ws.push(c)});
  ws.forEach(c=>c.classList.add('wspark'));SOUND.play('glide');await sleep(900);ws.forEach(c=>c.classList.remove('wspark'));}
 async function snowballFight(){
- peek('L',1800,false,true);await sleep(450);SOUND.play('throw');await sleep(250);SOUND.play('impact');
+ peek('B',1800,false,true);await sleep(450);SOUND.play('throw');await sleep(250);SOUND.play('impact');
  const fr=$('frameEl'),sp=document.createElement('img');sp.className='splat';sp.src=XIMG.SPLAT;sp.alt='';fr.appendChild(sp);say('Snowball fight!',2000);SOUND.play('feature');
  await sleep(900);sp.remove();
  const f=E.snowFight(denom(),mult()),seq=f.seq.slice();let picks=0;const count={};
@@ -2040,7 +2044,7 @@ $('info').onclick=()=>{const u=bet()/50;let pt='';for(const s of ['F','P','S','B
  <h4>Frostfang</h4><p>${ART.F} Frostfang is the top-paying symbol on every reel.</p>
  <h4>Moonrise Free Games</h4><p>${ART.M} Moons are scatters: they count anywhere, at most one per reel. <b>3, 4 or 5 moons</b> pay <b>2×, 10× or 50× the bet</b> up front and start <b>6 free games</b>. Even 1 or 2 moons can start the free games now and then, at random. 3 or more moons during free games add 6 more games and pay again.<br>
  During free games <b>the card symbols (A, K, Q, J and 10) are taken off the reels</b>: only Frostfang, pumpkins, skulls, bats, candles, wilds and moons land.</p>
- <h4>Diamond Hunt</h4><p><span class="ffsym pff"></span> The dancing Frostfang lands only on <b>reel 1</b>; the gems ${ART.Z.replace('symimg','symimg gemi')}${ART.R.replace('symimg','symimg gemi')}${ART.E.replace('symimg','symimg gemi')} land only on <b>reels 2–5</b>. Frostfang plus <b>at least one gem</b> on the same spin starts the Diamond Hunt. Each gem type adds its own boost (two of the same gem count once):<br>
+ <h4>Diamond Hunt</h4><p><img class="symimg" src="img/peek_side.webp" alt=""> Now and then Frostfang <b>peeks in from the left side</b> of the reels, whatever is on reel 1, and reels 2–5 super-spin. The gems ${ART.Z.replace('symimg','symimg gemi')}${ART.R.replace('symimg','symimg gemi')}${ART.E.replace('symimg','symimg gemi')} land only on <b>reels 2–5</b>. A left-side peek plus <b>at least one gem</b> on the same spin starts the Diamond Hunt. Each gem type adds its own boost (two of the same gem count once):<br>
  <b>Sapphire</b>: double symbols join the hunt: double diamonds (two separate values), double +1 SPIN diamonds (+1 spin and a value), double gold coins (two separate values) and double +1 SPIN gold coins (+1 spin and a value).<br>
  <b>Ruby</b>: Frostfang's grid can grow past 5×5, all the way to 8×5.<br>
  <b>Emerald</b>: 2 extra starting spins (5 instead of 3).<br>
