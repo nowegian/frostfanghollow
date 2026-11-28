@@ -42,4 +42,16 @@ r=runMany({sapphire:true},3000);ok(r.two>0&&r.twoDiff/r.two>0.5,`double gold coi
  ok(plus2>0&&cash2>0&&std>plus2+cash2,'sapphire adds +2 SPIN and double diamonds and keeps the standard ones');}
 {const st=E.moonStart({},DEN,MULT);const g=E.moonGrid(st,bet);for(let r=0;r<5;r++)for(let y=0;y<8;y++)g[r][y]={s:'T'};g[4][7]={s:'D',plus:2,many:true};const s0=st.spins;const ev=E.moonResolve(st,g,jp);ok(st.spins-s0>=2,'+2 SPIN diamond adds 2 spins');}
 {const st=E.moonStart({},DEN,MULT);const g=E.moonGrid(st,bet);for(let r=0;r<5;r++)for(let y=0;y<8;y++)g[r][y]={s:'T'};g[st.col][st.row]={s:'O',many:true,orb:{cash:1},orb2:{cash:2.5}};const ev=E.moonResolve(st,g,jp);ok(st.pot===3.5&&ev.collected[0].parts.length===2,'double gold coin pays 1.00 + 2.50 = 3.50 as two parts');}
+
+// --- gems carry values into the hunt
+{let withVal=0,tot=0,jpS=0;for(let i=0;i<200000;i++){const g=E.spinGrid(bet,false);g.forEach(c=>c.forEach(x=>{if(E.GEMS[x.s]){tot++;if(x.val&&(x.val.cash>0||x.val.jp))withVal++;if(x.val&&x.val.jp)jpS++;}}));}
+ ok(tot>0&&withVal===tot,'every gem on a regular spin carries a credit value or jackpot ('+jpS+' jackpots in '+tot+' gems)');}
+{const g=grid(['G','A','K'],T,['R','J','Q'],['Z','J','Q'],T);g[2][0].val={cash:1.2};g[3][0].val={jp:'MINI'};const ev=E.evaluate(g,bet);
+ ok(ev.total===0||ev.wins.every(w=>!w.cells.some(([r,y])=>E.GEMS[g[r][y].s])),'gems block lines (no line win uses a gem)');
+ ok(ev.gemVals.length===2,'trigger reports both gems with their values');
+ let okAll=true;for(let t=0;t<300;t++){const st=E.moonStart(ev.mods,DEN,MULT,ev.gemVals);const cg=st.carryGrid;
+  if(!cg||cg[2][0].s!=='D'||cg[2][0].cash!==1.2||cg[3][0].jp!=='MINI'||E.inZone(st,2,0)||E.inZone(st,3,0)){okAll=false;break}
+  const pot0=st.pot,r=E.moonResolve(st,cg,jp);if(Math.abs(st.pot-pot0-(1.2+jp.MINI))>0.001||r.path.length!==2){okAll=false;break}}
+ ok(okAll,'gems become diamonds in the same spots, outside the grid, and Frostfang collects their credits and jackpot');}
+{const ev=E.evaluate(grid(['A','K','Q'],['R','J','Q'],T,T,T),bet);ok(!ev.huntTrigger&&ev.wins.every(w=>!w.cells.some(([r,y])=>r===1&&y===0)),'gems without Frostfang pay nothing');}
 console.log(fails?fails+' FAILED':'all passed');process.exit(fails?1:0);
