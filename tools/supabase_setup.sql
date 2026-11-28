@@ -4,10 +4,12 @@
 -- One row holds the shared meters for everyone
 create table if not exists public.jackpots (
   id          int primary key default 1 check (id = 1),
-  grand_acc   numeric not null default 0,  -- dollars added to the GRAND above its $9,000 start
-  major_acc   numeric not null default 0,  -- growth added to the MAJOR (scaled by each player's bet)
+  grand_acc   numeric not null default 0,  -- dollars added to the GRAND above its $12,000 start
+  major_acc   numeric not null default 0,  -- dollars added to the MAJOR above its $6,000 start
   grand_round int not null default 0,      -- goes up by 1 each time someone wins the GRAND
   major_round int not null default 0,      -- goes up by 1 each time someone wins the MAJOR
+  maxi_acc    numeric not null default 0,  -- dollars added to the MAXI above its $1,000 start
+  maxi_round  int not null default 0,      -- goes up by 1 each time someone wins the MAXI
   updated_at  timestamptz not null default now()
 );
 insert into public.jackpots (id) values (1) on conflict (id) do nothing;
@@ -58,3 +60,5 @@ revoke all on function public.jp_add(numeric, numeric) from public;
 revoke all on function public.jp_win(text, int) from public;
 grant execute on function public.jp_add(numeric, numeric) to anon, authenticated;
 grant execute on function public.jp_win(text, int) to anon, authenticated;
+
+-- The game uses jp_add3 and the MAXI branch of jp_win: run supabase_maxi_upgrade.sql after this script.

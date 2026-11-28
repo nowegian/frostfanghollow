@@ -11,7 +11,7 @@ const ENGINE = (() => {
     A:{3:10,4:30,5:120}, K:{3:10,4:30,5:120}, Q:{3:10,4:30,5:80}, J:{3:10,4:30,5:80}, T:{3:10,4:20,5:70}
   };
   // Regular spins: no orbs. Frostfang (F) is the top pay symbol on every reel; moons (M) are the free-games scatter, at most one per reel.
-  const BASE_W = {F:2.5,P:5,S:6,B:7,C:8,A:10,K:10,Q:12,J:12,T:12,W:2.9,M:3.1};
+  const BASE_W = {F:2.5,P:5,S:6,B:7,C:8,A:10,K:10,Q:12,J:12,T:12,W:2.9,M:3.05};
   const MOON_REELS = [0,1,2,3,4];
   // Free games: the card symbols (A, K, Q, J, 10) are taken off the reels. No orbs (orbs are retired for now).
   const FREE_W = {F:4,P:5,S:6,B:7,C:8,W:4.3,M:1.2};
@@ -19,8 +19,7 @@ const ENGINE = (() => {
   const LINE = {K:0.75};                           // scales every line pay
   const FREE_GAMES = 6;                           // 3+ moons anywhere (or the lucky single-moon trigger) = 6 free games
   const FG = {COLLECT_STEP:4, MAX_MULT:3, ORB_K:1.8};  // every 4 collections raise the orb multiplier (x2, then x3)
-  const RANDOM = {CRACK:0, SNOWBALL:1/700, LUCKY:1/400};  // surprise features on regular spins; LUCKY: 1 or 2 moons start the free games anyway
-  const SNOWFIGHT = {MINI:0.60, X1:0.12, X2:0.10, X3:0.08, MINOR:0.08, MAJOR:0.02};
+  const RANDOM = {CRACK:0, LUCKY:1/400};  // surprise features on regular spins; LUCKY: 1 or 2 moons start the free games anyway
   const JP = {MINI:20, MINOR:50, MAJOR:300}; // x bet seeds (MAJOR also grows)
   const GRAND_SEED = 9000;           // dollars, same at every bet, grows from here
   const GRAND_K = 0.04;              // share of every bet paid back through the GRAND, at any bet size
@@ -127,16 +126,32 @@ const ENGINE = (() => {
       g[r][y]={s:'O',orb:orbValue(bet,false)}; out.push({r,y}); }
     return out;
   }
-  const snowRoll=()=>rng()<RANDOM.SNOWBALL;
-  // Snowball Fight: pick snowballs until one prize shows 3 times. Returns the prize and the order the picks reveal.
-  // GRAND chance inside a Snowball Fight: proportional to the bet, so the GRAND returns GRAND_K of every bet at any bet size
-  const grandSnowChance = bet => Math.min(1, GRAND_K*bet/GRAND_SEED/RANDOM.SNOWBALL);
-  function snowFight(bet){
-    const keys=Object.keys(SNOWFIGHT); let x=rng(), prize=keys[keys.length-1];
-    if(bet && rng()<grandSnowChance(bet)) prize='GRAND';
-    else for(const k of keys){ if((x-=SNOWFIGHT[k])<0){ prize=k; break; } }
-    const others=[]; keys.forEach(k=>{ if(k!==prize){ others.push(k,k); } }); if(prize!=='GRAND') others.push('GRAND');
-    const nOther=Math.floor(rng()*Math.min(9,others.length+1));
+  // ===== Snowball Fight jackpot feature =====
+  // Any wild that lands on a regular spin can start it. MINI and MINOR are fixed credits, so their dollar value follows the
+  // denomination; MAXI, MAJOR and GRAND are progressives in dollars, the same at every denomination.
+  // Each prize returns a fixed share of every bet: its chance per spin is SHARE x bet / value. Bigger bets start the
+  // Snowball Fight more often, and bigger denominations make the progressives more likely.
+  const JPF = {MINI_CR:1000, MINOR_CR:5000, SEED:{MAXI:1000, MAJOR:6000, GRAND:12000},
+    SHARE:{MINI:0.03, MINOR:0.015, MAXI:0.015, MAJOR:0.015, GRAND:0.02},
+    GROW:{MAXI:0.004, MAJOR:0.003, GRAND:0.003}};   // share of every bet added to each progressive meter
+  function jpOdds(denom, mult){
+    const bet=50*mult*denom, v=Object.assign({MINI:JPF.MINI_CR*denom, MINOR:JPF.MINOR_CR*denom}, JPF.SEED), per={};
+    let fight=0; for(const k in JPF.SHARE){ per[k]=JPF.SHARE[k]*bet/v[k]; fight+=per[k]; }
+    return {per, fight};
+  }
+  // expected wilds per regular spin (wilds land on reels 2-5)
+  const expWilds=()=>{ let t=0; for(const k in BASE_W) t+=BASE_W[k]; return 12*BASE_W.W/t; };
+  function wildRoll(g, denom, mult){
+    let n=0; for(let r=1;r<5;r++) g[r].forEach(c=>{ if(c.s==='W') n++; });
+    if(!n) return false;
+    return rng() < Math.min(1, jpOdds(denom,mult).fight*n/expWilds());
+  }
+  // Pick snowballs until one prize shows 3 times. Returns the prize and the order the picks reveal (15 snowballs).
+  function snowFight(denom, mult){
+    const o=jpOdds(denom,mult), keys=Object.keys(o.per); let x=rng()*o.fight, prize='MINI';
+    for(const k of keys){ if((x-=o.per[k])<0){ prize=k; break; } }
+    const others=[]; keys.forEach(k=>{ if(k!==prize){ others.push(k,k); } });
+    const nOther=Math.floor(rng()*(others.length+1));
     const seq=[prize,prize]; for(let k=0;k<nOther;k++) seq.push(others.splice(Math.floor(rng()*others.length),1)[0]);
     for(let k=seq.length-1;k>0;k--){ const j=Math.floor(rng()*(k+1)); [seq[k],seq[j]]=[seq[j],seq[k]]; }
     seq.push(prize);
@@ -294,6 +309,6 @@ const ENGINE = (() => {
     const min=Math.round(MOON.MIN_PAY*bet*100)/100, add=Math.max(0, Math.round((min-st.pot)*100)/100);
     st.pot=Math.round((st.pot+add)*100)/100; return add;
   }
-  return {LINES,SCATTER,LINE,BASE_W,FREE_W,HOLD,FG,RANDOM,SNOWFIGHT,FREE_GAMES,freeStart,freeSpin,crackRoll,crackOrbs,snowRoll,snowFight,setUnit:u=>{UNIT=u}, moonEnsure, moonSnow, moonFinish,SYM,PAY,JP,GRAND_SEED,GRAND_K,HOLD_SPIN_RATE,grandChance,MOON,inZone,moonStart,moonGrid,moonResolve,spinGrid,evaluate,holdStep,holdTotal,orbValue,setRng:f=>rng=f};
+  return {LINES,SCATTER,LINE,BASE_W,FREE_W,HOLD,FG,RANDOM,FREE_GAMES,freeStart,freeSpin,crackRoll,crackOrbs,JPF,jpOdds,wildRoll,snowFight,setUnit:u=>{UNIT=u}, moonEnsure, moonSnow, moonFinish,SYM,PAY,JP,GRAND_SEED,GRAND_K,HOLD_SPIN_RATE,grandChance,MOON,inZone,moonStart,moonGrid,moonResolve,spinGrid,evaluate,holdStep,holdTotal,orbValue,setRng:f=>rng=f};
 })();
 if(typeof module!=='undefined') module.exports=ENGINE;

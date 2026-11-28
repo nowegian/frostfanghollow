@@ -16,6 +16,7 @@ u=u[:i]+'''<div class="cab m">
   <div class="jps art">
     <div class="jp grand" id="jpGRAND"><b>GRAND</b><i>$0</i></div>
     <div class="jp major" id="jpMAJOR"><b>MAJOR</b><i>$0</i></div>
+    <div class="jp maxi" id="jpMAXI"><b>MAXI</b><i>$0</i></div>
     <div class="jp minor" id="jpMINOR"><b>MINOR</b><i>$0</i></div>
     <div class="jp mini" id="jpMINI"><b>MINI</b><i>$0</i></div>
   </div>
@@ -29,7 +30,7 @@ u=u[:i]+'''<div class="cab m">
     </div>
     <div class="meter hidden" id="meter"></div>
   </div>
-  <div class="win-line" id="winLine">3 moons in a row from reel 1 = free games. Frostfang on 1, 3, 5 = Diamond Hunt.</div>
+  <div class="win-line" id="winLine">3+ moons anywhere = 6 free games. Wilds can start the Snowball Fight.</div>
   <div class="mstats">
     <div class="box bank" id="bankBox"><small>CREDIT <span class="unit" id="bankUnit"><b class="d">$</b><b class="c">CR</b></span></small><div id="credit">$0</div><small id="creditCr" class="cr"></small></div>
     <div class="box betbox"><div class="denoms" id="denoms"></div>
@@ -72,7 +73,8 @@ button{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 .menubtn{position:absolute;right:0;top:50%;transform:translateY(-50%);width:42px;height:42px;border-radius:12px;font-size:22px;
  background:#24174fcc;border:2px solid #ffffff33;backdrop-filter:blur(4px)}
 .menubtn.armed{background:#ff8a1f;animation:pulse .6s infinite alternate}
-.cab.m .jps.art{grid-template-columns:1.1fr 1.05fr 1fr 1fr;gap:3px;margin:0}
+.cab.m .jps.art{grid-template-columns:repeat(6,1fr);gap:2px 3px;margin:0}
+.cab.m .jps.art .jp{grid-column:span 2}.cab.m .jps.art .jp.grand,.cab.m .jps.art .jp.major{grid-column:span 3}
 .cab.m .jps.art .jp i{font-size:13cqw}
 .cab.m .stage{flex:1;justify-content:center}
 .cab.m .frame,.cab.m .frame.moonf{width:calc(100% + 14px);margin:0 -7px}
@@ -120,6 +122,7 @@ button{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 .cab.m h1.logo img{height:auto;width:100%;max-width:100%;max-height:20dvh}
 .cab.m .menubtn{position:static;transform:none;width:34px;height:34px;font-size:18px;flex:none}
 .cab.m .jps.art{grid-area:jps;grid-template-columns:1fr;align-content:center;gap:4px}
+.cab.m .jps.art .jp,.cab.m .jps.art .jp.grand,.cab.m .jps.art .jp.major{grid-column:auto}
 .cab.m .stage{grid-area:stage;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px}
 .cab.m .frame:not(.moonf){aspect-ratio:1600/1000;height:auto;width:min(100%,calc(var(--H)*1.6));margin:0}
 .cab.m .frame:not(.moonf)::after{border:none;border-image:none;background:url(img/frame_base.webp) 0 0/100% 100% no-repeat}

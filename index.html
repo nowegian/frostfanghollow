@@ -27,16 +27,17 @@ h1 span{background:linear-gradient(180deg,#ffe08a,var(--pump));-webkit-backgroun
 .jp.minor{background:linear-gradient(#1aa0e0,#0b4f80)}.jp.mini{background:linear-gradient(#29b35a,#0f5a2a)}
 .jp.flash{animation:jpf .35s 6 alternate}
 /* artwork plaques: the name is in the art, the amount sits in each plaque's dark panel */
-.jps.art{grid-template-columns:1.15fr 1.05fr 1fr 1fr;gap:4px;align-items:center}
+.jps.art{grid-template-columns:repeat(5,1fr);gap:4px;align-items:center}
 .jps.art .jp{position:relative;aspect-ratio:600/190;border:0;border-radius:0;box-shadow:none;padding:0;container-type:inline-size;
  background:center/contain no-repeat;filter:drop-shadow(0 4px 8px #000b)}
 .jps.art .jp b{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 .jps.art .jp i{position:absolute;left:0;right:0;top:var(--py);transform:translateY(-50%);font-size:11cqw;line-height:1;text-shadow:0 2px 0 #000,0 0 8px #000}
 .jps.art .jp.grand{background-image:url(img/plaque_grand.webp);--py:59%}
 .jps.art .jp.major{background-image:url(img/plaque_major.webp);--py:56%}
+.jps.art .jp.maxi{background-image:url(img/plaque_maxi.webp);--py:56%}
 .jps.art .jp.minor{background-image:url(img/plaque_minor.webp);--py:55%}
 .jps.art .jp.mini{background-image:url(img/plaque_mini.webp);--py:56%}
-@media (max-width:560px){.jps.art{grid-template-columns:1fr 1fr;gap:2px 6px}}
+@media (max-width:560px){.jps.art{grid-template-columns:repeat(6,1fr);gap:2px 4px}.jps.art .jp{grid-column:span 2}.jps.art .jp.grand,.jps.art .jp.major{grid-column:span 3}}
 #spin.art{background:url(img/button_spin.webp) center/contain no-repeat;box-shadow:none;border-radius:50%;filter:drop-shadow(0 6px 10px #000c);
  text-shadow:0 2px 0 #7a2a00,0 0 10px #000a;font-size:clamp(18px,3.6vw,24px);transition:transform .08s,filter .2s}
 #spin.art:hover{filter:drop-shadow(0 6px 10px #000c) drop-shadow(0 0 16px #ff8a1f) brightness(1.08)}
@@ -75,7 +76,7 @@ h1 span{background:linear-gradient(180deg,#ffe08a,var(--pump));-webkit-backgroun
 @keyframes splat{0%{transform:translate(-50%,-50%) scale(.2)}25%{transform:translate(-50%,-50%) scale(1.1)}70%{opacity:1}100%{transform:translate(-50%,-50%) scale(1.15);opacity:0}}
 .msg.sf{background:#0b0720e8}
 .ball.flyorb{position:fixed}.ball.flyorb .val{position:absolute;inset:auto 0 auto 0;top:40%;transform:translateY(-50%);text-align:center;font-weight:700;font-size:clamp(12px,2vw,20px);color:#fff;text-shadow:0 2px 0 #2a0b5c,0 0 6px #000}
-.sfgrid{display:grid;grid-template-columns:repeat(6,1fr);gap:clamp(4px,1vw,10px);width:min(94%,620px);margin-top:10px}
+.sfgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:clamp(4px,1vw,10px);width:min(94%,620px);margin-top:10px}
 .sfball{aspect-ratio:1;border-radius:50%;padding:2%;background:radial-gradient(circle at 40% 35%,#3a2f7a,#140c33);border:2px solid #bfe9ff55;display:flex;align-items:center;justify-content:center;transition:transform .15s}
 .sfball:not(.open):hover{transform:scale(1.08);border-color:#bfe9ff}
 .sfball img,.sfball svg{width:100%;height:100%;object-fit:contain}
@@ -258,7 +259,7 @@ button{font-family:inherit;cursor:pointer;border:none;color:#fff;font-weight:700
 .cab:not(.m) .frame.moonf{width:var(--fw)}
 .cab:not(.m) .stage:has(.frame.moonf)>.meter{position:absolute;top:50%;left:calc(50% + var(--fw)/2 + 8px);transform:translateY(-50%);width:max-content;max-width:150px;margin:0;padding:8px 10px}
 .cab:not(.m) .stage:has(.frame.moonf)>.meter .dots{max-width:120px;margin:0 auto}
-.cab:not(.m) .jps.art{width:min(760px,100%);margin:0 auto 4px}
+.cab:not(.m) .jps.art{width:min(900px,100%);margin:0 auto 4px}
 .cab:not(.m) .win-line{margin-top:2px;min-height:18px;font-size:13px}
 .panel{width:min(820px,100%);margin:2px auto 0;grid-template-columns:1fr 1.5fr 1fr auto;gap:6px;align-items:center}
 .panel .box{padding:3px 8px;border-radius:10px;background:#0c0828d9;backdrop-filter:blur(3px);align-self:stretch;display:flex;flex-direction:column;justify-content:center}
@@ -332,6 +333,8 @@ button{font-family:inherit;cursor:pointer;border:none;color:#fff;font-weight:700
 .sfj{display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%}
 .sfj img.symimg{height:auto!important;width:96%!important;max-width:none}
 .sfj small{font-size:11px;font-weight:700;color:#fff;text-shadow:0 1px 2px #000}
+.cell.wspark{animation:wspark .3s ease-in-out 3 alternate;box-shadow:0 0 0 3px #bfe9ff,0 0 26px #6cc8ff!important;z-index:3}
+@keyframes wspark{to{transform:scale(1.12);filter:brightness(1.8)}}
 </style>
 </head>
 <body>
@@ -341,6 +344,7 @@ button{font-family:inherit;cursor:pointer;border:none;color:#fff;font-weight:700
   <div class="jps art">
     <div class="jp grand" id="jpGRAND"><b>GRAND</b><i>$0</i></div>
     <div class="jp major" id="jpMAJOR"><b>MAJOR</b><i>$0</i></div>
+    <div class="jp maxi" id="jpMAXI"><b>MAXI</b><i>$0</i></div>
     <div class="jp minor" id="jpMINOR"><b>MINOR</b><i>$0</i></div>
     <div class="jp mini" id="jpMINI"><b>MINI</b><i>$0</i></div>
   </div>
@@ -398,7 +402,7 @@ const ENGINE = (() => {
     A:{3:10,4:30,5:120}, K:{3:10,4:30,5:120}, Q:{3:10,4:30,5:80}, J:{3:10,4:30,5:80}, T:{3:10,4:20,5:70}
   };
   // Regular spins: no orbs. Frostfang (F) is the top pay symbol on every reel; moons (M) are the free-games scatter, at most one per reel.
-  const BASE_W = {F:2.5,P:5,S:6,B:7,C:8,A:10,K:10,Q:12,J:12,T:12,W:2.9,M:3.1};
+  const BASE_W = {F:2.5,P:5,S:6,B:7,C:8,A:10,K:10,Q:12,J:12,T:12,W:2.9,M:3.05};
   const MOON_REELS = [0,1,2,3,4];
   // Free games: the card symbols (A, K, Q, J, 10) are taken off the reels. No orbs (orbs are retired for now).
   const FREE_W = {F:4,P:5,S:6,B:7,C:8,W:4.3,M:1.2};
@@ -406,8 +410,7 @@ const ENGINE = (() => {
   const LINE = {K:0.75};                           // scales every line pay
   const FREE_GAMES = 6;                           // 3+ moons anywhere (or the lucky single-moon trigger) = 6 free games
   const FG = {COLLECT_STEP:4, MAX_MULT:3, ORB_K:1.8};  // every 4 collections raise the orb multiplier (x2, then x3)
-  const RANDOM = {CRACK:0, SNOWBALL:1/700, LUCKY:1/400};  // surprise features on regular spins; LUCKY: 1 or 2 moons start the free games anyway
-  const SNOWFIGHT = {MINI:0.60, X1:0.12, X2:0.10, X3:0.08, MINOR:0.08, MAJOR:0.02};
+  const RANDOM = {CRACK:0, LUCKY:1/400};  // surprise features on regular spins; LUCKY: 1 or 2 moons start the free games anyway
   const JP = {MINI:20, MINOR:50, MAJOR:300}; // x bet seeds (MAJOR also grows)
   const GRAND_SEED = 9000;           // dollars, same at every bet, grows from here
   const GRAND_K = 0.04;              // share of every bet paid back through the GRAND, at any bet size
@@ -514,16 +517,32 @@ const ENGINE = (() => {
       g[r][y]={s:'O',orb:orbValue(bet,false)}; out.push({r,y}); }
     return out;
   }
-  const snowRoll=()=>rng()<RANDOM.SNOWBALL;
-  // Snowball Fight: pick snowballs until one prize shows 3 times. Returns the prize and the order the picks reveal.
-  // GRAND chance inside a Snowball Fight: proportional to the bet, so the GRAND returns GRAND_K of every bet at any bet size
-  const grandSnowChance = bet => Math.min(1, GRAND_K*bet/GRAND_SEED/RANDOM.SNOWBALL);
-  function snowFight(bet){
-    const keys=Object.keys(SNOWFIGHT); let x=rng(), prize=keys[keys.length-1];
-    if(bet && rng()<grandSnowChance(bet)) prize='GRAND';
-    else for(const k of keys){ if((x-=SNOWFIGHT[k])<0){ prize=k; break; } }
-    const others=[]; keys.forEach(k=>{ if(k!==prize){ others.push(k,k); } }); if(prize!=='GRAND') others.push('GRAND');
-    const nOther=Math.floor(rng()*Math.min(9,others.length+1));
+  // ===== Snowball Fight jackpot feature =====
+  // Any wild that lands on a regular spin can start it. MINI and MINOR are fixed credits, so their dollar value follows the
+  // denomination; MAXI, MAJOR and GRAND are progressives in dollars, the same at every denomination.
+  // Each prize returns a fixed share of every bet: its chance per spin is SHARE x bet / value. Bigger bets start the
+  // Snowball Fight more often, and bigger denominations make the progressives more likely.
+  const JPF = {MINI_CR:1000, MINOR_CR:5000, SEED:{MAXI:1000, MAJOR:6000, GRAND:12000},
+    SHARE:{MINI:0.03, MINOR:0.015, MAXI:0.015, MAJOR:0.015, GRAND:0.02},
+    GROW:{MAXI:0.004, MAJOR:0.003, GRAND:0.003}};   // share of every bet added to each progressive meter
+  function jpOdds(denom, mult){
+    const bet=50*mult*denom, v=Object.assign({MINI:JPF.MINI_CR*denom, MINOR:JPF.MINOR_CR*denom}, JPF.SEED), per={};
+    let fight=0; for(const k in JPF.SHARE){ per[k]=JPF.SHARE[k]*bet/v[k]; fight+=per[k]; }
+    return {per, fight};
+  }
+  // expected wilds per regular spin (wilds land on reels 2-5)
+  const expWilds=()=>{ let t=0; for(const k in BASE_W) t+=BASE_W[k]; return 12*BASE_W.W/t; };
+  function wildRoll(g, denom, mult){
+    let n=0; for(let r=1;r<5;r++) g[r].forEach(c=>{ if(c.s==='W') n++; });
+    if(!n) return false;
+    return rng() < Math.min(1, jpOdds(denom,mult).fight*n/expWilds());
+  }
+  // Pick snowballs until one prize shows 3 times. Returns the prize and the order the picks reveal (15 snowballs).
+  function snowFight(denom, mult){
+    const o=jpOdds(denom,mult), keys=Object.keys(o.per); let x=rng()*o.fight, prize='MINI';
+    for(const k of keys){ if((x-=o.per[k])<0){ prize=k; break; } }
+    const others=[]; keys.forEach(k=>{ if(k!==prize){ others.push(k,k); } });
+    const nOther=Math.floor(rng()*(others.length+1));
     const seq=[prize,prize]; for(let k=0;k<nOther;k++) seq.push(others.splice(Math.floor(rng()*others.length),1)[0]);
     for(let k=seq.length-1;k>0;k--){ const j=Math.floor(rng()*(k+1)); [seq[k],seq[j]]=[seq[j],seq[k]]; }
     seq.push(prize);
@@ -681,7 +700,7 @@ const ENGINE = (() => {
     const min=Math.round(MOON.MIN_PAY*bet*100)/100, add=Math.max(0, Math.round((min-st.pot)*100)/100);
     st.pot=Math.round((st.pot+add)*100)/100; return add;
   }
-  return {LINES,SCATTER,LINE,BASE_W,FREE_W,HOLD,FG,RANDOM,SNOWFIGHT,FREE_GAMES,freeStart,freeSpin,crackRoll,crackOrbs,snowRoll,snowFight,setUnit:u=>{UNIT=u}, moonEnsure, moonSnow, moonFinish,SYM,PAY,JP,GRAND_SEED,GRAND_K,HOLD_SPIN_RATE,grandChance,MOON,inZone,moonStart,moonGrid,moonResolve,spinGrid,evaluate,holdStep,holdTotal,orbValue,setRng:f=>rng=f};
+  return {LINES,SCATTER,LINE,BASE_W,FREE_W,HOLD,FG,RANDOM,FREE_GAMES,freeStart,freeSpin,crackRoll,crackOrbs,JPF,jpOdds,wildRoll,snowFight,setUnit:u=>{UNIT=u}, moonEnsure, moonSnow, moonFinish,SYM,PAY,JP,GRAND_SEED,GRAND_K,HOLD_SPIN_RATE,grandChance,MOON,inZone,moonStart,moonGrid,moonResolve,spinGrid,evaluate,holdStep,holdTotal,orbValue,setRng:f=>rng=f};
 })();
 if(typeof module!=='undefined') module.exports=ENGINE;
 
@@ -1112,7 +1131,7 @@ const SOUND = (() => {
       bell(N(72 + s), t + i * 0.12, { gain: 0.1 }); }); bell(N(84), t + 0.55, { gain: 0.14, dur: 2.2 }); },
     feature: t => { noise(t, 1.0, { f: 200, to: 5000, q: 0.5, gain: 0.08, verb: 0.4 });
       [0, 3, 7, 10, 12, 15].forEach((s, i) => bell(N(69 + s), t + 0.2 + i * 0.09, { gain: 0.09, dur: 1.2 })); },
-    jackpot: (t, { level = 'MINI' } = {}) => { const k = { MINI: 1, MINOR: 2, MAJOR: 3, GRAND: 4 }[level] || 1;
+    jackpot: (t, { level = 'MINI' } = {}) => { const k = { MINI: 1, MINOR: 2, MAXI: 3, MAJOR: 4, GRAND: 5 }[level] || 1;
       for (let r = 0; r < k; r++) [0, 4, 7, 12].forEach((s, i) => bell(N(72 + s + r * 5), t + r * 0.45 + i * 0.07, { gain: 0.1, dur: 1.2 }));
       pad([N(48), N(55), N(64)], t, 1.2 + k * 0.4, { gain: 0.05, dest: sfxBus, cutoff: 2500 }); },
     grow: t => { for (let k = 0; k < 10; k++) bell(N(72 + k * 2), t + k * 0.05, { gain: 0.06, dur: 0.7 });
@@ -1132,6 +1151,7 @@ const SOUND = (() => {
     if (!ready()) return;
     opt = opt || {};
     if (name === 'jackpot' && opt.level && files['jackpot_' + opt.level]) name = 'jackpot_' + opt.level;
+      else if (name === 'jackpot' && opt.level === 'MAXI' && files.jackpot_MAJOR) name = 'jackpot_MAJOR';
     if (files[name]) {
       if (name === 'coin') { const t = ctx.currentTime; if (t - lastCoin < 0.05) return; lastCoin = t; }
       playFile(name, sfxBus, { rate: STEP[name] ? Math.pow(2, STEP[name](opt) / 12) : 1 }); return; }
@@ -1310,64 +1330,76 @@ WIDE.addEventListener('change',wideLayout);wideLayout();
 const DENOMS=[0.01,0.02,0.05], MULTS=[1,2,3,4,5], MAXM=[4,4,4];
 const dLabel=d=>Math.round(d*100)+'¢';
 const START=100;
-const fresh=()=>({credit:START,denI:1,multI:0,speed:1,acc:{MAJORX:0,GRAND:0}});
+const fresh=()=>({credit:START,denI:1,multI:0,speed:1,acc:{MAXI:0,MAJOR:0,GRAND:0}});
 let S=fresh();
 try{const s=JSON.parse(localStorage.getItem('ffh-link-v2')); if(s&&typeof s.credit==='number') S=Object.assign(S,s);}catch(e){}
 const save=()=>{try{localStorage.setItem('ffh-link-v2',JSON.stringify(S))}catch(e){};queueSave();};
 // ---------- shared progressive jackpots + per-player cloud save (Claude database) ----------
-// jps/state   {ge, me}        current GRAND / MAJOR "round" numbers; bumped when someone wins
-// jpc/<id>    {ge,g, me,m}    this player's contributions to the current rounds (each player writes only their own)
+// jps/state   {ge, je, xe}            current GRAND / MAJOR / MAXI "round" numbers; bumped when someone wins
+// jpc/<id>    {ge,g, je,j, xe,x}      this player's dollar contributions to the current rounds (each player writes only their own)
 // data/users/<id>/save         this player's balance and settings (private)
 // Signed out, or no database: everything works as before, saved in this browser only.
-const NET={db:null,uid:null,on:false,ro:false,ep:{g:0,m:0},others:{g:0,m:0},mine:{ge:0,g:0,me:0,m:0},docs:[],cBusy:false,cAgain:false,sBusy:false,sAgain:false};
+const JK={g:'GRAND',j:'MAJOR',x:'MAXI'},JF={GRAND:'g',MAJOR:'j',MAXI:'x'};
+const z3=()=>({g:0,j:0,x:0});
+const NET={db:null,uid:null,on:false,ro:false,ep:z3(),others:z3(),mine:{ge:0,g:0,je:0,j:0,xe:0,x:0},docs:[],cBusy:false,cAgain:false,sBusy:false,sAgain:false};
 const wait=ms=>new Promise(r=>setTimeout(r,ms));
+const r4=v=>Math.round(v*10000)/10000;
 // ---------- Public website (GitHub Pages): shared jackpots through Supabase, no player accounts ----------
-// One row in the 'jackpots' table holds the shared GRAND and MAJOR growth. Spins add to it in small batches
-// (jp_add); a win resets it for everyone (jp_win, first winner of a round only). Balances stay in this browser.
+// One row in the 'jackpots' table holds the shared GRAND, MAJOR and MAXI growth in dollars. Spins add to it in small
+// batches (jp_add3); a win resets that meter for everyone (jp_win, first winner of a round only). Balances stay in this browser.
+// If the database hasn't been upgraded for the MAXI yet, GRAND and MAJOR still use the old jp_add and the MAXI grows locally.
 const SB={url:'https://ngdgmikqyzydnfwwdhvq.supabase.co',key:'sb_publishable_-F8HEWHh4yR0GXOlJRWoRA_88i3Iv_h',
- on:false,round:{g:0,m:0},base:{g:0,m:0},pend:{g:0,m:0},busy:false,again:false};
+ on:false,v3:true,hasX:false,round:z3(),base:z3(),pend:z3(),busy:false,again:false};
+const SBCOL={g:['grand_acc','grand_round'],j:['major_acc','major_round'],x:['maxi_acc','maxi_round']};
 async function sbCall(path,body){const r=await fetch(SB.url+'/rest/v1/'+path,{method:body?'POST':'GET',
   headers:Object.assign({apikey:SB.key,Accept:'application/json'},body?{'Content-Type':'application/json'}:{}),body:body?JSON.stringify(body):undefined});
  if(!r.ok)throw new Error('supabase '+r.status);return r.json();}
-function sbApply(){S.acc.GRAND=Math.round((SB.base.g+SB.pend.g)*10000)/10000;S.acc.MAJORX=Math.round((SB.base.m+SB.pend.m)*1e6)/1e6;}
+function sbApply(){for(const f in JK)S.acc[JK[f]]=r4(SB.base[f]+SB.pend[f]);}
 function sbRow(row){if(!row)return;row=Array.isArray(row)?row[0]:row;if(!row)return;
- const gr=+row.grand_round||0,mr=+row.major_round||0;
- if(gr>SB.round.g){SB.round.g=gr;SB.pend.g=0;} if(mr>SB.round.m){SB.round.m=mr;SB.pend.m=0;}
- if(gr===SB.round.g)SB.base.g=Math.max(0,+row.grand_acc||0); if(mr===SB.round.m)SB.base.m=Math.max(0,+row.major_acc||0);
+ SB.hasX=row.maxi_acc!==undefined&&row.maxi_acc!==null;
+ for(const f in JK){const [ac,rc]=SBCOL[f];if(row[ac]===undefined||row[ac]===null)continue;const rd=+row[rc]||0;
+  if(rd>SB.round[f]){SB.round[f]=rd;SB.pend[f]=0;}
+  if(rd===SB.round[f])SB.base[f]=Math.max(0,+row[ac]||0);}
  sbApply();}
 async function sbPoll(){try{sbRow(await sbCall('jackpots?id=eq.1&select=*'));if(!busy)drawMeters();}catch(e){}}
 async function sbFlush(){if(!SB.on)return;if(SB.busy){SB.again=true;return}SB.busy=true;
  try{do{SB.again=false;await wait(2000);
-   while(SB.pend.g>0||SB.pend.m>0){const g=Math.min(SB.pend.g,2),m=Math.min(SB.pend.m,0.12),rg=SB.round.g,rm=SB.round.m;
-    const row=await sbCall('rpc/jp_add',{g,m});
-    if(SB.round.g===rg)SB.pend.g=Math.max(0,Math.round((SB.pend.g-g)*1e6)/1e6);
-    if(SB.round.m===rm)SB.pend.m=Math.max(0,Math.round((SB.pend.m-m)*1e6)/1e6);
+   while(SB.pend.g>0||SB.pend.j>0||(SB.hasX&&SB.v3&&SB.pend.x>0)){
+    const rd={...SB.round};let take,row;
+    if(SB.v3){take={g:Math.min(SB.pend.g,1),j:Math.min(SB.pend.j,1),x:SB.hasX?Math.min(SB.pend.x,1.5):0};
+     try{row=await sbCall('rpc/jp_add3',take);}catch(e){SB.v3=false;continue;}}
+    else{take={g:Math.min(SB.pend.g,2),j:Math.min(SB.pend.j,0.12),x:0};row=await sbCall('rpc/jp_add',{g:take.g,m:take.j});}
+    for(const f in JK)if(SB.round[f]===rd[f])SB.pend[f]=Math.max(0,Math.round((SB.pend[f]-take[f])*1e6)/1e6);
     sbRow(row);}
   }while(SB.again);}catch(e){}SB.busy=false;}
-async function sbWin(k){const f=k==='GRAND'?'g':'m',round=SB.round[f];
+async function sbWin(k){const f=JF[k],round=SB.round[f];
  SB.base[f]=0;SB.pend[f]=0;SB.round[f]=round+1;sbApply();
+ if(f==='x'&&!SB.hasX)return;
  try{await sbCall('rpc/jp_win',{which:k,round});}catch(e){}
  sbPoll();}
 async function sbStart(){try{sbRow(await sbCall('jackpots?id=eq.1&select=*'));SB.on=true;
   try{localStorage.setItem('ffh-link-v2',JSON.stringify(S))}catch(e){}
   drawMeters();setInterval(sbPoll,4000);}catch(e){SB.on=false;}}
-function applyAcc(){if(!NET.on)return;S.acc.GRAND=Math.round((NET.others.g+NET.mine.g)*10000)/10000;S.acc.MAJORX=Math.round((NET.others.m+NET.mine.m)*1e6)/1e6;}
-function sumOthers(){let g=0,m=0;for(const d of NET.docs){if(d.id===NET.uid)continue;const v=d.data()||{};
- if(v.ge===NET.ep.g&&typeof v.g==='number')g+=Math.max(0,Math.min(v.g,1e6));if(v.me===NET.ep.m&&typeof v.m==='number')m+=Math.max(0,Math.min(v.m,1e3));}
- NET.others={g,m};applyAcc();}
-function syncEpochs(){if(NET.mine.ge!==NET.ep.g){NET.mine.ge=NET.ep.g;NET.mine.g=0;}if(NET.mine.me!==NET.ep.m){NET.mine.me=NET.ep.m;NET.mine.m=0;}}
+// ---------- Claude database ----------
+function applyAcc(){if(!NET.on)return;for(const f in JK)S.acc[JK[f]]=r4(NET.others[f]+NET.mine[f]);}
+function sumOthers(){const o=z3();for(const d of NET.docs){if(d.id===NET.uid)continue;const v=d.data()||{};
+  for(const f in JK)if(v[f+'e']===NET.ep[f]&&typeof v[f]==='number')o[f]+=Math.max(0,Math.min(v[f],1e6));}
+ NET.others=o;applyAcc();}
+function syncEpochs(){for(const f in JK)if(NET.mine[f+'e']!==NET.ep[f]){NET.mine[f+'e']=NET.ep[f];NET.mine[f]=0;}}
 function writeFailed(){if(NET.ro)return;NET.ro=true;$('winLine').textContent='Playing view-only: ask the game owner for Contributor access to save your progress and feed the shared jackpots.';}
 async function queueContrib(){if(!NET.on||NET.ro)return;if(NET.cBusy){NET.cAgain=true;return}NET.cBusy=true;
  try{do{NET.cAgain=false;await wait(2000);await NET.db.doc('jpc/'+NET.uid).set(Object.assign({},NET.mine));}while(NET.cAgain);}
  catch(e){if(e&&e.code==='invalid_argument')writeFailed();}NET.cBusy=false;}
 async function queueSave(){if(!NET.on||NET.ro)return;if(NET.sBusy){NET.sAgain=true;return}NET.sBusy=true;
  try{do{NET.sAgain=false;await wait(1500);await NET.db.doc('data/users/'+NET.uid+'/save').set({credit:S.credit,denI:S.denI,multI:S.multI,speed:S.speed,bank:S.bank||'$'});}while(NET.sAgain);}
- catch(e){if(e&&e.code==='invalid_argument')writeFailed();}NET.sBusy=false;}
-function jpAdd(m,g){if(SB.on){SB.pend.m+=m;SB.pend.g=Math.round((SB.pend.g+g)*10000)/10000;sbApply();sbFlush();}
- else if(NET.on){NET.mine.m+=m;NET.mine.g=Math.round((NET.mine.g+g)*10000)/10000;applyAcc();queueContrib();}
- else{S.acc.MAJORX+=m;S.acc.GRAND=Math.round((S.acc.GRAND+g)*10000)/10000;}}
-async function jpWon(k){const f=k==='GRAND'?'g':'m',ef=f==='g'?'ge':'me';
- if(k==='GRAND')S.acc.GRAND=0;else S.acc.MAJORX=0;
+ catch(e){if(e&&e.code==="invalid_argument")writeFailed();}NET.sBusy=false;}
+// every spin feeds the three progressives a share of the bet (dollars)
+function jpAdd(b){const add={g:b*E.JPF.GROW.GRAND,j:b*E.JPF.GROW.MAJOR,x:b*E.JPF.GROW.MAXI};
+ if(SB.on){for(const f in JK)SB.pend[f]=Math.round((SB.pend[f]+add[f])*1e6)/1e6;sbApply();sbFlush();}
+ else if(NET.on){for(const f in JK)NET.mine[f]=Math.round((NET.mine[f]+add[f])*1e6)/1e6;applyAcc();queueContrib();}
+ else for(const f in JK)S.acc[JK[f]]=r4(S.acc[JK[f]]+add[f]);}
+async function jpWon(k){const f=JF[k];if(!f)return;const ef=f+'e';
+ S.acc[k]=0;
  if(SB.on){sbWin(k);return;}
  if(!NET.on)return;
  // start the next round for everyone: everybody's old contributions stop counting
@@ -1375,7 +1407,7 @@ async function jpWon(k){const f=k==='GRAND'?'g':'m',ef=f==='g'?'ge':'me';
  if(NET.ro)return;
  try{const ref=NET.db.doc('jps/state');
   for(let t=0;t<6;t++){const a=await ref.acquire({holder:NET.uid,ttlMs:4000});if(a.acquired)break;await wait(300+Math.random()*400);}
-  const cur=await ref.get(),d=cur.exists?(cur.data()||{}):{},body={ge:d.ge||0,me:d.me||0};
+  const cur=await ref.get(),d=cur.exists?(cur.data()||{}):{},body={ge:d.ge||0,je:d.je||0,xe:d.xe||0};
   body[ef]=Math.max((d[ef]||0)+1,NET.ep[f]);await ref.set(body);NET.ep[f]=body[ef];syncEpochs();sumOthers();queueContrib();}
  catch(e){if(e&&e.code==='invalid_argument')writeFailed();}}
 (async()=>{try{
@@ -1388,13 +1420,13 @@ async function jpWon(k){const f=k==='GRAND'?'g':'m',ef=f==='g'?'ge':'me';
   if(Number.isInteger(d.denI))S.denI=Math.min(Math.max(d.denI,0),DENOMS.length-1);
   if(Number.isInteger(d.multI))S.multI=Math.min(Math.max(d.multI,0),MAXM[S.denI]);
   if([1,2,3,4].includes(d.speed))S.speed=d.speed;if(d.bank==='cr'||d.bank==='$')S.bank=d.bank;}
- if(mine.exists){const d=mine.data()||{};for(const k of ['ge','g','me','m'])if(typeof d[k]==='number')NET.mine[k]=d[k];}
- if(st.exists){const d=st.data()||{};NET.ep.g=d.ge||0;NET.ep.m=d.me||0;}
+ if(mine.exists){const d=mine.data()||{};for(const k of ['ge','g','je','j','xe','x'])if(typeof d[k]==='number')NET.mine[k]=d[k];}
+ if(st.exists){const d=st.data()||{};for(const f in JK)NET.ep[f]=d[f+'e']||0;}
  syncEpochs();NET.on=true;applyAcc();
  try{localStorage.setItem('ffh-link-v2',JSON.stringify(S))}catch(e){}
  drawMeters();try{drawSpeed()}catch(e){}
- db.doc('jps/state').onSnapshot(s=>{const d=s.exists?(s.data()||{}):{};const g=d.ge||0,m=d.me||0;
-   if(g>NET.ep.g)NET.ep.g=g;if(m>NET.ep.m)NET.ep.m=m;syncEpochs();sumOthers();if(!busy)drawMeters();},()=>{});
+ db.doc('jps/state').onSnapshot(s=>{const d=s.exists?(s.data()||{}):{};
+   for(const f in JK){const v=d[f+'e']||0;if(v>NET.ep[f])NET.ep[f]=v;}syncEpochs();sumOthers();if(!busy)drawMeters();},()=>{});
  db.collection('jpc').onSnapshot(s=>{NET.docs=s.docs;sumOthers();if(!busy)drawMeters();},()=>{});
  setInterval(()=>{if(!busy)drawMeters()},4000);
 }catch(e){NET.on=false;}})();
@@ -1402,7 +1434,7 @@ let rig=null,busy=false, auto=false, inHold=false, inFree=false;
 // spin speed 1-4: 1 is the relaxed default, 4 is fastest. SF() scales every animation time.
 if(![1,2,3,4].includes(S.speed))S.speed=1;
 const SF=()=>[1.3,1,0.7,0.45][S.speed-1];
-if(S.betI!=null||S.acc.MAJORX==null){delete S.betI;S.denI=S.denI??1;S.multI=S.multI??0;S.acc={MAJORX:0,GRAND:0};}
+if(S.betI!=null||!S.acc||S.acc.MAXI==null){delete S.betI;S.denI=S.denI??1;S.multI=S.multI??0;S.acc={MAXI:0,MAJOR:0,GRAND:0};}
 S.denI=Math.min(S.denI,DENOMS.length-1);S.multI=Math.min(S.multI,MAXM[S.denI]);
 const denom=()=>DENOMS[S.denI], mult=()=>MULTS[S.multI];
 // dollars -> whole credits at the current denomination
@@ -1414,7 +1446,8 @@ let winAmt=0;const setWin=v=>{winAmt=v;$('win').textContent=fmtBank(v)};
 const bet=()=>Math.round(50*mult()*denom()*100)/100;
 const fmt=v=>'$'+(Math.round(v*100)/100).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
 const r10=v=>{const s=10*denom();return Math.round(Math.floor(v/s+1e-9)*s*100)/100};
-const jpVals=()=>({MINI:E.JP.MINI*bet(),MINOR:E.JP.MINOR*bet(),MAJOR:r10((E.JP.MAJOR+S.acc.MAJORX)*bet()),GRAND:r10(E.GRAND_SEED+S.acc.GRAND)});
+// MINI and MINOR: fixed credits (their dollar value follows the denomination). MAXI, MAJOR, GRAND: shared progressives in dollars.
+const jpVals=()=>({MINI:Math.round(E.JPF.MINI_CR*denom()*100)/100,MINOR:Math.round(E.JPF.MINOR_CR*denom()*100)/100,MAXI:r10(E.JPF.SEED.MAXI+S.acc.MAXI),MAJOR:r10(E.JPF.SEED.MAJOR+S.acc.MAJOR),GRAND:r10(E.JPF.SEED.GRAND+S.acc.GRAND)});
 const sleep=ms=>new Promise(r=>setTimeout(r,ms*SF()));
 function drawMeters(){const j=jpVals();for(const k in j)$('jp'+k).querySelector('i').textContent=fmt(j[k]);
  const crs=Math.floor(S.credit/denom()+1e-6).toLocaleString();
@@ -1621,7 +1654,7 @@ async function showWins(ev,g,label){
 async function play(){
  if(busy)return; if(S.credit<bet()){auto=false;$('auto').classList.remove('on');say('Out of credits! Tap ADD $100.');drawMeters();return}
  busy=true;$('spin').disabled=true;hideMsg();
- S.credit-=bet();jpAdd(0.006,bet()*0.004);setWin(0);drawMeters();
+ S.credit-=bet();jpAdd(bet());setWin(0);drawMeters();
  $('winLine').textContent='Good luck…';
  const g=E.spinGrid(bet(),false);
  await spinReels(g);
@@ -1633,7 +1666,7 @@ async function play(){
  if(ev.huntTrigger){await sleep(600);total+=await moonBonus();}
  if(ev.freeTrigger){await sleep(700);total+=await freeGames(ev.freeGames);}
  // surprise features on regular spins
- if(!feat&&E.snowRoll()){feat=true;await sleep(300);total+=await snowballFight();}
+ if(!feat&&E.wildRoll(g,denom(),mult())){feat=true;await wildSpark();total+=await snowballFight();}
  S.credit+=total;if(total>=bet()*20&&!feat)await bigWin(total);
  setWin(total);save();busy=false;$('spin').disabled=false;drawMeters();
  if(auto){await sleep(total>0?900:350);if(auto)play();}
@@ -1804,14 +1837,17 @@ async function iceCrack(g){
 }
 
 // ---------- Snowball Fight: pick snowballs until one prize shows 3 times ----------
-const SF_LABEL={MINI:'MINI',MINOR:'MINOR',MAJOR:'MAJOR',GRAND:'GRAND',X1:'1× BET',X2:'2× BET',X3:'3× BET'};
+const SF_LABEL={MINI:'MINI',MINOR:'MINOR',MAXI:'MAXI',MAJOR:'MAJOR',GRAND:'GRAND'};
 function sfTile(k){if(k[0]==='X')return `<div class="sfx">${k[1]}×<small>${fmt((+k[1])*bet())}</small></div>`;return `<div class="sfj">${imgTag('img/plaque_'+k.toLowerCase()+'.webp')}<small>${fmt(jpVals()[k])}</small></div>`;}
+// a wild that starts the Snowball Fight flashes first
+async function wildSpark(){const ws=[];cells.forEach((c,i)=>{if(c.dataset.s==='W'&&i%5>0)ws.push(c)});
+ ws.forEach(c=>c.classList.add('wspark'));SOUND.play('glide');await sleep(900);ws.forEach(c=>c.classList.remove('wspark'));}
 async function snowballFight(){
  peek('L',1800,false,true);await sleep(450);SOUND.play('throw');await sleep(250);SOUND.play('impact');
  const fr=$('frameEl'),sp=document.createElement('img');sp.className='splat';sp.src=XIMG.SPLAT;sp.alt='';fr.appendChild(sp);say('Snowball fight!',2000);SOUND.play('feature');
  await sleep(900);sp.remove();
- const f=E.snowFight(bet()),seq=f.seq.slice();let picks=0;const count={};
- showMsg(`<img class="ttl ttls" src="${XIMG.T_SNOW}" alt="Snowball Fight"><p>Pick snowballs. Match 3 to win that prize!</p><div class="sfgrid" id="sfgrid">${Array.from({length:12},(_,i)=>`<button class="sfball" data-i="${i}">${imgTag(XIMG.PICK)}</button>`).join('')}</div>`);
+ const f=E.snowFight(denom(),mult()),seq=f.seq.slice();let picks=0;const count={};
+ showMsg(`<img class="ttl ttls" src="${XIMG.T_SNOW}" alt="Snowball Fight"><p>Pick snowballs. Match 3 to win that prize!</p><div class="sfgrid" id="sfgrid">${Array.from({length:15},(_,i)=>`<button class="sfball" data-i="${i}">${imgTag(XIMG.PICK)}</button>`).join('')}</div>`);
  $('msg').classList.add('sf');
  const prize=await new Promise(done=>{let idle;
   const pickOne=btn=>{if(!btn||btn.disabled||!seq.length)return;clearTimeout(idle);btn.disabled=true;const k=seq.shift();picks++;count[k]=(count[k]||0)+1;
@@ -1823,11 +1859,11 @@ async function snowballFight(){
   const arm=()=>{clearTimeout(idle);idle=setTimeout(auto1,auto?650:9000);};
   document.querySelectorAll('#sfgrid .sfball').forEach(b=>b.onclick=()=>pickOne(b));arm();
   say('Pick a snowball!',1600);});
- const jv=jpVals(),amt=prize[0]==='X'?Math.round((+prize[1])*bet()*100)/100:jv[prize];
- if(prize==='MAJOR'||prize==='GRAND')jpWon(prize);
+ const jv=jpVals(),amt=jv[prize];
+ if(prize==='MAXI'||prize==='MAJOR'||prize==='GRAND')jpWon(prize);
  $('msg').classList.remove('sf');
  showMsg(`<h2>${prize[0]==='X'?'SNOWBALL WIN':prize+' JACKPOT!'}</h2><p>${SF_LABEL[prize]}</p><div class="big" id="sw">$0.00</div>`);
- if(prize[0]!=='X'){$('jp'+prize).classList.add('flash');setTimeout(()=>$('jp'+prize).classList.remove('flash'),2600);SOUND.play('jackpot',{level:prize});say(prize==='MINI'?'Mini jackpot!':prize==='MINOR'?'Minor jackpot!':prize==='GRAND'?'THE GRAND!!!':'Major jackpot!',2000);if(prize==='GRAND')SOUND.play('grand');}
+ if(prize[0]!=='X'){$('jp'+prize).classList.add('flash');setTimeout(()=>$('jp'+prize).classList.remove('flash'),2600);SOUND.play('jackpot',{level:prize});say(prize==='MINI'?'Mini jackpot!':prize==='MINOR'?'Minor jackpot!':prize==='GRAND'?'THE GRAND!!!':prize==='MAXI'?'Maxi jackpot!':'Major jackpot!',2000);if(prize==='GRAND')SOUND.play('grand');}
  else SOUND.play('winMed');
  cheer(2600);await countUp($('sw'),0,amt,1400);await countUp($('win'),0,amt,300);await sleep(1300);hideMsg();
  return amt;
@@ -1863,15 +1899,15 @@ $('info').onclick=()=>{const u=bet()/50;let pt='';for(const s of ['F','P','S','B
  <h4>Frostfang</h4><p>${ART.F} Frostfang is the top-paying symbol on every reel.</p>
  <h4>Moonrise Free Games</h4><p>${ART.M} Moons are scatters: they count anywhere, at most one per reel. <b>3, 4 or 5 moons</b> pay <b>2×, 10× or 50× the bet</b> up front and start <b>6 free games</b>. Even 1 or 2 moons can start the free games now and then, at random. 3 or more moons during free games add 6 more games and pay again.<br>
  During free games <b>the card symbols (A, K, Q, J and 10) are taken off the reels</b>: only Frostfang, pumpkins, skulls, bats, candles, wilds and moons land.</p>
- <h4>Snowball Fight</h4><p>Rarely, after a regular spin, Frostfang starts a snowball fight. Pick snowballs until one prize shows up 3 times, and you win it: the <b>MINI</b> (most often), <b>MINOR</b>, <b>MAJOR</b>, <b>1×, 2× or 3× the bet</b>, or, very rarely, the <b>GRAND</b>. Bigger bets make the GRAND more likely.</p>
+ <h4>Snowball Fight jackpot feature</h4><p>${ART.W} Any <b>wild</b> that lands on a regular spin can start the Snowball Fight at random. The more credits per line you bet, the more often it starts. The screen switches to <b>15 snowballs</b>: tap them one by one until 3 matching jackpots show, and you win that jackpot.</p>
  <h4>Bets</h4><p>50 fixed lines. Pick a denomination (1¢, 2¢ or 5¢), then 1 to 5 credits per line (50 to 250 credits). Bets run from $0.50 to $12.50. New players start with $100, and your balance is saved between visits. Use <b>ADD $100</b> to top up.</p>
- <h4>Jackpots</h4><p>MINI is ${E.JP.MINI}× the bet and MINOR is ${E.JP.MINOR}× the bet. MAJOR starts at ${E.JP.MAJOR}× the bet and grows with every spin. At your bet of ${fmt(bet())} that's ${fmt(E.JP.MINI*bet())}, ${fmt(E.JP.MINOR*bet())} and ${fmt(E.JP.MAJOR*bet())}+.<br>
- <b>GRAND starts at ${fmt(E.GRAND_SEED)} at every bet</b> and grows with every spin. It's won in the Snowball Fight. Your chance grows with your bet: about 1 in ${Math.round(E.GRAND_SEED/(E.GRAND_K*bet())).toLocaleString()} spins at your bet of ${fmt(bet())}, from 1 in 450,000 at $0.50 to 1 in 18,000 at $12.50.</p>
+ <h4>Jackpots</h4><p><b>MINI</b> (${E.JPF.MINI_CR.toLocaleString()} credits) and <b>MINOR</b> (${E.JPF.MINOR_CR.toLocaleString()} credits) are fixed credit prizes, so their dollar value follows your denomination: at ${Math.round(denom()*100)}¢ that's ${fmt(jpVals().MINI)} and ${fmt(jpVals().MINOR)}.<br>
+ <b>MAXI</b> (starts at ${fmt(E.JPF.SEED.MAXI)}), <b>MAJOR</b> (starts at ${fmt(E.JPF.SEED.MAJOR)}) and <b>GRAND</b> (starts at ${fmt(E.JPF.SEED.GRAND)}) are progressives shared by every player. They grow with every spin and are worth the same dollars at every denomination; bigger bets make them more likely. At your bet of ${fmt(bet())}: ${(()=>{const o=E.jpOdds(denom(),mult());return ['MINI','MINOR','MAXI','MAJOR','GRAND'].map(k=>`${k} about 1 in ${Math.round(1/o.per[k]).toLocaleString()} spins`).join(', ')})()}.</p>
  <h4>Payout &amp; odds (Minnesota standard)</h4>
  <p>Built to the payout rule in Minnesota's tribal-state compacts for video games of chance: a game not affected by player skill must return at least 80% and no more than 95% of the amount wagered.</p>
- <ul><li><b>Theoretical return: about 93% at every bet.</b> Measured over 48 million simulated spins, plus the GRAND's fixed 4% share, which is the same at every bet because its odds scale with the bet. This includes the 1% of each bet that grows the MAJOR and GRAND meters.</li>
- <li>Odds per spin: MINI about 1 in 1,200, MINOR about 1 in 9,000, MAJOR about 1 in 37,000, GRAND about 1 in 225,000 ÷ your bet in dollars. Moonrise Free Games about 1 in 105 (6.3 games on average), Snowball Fight about 1 in 705.</li>
- <li>Even at the smallest bet ($0.50, about 1 in 450,000), the GRAND is far more likely than the compacts' 1 in 17,000,000 limit, and every advertised award hits much more often than once in 100 million games.</li>
+ <ul><li><b>Theoretical return: about 93% at every bet.</b> Measured over 60 million simulated spins at $0.50, $3.00 and $12.50. This includes the 1% of each bet that grows the MAXI, MAJOR and GRAND meters. Every jackpot pays back a fixed share of each bet, so the return is the same at every bet.</li>
+ <li>Odds per spin: Moonrise Free Games about 1 in 109 (6.3 games on average). Snowball Fight about 1 in 600 at 1 credit per line, down to about 1 in 120 at 5 credits per line on 5¢. GRAND from about 1 in 1,200,000 at $0.50 to about 1 in 48,000 at $12.50.</li>
+ <li>Even at the smallest bet ($0.50, about 1 in 1,200,000), the GRAND is far more likely than the compacts' 1 in 17,000,000 limit, and every advertised award hits much more often than once in 100 million games.</li>
  <li>Every spin is independent. Past results never change the odds.</li></ul>
  <p style="opacity:.6">Play money only. A real-money machine needs independent lab certification and approval by the Minnesota Department of Public Safety.</p>`;$('pays').classList.remove('hidden')};
 $('pays').onclick=e=>{if(e.target.id==='pays')$('pays').classList.add('hidden')};

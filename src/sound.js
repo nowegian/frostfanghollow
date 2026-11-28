@@ -144,7 +144,7 @@ const SOUND = (() => {
       bell(N(72 + s), t + i * 0.12, { gain: 0.1 }); }); bell(N(84), t + 0.55, { gain: 0.14, dur: 2.2 }); },
     feature: t => { noise(t, 1.0, { f: 200, to: 5000, q: 0.5, gain: 0.08, verb: 0.4 });
       [0, 3, 7, 10, 12, 15].forEach((s, i) => bell(N(69 + s), t + 0.2 + i * 0.09, { gain: 0.09, dur: 1.2 })); },
-    jackpot: (t, { level = 'MINI' } = {}) => { const k = { MINI: 1, MINOR: 2, MAJOR: 3, GRAND: 4 }[level] || 1;
+    jackpot: (t, { level = 'MINI' } = {}) => { const k = { MINI: 1, MINOR: 2, MAXI: 3, MAJOR: 4, GRAND: 5 }[level] || 1;
       for (let r = 0; r < k; r++) [0, 4, 7, 12].forEach((s, i) => bell(N(72 + s + r * 5), t + r * 0.45 + i * 0.07, { gain: 0.1, dur: 1.2 }));
       pad([N(48), N(55), N(64)], t, 1.2 + k * 0.4, { gain: 0.05, dest: sfxBus, cutoff: 2500 }); },
     grow: t => { for (let k = 0; k < 10; k++) bell(N(72 + k * 2), t + k * 0.05, { gain: 0.06, dur: 0.7 });
@@ -164,6 +164,7 @@ const SOUND = (() => {
     if (!ready()) return;
     opt = opt || {};
     if (name === 'jackpot' && opt.level && files['jackpot_' + opt.level]) name = 'jackpot_' + opt.level;
+      else if (name === 'jackpot' && opt.level === 'MAXI' && files.jackpot_MAJOR) name = 'jackpot_MAJOR';
     if (files[name]) {
       if (name === 'coin') { const t = ctx.currentTime; if (t - lastCoin < 0.05) return; lastCoin = t; }
       playFile(name, sfxBus, { rate: STEP[name] ? Math.pow(2, STEP[name](opt) / 12) : 1 }); return; }

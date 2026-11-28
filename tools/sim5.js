@@ -2,9 +2,10 @@
 const E=require(require('path').resolve(process.argv[4]||'./engine.js'));
 if(process.env.UNIT)E.setUnit(+process.env.UNIT);
 if(process.env.CFG){const c=JSON.parse(process.env.CFG);for(const k in c)Object.assign(E[k],c[k]);}
-const N=+process.argv[2],bet=+process.argv[3];
+const N=+process.argv[2],bet=+process.argv[3];const DEN=+(process.env.UNIT||0.01),MULT=Math.round(bet/50/DEN);
+const JV=Object.assign({MINI:E.JPF.MINI_CR*DEN,MINOR:E.JPF.MINOR_CR*DEN},E.JPF.SEED);
 const jp={MINI:E.JP.MINI*bet,MINOR:E.JP.MINOR*bet,MAJOR:E.JP.MAJOR*bet,GRAND:E.GRAND_SEED};
-const P={L:0,Sc:0,FG:0,FGc:0,Lk:0,Hu:0,Sn:0,G:0};const C={free:0,freeSpins:0,hunt:0,huntSpins:0,link:0,linkFree:0,crack:0,snow:0,holdSpins:0,MINI:0,MINOR:0,MAJOR:0,GRAND:0};
+const P={L:0,Sc:0,FG:0,FGc:0,Lk:0,Hu:0,Sn:0,G:0};const C={MAXI:0,free:0,freeSpins:0,hunt:0,huntSpins:0,link:0,linkFree:0,crack:0,snow:0,holdSpins:0,MINI:0,MINOR:0,MAJOR:0,GRAND:0};
 let won=0,sq=0;
 function runHold(g){const c=Array(25).fill(null);g.forEach((col,r)=>col.forEach((x,y)=>{if(x.s==='O')c[y*5+r]=Object.assign({},x.orb)}));
  let s=E.HOLD.SPINS;while(s>0&&c.some(v=>!v)){s--;C.holdSpins++;const ev=E.holdStep(c,bet);if(ev.some(x=>x.type==='orb'))s=E.HOLD.SPINS;}
@@ -22,6 +23,6 @@ for(let i=0;i<N;i++){const g=E.spinGrid(bet,false),ev=E.evaluate(g,bet);let w=ev
  if(ev.huntTrigger)w+=runMoon();
  if(!ev.freeTrigger&&!ev.huntTrigger){
   if(E.crackRoll()){C.crack++;E.crackOrbs(g,bet);w+=runHold(g);}
-  else if(E.snowRoll()){C.snow++;const f=E.snowFight(bet);const v=f.prize[0]==='X'?(+f.prize[1])*bet:jp[f.prize];if(f.prize[0]!=='X')C[f.prize]++;w+=v;if(f.prize==='GRAND')P.G+=v;else P.Sn+=v;}}
+  else if(E.wildRoll(g,DEN,MULT)){C.snow++;const f=E.snowFight(DEN,MULT);const v=JV[f.prize];C[f.prize]=(C[f.prize]||0)+1;w+=v;if(f.prize==='MINI'||f.prize==='MINOR')P.Sn+=v;else P.G+=v;}}
  won+=w;sq+=w*w;}
 console.log(JSON.stringify({N,bet,won,sq,P,C}));
