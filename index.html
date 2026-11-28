@@ -1906,6 +1906,8 @@ async function moonBonus(mods,gemVals){
    shown=st.spins-ev.path.reduce((a,p)=>a+(p.plus||0)+(p.addSpins||0),0);lab(view.level,pot0);}
   // 1) orbs inside the grid where it sits go to the pot
   let pot=pot0;
+  // now and then Frostfang grabs the coins with a line (not over a jackpot call)
+  if(ev.collected.length&&!ev.collected.some(c=>c.parts.some(p=>p.jp))&&Math.random()<0.4)say("I'll take those!");
   for(const c of ev.collected){const el=cells[c.y*5+c.r];el.classList.add('collect','got');
    for(let k=0;k<c.parts.length;k++){const p=c.parts[k];
     if(c.parts.length>1){el.querySelectorAll('.val').forEach((v,j)=>v.classList.toggle('lit',j===k));
