@@ -727,7 +727,7 @@ async function spinReels(g,free){
  // Frostfang peeks: a gasp from the right pillar when the moon tease starts, otherwise now and then a quick peek before reel 1 lands
  if(ROWS===3&&!inHold){const tr=stops.findIndex((s,r)=>s.tease&&r>0);
   // the left-side peek means a Diamond Hunt attempt: he stays until the last reel stops
-  if(g.peek&&!free){setTimeout(()=>{peek('L',99999,false,true);say('Ooh, shiny!');},60);}
+  if(g.peek&&!free){setTimeout(()=>{peek('L',99999,false,true);say('Anything shiny?');},60);}
   else if(tr>0){const a=stops[tr-1].t,d=stops[tr].t-a-380;if(d>300)setTimeout(()=>peek('B',d),a);
    if(has(0,'M')&&has(1,'M'))setTimeout(()=>say('Full moon tonight!',1600),a+120);}
   else if(Math.random()<0.2&&stops[0].t>=650){setTimeout(()=>peek('B',stops[0].t-420),60);}}
