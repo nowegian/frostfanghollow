@@ -30,7 +30,7 @@ u=u[:i]+'''<div class="cab m">
     </div>
     <div class="meter hidden" id="meter"></div>
   </div>
-  <div class="win-line" id="winLine">3+ moons anywhere = 6 free games. Wilds can start the Snowball Fight.</div>
+  <div class="win-line" id="winLine">3+ moons = free games. Frostfang on reel 1 + a gem = Diamond Hunt. Wilds can start the Snowball Fight.</div>
   <div class="mstats">
     <div class="box bank" id="bankBox"><small>CREDIT <span class="unit" id="bankUnit"><b class="d">$</b><b class="c">CR</b></span></small><div id="credit">$0</div><small id="creditCr" class="cr"></small></div>
     <div class="box betbox"><div class="denoms" id="denoms"></div>

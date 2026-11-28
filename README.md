@@ -25,7 +25,8 @@ python3 -m http.server 8000
 - Bets from $0.50 to $12.50: 1¢, 2¢ or 5¢ at 1 to 5 credits per line (50 to 250 credits), e.g. 1¢ gives $0.50, $1.00, $1.50, $2.00 or $2.50. New players start with $100, the balance is saved between visits, and ADD $100 tops it up
 - **Snowball Fight jackpot feature**: any wild on a regular spin can start it (more often at more credits per line). Pick from 15 snowballs until 3 match. MINI (1,000 credits) and MINOR (5,000 credits) follow the denomination; MAXI ($1,000), MAJOR ($6,000) and GRAND ($12,000) are shared progressives in dollars, the same at every denomination, more likely at bigger bets
 - **Moonrise Free Games**: moons are scatters. 3, 4 or 5 anywhere pay 2×, 10× or 50× the bet and start 6 free games; 1 or 2 moons can also start them at random. In free games the card symbols (A, K, Q, J, 10) are removed. 3+ moons in free games add 6 more
-- **Frostfang** is the top-paying symbol. Orbs, Frost Link (Hold & Spin) and the Diamond Hunt are switched off for now; their code is still in the game for a future bonus
+- **Frostfang** is the top-paying symbol on every reel
+- **Diamond Hunt**: the dancing Frostfang on reel 1 plus a gem on reels 2–5 starts it. Sapphire adds double symbols (two-value diamonds and gold coins, +2 SPIN diamonds), ruby lets the grid grow past 5×5 to 8×5, emerald adds 2 starting spins (3 → 5). The board grows to 8×5; gold coins pay inside Frostfang's grid (they can hold any of the five jackpots), diamonds land only outside it and he travels to collect them. `tools/hunt_tests.js` checks the rules and `tools/huntsim.js` reports every gem combination
 - Every bonus prize comes in steps of 10 credits, so bonus totals are always round
 - Real reel strips with motion blur and suspense on reel 5, SPEED 1–4, synthesized music and effects, and voice lines for Frostfang
 - A $ / CR toggle for the credit, bet and win displays
