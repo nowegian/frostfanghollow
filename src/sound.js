@@ -168,14 +168,14 @@ const SOUND = (() => {
     if (files[name]) {
       if (name === 'coin') { const t = ctx.currentTime; if (t - lastCoin < 0.05) return; lastCoin = t; }
       playFile(name, sfxBus, { rate: STEP[name] ? Math.pow(2, STEP[name](opt) / 12) : 1 }); return; }
-    const f = FX[name]; if (f) try { f(ctx.currentTime + 0.01, opt || {}); } catch (e) {}
+    // recordings only: the old built-in synthesized effects are retired
   }
 
   // ---------- reel spin rattle ----------
   let spinTimer = null, spinRate = 60;
   function spin(on, rateMs = 60) {
     clearInterval(spinTimer); spinTimer = null; spinRate = rateMs;
-    if (!on || !ready()) return;
+    if (!on || !ready() || true) return;   // the old synthesized reel rattle is retired
     spinTimer = setInterval(() => { if (!ready()) return; const t = ctx.currentTime;
       noise(t, 0.025, { type: 'bandpass', f: 1600 + Math.random() * 600, q: 3, gain: 0.05 }); }, spinRate);
   }
@@ -228,7 +228,7 @@ const SOUND = (() => {
       src.loopStart = off; src.loopEnd = Math.min(buf.duration, off + len);
       const g = ctx.createGain(); g.gain.setValueAtTime(0.0001, ctx.currentTime); g.gain.exponentialRampToValueAtTime(1, ctx.currentTime + 0.8);
       src.connect(g).connect(musicBus); src.start(ctx.currentTime + 0.02, off); fileSrc = src; fileGain = g; return; }
-    step = 0; nextT = ctx.currentTime + 0.1; timer = setInterval(tick, 30);
+    // no recording loaded yet: stay silent (the old synthesized music is retired); the loader starts the track when it arrives
   }
 
   // ---------- Frostfang's chatter (made-up monster language) ----------
@@ -240,6 +240,7 @@ const SOUND = (() => {
     if (file) { const buf = await loadVoice(file);
       if (buf) { if (voiceNow) { try { voiceNow.stop(); } catch (e) {} }
         const s = ctx.createBufferSource(); s.buffer = buf; s.connect(voiceBus); s.start(); voiceNow = s; s.onended = () => { if (voiceNow === s) voiceNow = null; }; return; } }
+    return;   // recorded lines only: the old made-up chatter is retired
     const excited = (text.match(/!/g) || []).length, syl = Math.max(2, Math.min(12, Math.round(text.replace(/[^a-z]/gi, '').length / 2.6)));
     let t = ctx.currentTime + 0.02; const base = 190 + excited * 25;
     for (let k = 0; k < syl; k++) {
