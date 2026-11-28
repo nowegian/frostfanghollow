@@ -7,24 +7,24 @@ const ENGINE = (() => {
   };
   // line pays in credits for one line at the 1x bet (50 lines x 1 credit), always in steps of 10, so every win is a whole number of 10-credit steps
   const PAY = {
-    P:{3:50,4:160,5:750}, S:{3:40,4:120,5:550}, B:{3:30,4:80,5:400}, C:{3:20,4:60,5:250},
+    F:{3:60,4:250,5:1000}, P:{3:50,4:160,5:750}, S:{3:40,4:120,5:550}, B:{3:30,4:80,5:400}, C:{3:20,4:60,5:250},
     A:{3:10,4:30,5:120}, K:{3:10,4:30,5:120}, Q:{3:10,4:30,5:80}, J:{3:10,4:30,5:80}, T:{3:10,4:20,5:70}
   };
-  // Regular spins: no orbs. Frostfang (F) is a bonus symbol on reels 1, 3 and 5 only; moons (M) on any reel.
-  // At most one moon and one Frostfang per reel.
-  const BASE_W = {F:7,P:5,S:6,B:7,C:8,A:10,K:10,Q:12,J:12,T:12,W:3,M:7};
+  // Regular spins: no orbs. Frostfang (F) is the top pay symbol on every reel; moons (M) are the free-games scatter, at most one per reel.
+  const BASE_W = {F:2.5,P:5,S:6,B:7,C:8,A:10,K:10,Q:12,J:12,T:12,W:1.75,M:2.8};
   const MOON_REELS = [0,1,2,3,4];
-  const F_REELS = {base:[0,2,4], free:[4]};    // in free games Frostfang only lands on reel 5, where he collects orbs
-  const FREE_W = Object.assign({}, BASE_W, {W:6, M:3.5, O:14, F:10});
+  // Free games: the card symbols (A, K, Q, J, 10) are taken off the reels. Orbs land, and Frostfang on reel 5 collects them.
+  const FREE_W = {F:4,P:5,S:6,B:7,C:8,W:4.3,M:1.2,O:5};
+  const SCATTER = {3:2, 4:10, 5:50};               // moons anywhere: x total bet, paid up front
   const LINE = {K:0.75};                           // scales every line pay
-  const FREE_GAMES = {3:6, 4:8, 5:10};          // moons on touching reels from reel 1
+  const FREE_GAMES = 6;                           // 3+ moons anywhere (or the lucky single-moon trigger) = 6 free games
   const FG = {COLLECT_STEP:4, MAX_MULT:3, ORB_K:1.8};  // every 4 collections raise the orb multiplier (x2, then x3)
-  const RANDOM = {CRACK:1/230, SNOWBALL:1/700};  // surprise features on regular spins
+  const RANDOM = {CRACK:1/230, SNOWBALL:1/700, LUCKY:1/400};  // surprise features on regular spins; LUCKY: 1 or 2 moons start the free games anyway
   const SNOWFIGHT = {MINI:0.60, X1:0.12, X2:0.10, X3:0.08, MINOR:0.08, MAJOR:0.02};
   const JP = {MINI:20, MINOR:50, MAJOR:300}; // x bet seeds (MAJOR also grows)
   const GRAND_SEED = 9000;           // dollars, same at every bet, grows from here
   const GRAND_K = 0.04;              // share of every bet paid back through the GRAND, at any bet size
-  const HOLD_SPIN_RATE = 1/32.5;      // Hold & Spin spins played per base-game spin (measured; set by calibration)
+  const HOLD_SPIN_RATE = 1/33.7;      // Hold & Spin spins played per base-game spin (measured; set by calibration)
   // chance a GRAND orb lands on one Hold & Spin spin: proportional to the bet, so every bet has the same payback
   const grandChance = bet => Math.min(1, GRAND_K*bet/GRAND_SEED/HOLD_SPIN_RATE);
   let rng = Math.random;
@@ -39,7 +39,7 @@ const ENGINE = (() => {
   const money = v => Math.round(v * 100) / 100;
 
   function pick(weights, reel, mode){
-    const skip=k=>(k==='W'&&reel===0)||(k==='M'&&!MOON_REELS.includes(reel))||(k==='F'&&!F_REELS[mode||'base'].includes(reel));
+    const skip=k=>(k==='W'&&reel===0)||(k==='M'&&!MOON_REELS.includes(reel));
     let tot=0; for(const k in weights){ if(skip(k)) continue; tot+=weights[k]; }
     let r=rng()*tot;
     for(const k in weights){ if(skip(k)) continue; r-=weights[k]; if(r<0) return k; }
@@ -56,13 +56,13 @@ const ENGINE = (() => {
     return {cash:money(cashOf(mult*bet,bet))};
   }
   // grid[reel][row]; free = free games (orbs land, Frostfang only on reel 5); fs = free-game state (orb multiplier)
-  const FILL5='PSBCAKQJT';
+  const FILL5='PSBCAKQJT', FILLF='PSBC';
   function spinGrid(bet, free, fs){
-    const w = free?FREE_W:BASE_W, mode=free?'free':'base', g=[];
-    for(let r=0;r<5;r++){ const col=[]; let m=0,f=0;
+    const w = free?FREE_W:BASE_W, mode=free?'free':'base', fill=free?FILLF:FILL5, g=[];
+    for(let r=0;r<5;r++){ const col=[]; let m=0;
       for(let y=0;y<3;y++){ let s=pick(w,r,mode);
-        if((s==='M'&&m)||(s==='F'&&f)) s=FILL5[Math.floor(rng()*FILL5.length)];
-        if(s==='M') m=1; if(s==='F') f=1;
+        if(s==='M'&&m) s=fill[Math.floor(rng()*fill.length)];
+        if(s==='M') m=1;
         col.push(s==='O'?{s,orb:freeOrb(bet,fs)}:{s}); }
       g.push(col); }
     return g;
@@ -83,7 +83,7 @@ const ENGINE = (() => {
     [2,0,2,0,2],[1,0,2,0,1],[1,2,0,2,1],[0,2,2,2,0],[2,0,0,0,2],[0,0,2,0,0],[2,2,0,2,2],[0,1,2,2,2],[2,1,0,0,0],[1,0,0,1,2],
     [1,2,2,1,0],[0,0,0,1,2],[2,2,2,1,0],[0,1,1,1,1],[2,1,1,1,1],[1,1,1,0,0],[1,1,1,2,2],[0,0,1,1,1],[2,2,1,1,1],[1,0,1,0,1],
     [1,2,1,2,1],[0,1,0,0,0],[2,1,2,2,2],[1,1,0,0,0],[1,1,2,2,2],[0,0,0,1,1],[2,2,2,1,1],[1,0,0,0,0],[1,2,2,2,2],[0,1,2,1,2]];
-  function evaluate(g, bet, mult){
+  function evaluate(g, bet, mult, free){
     mult=mult||1; const unit=bet/50*mult, wins=[]; let total=0;   // bet/50 = dollars per credit (each of the 50 lines bets 1 credit)
     LINES.forEach((ln,li)=>{
       const s=g[0][ln[0]].s; if(!PAY[s]) return;
@@ -93,13 +93,13 @@ const ENGINE = (() => {
       wins.push({s,n,line:li+1,amt,cells:ln.slice(0,n).map((y,r)=>[r,y])});
     });
     let orbs=0; g.forEach(col=>col.forEach(c=>{ if(c.s==='O') orbs++; }));
-    // free games: moons on touching reels starting from reel 1 (one per reel); 3, 4, 5 reels = 6, 8, 10 free games
-    let run=0; for(let r=0;r<5;r++){ if(g[r].some(c=>c.s==='M')) run++; else break; }
-    const freeGames=FREE_GAMES[run]||0;
-    // Diamond Hunt: Frostfang on reels 1, 3 and 5 pays 2x the bet
-    const fr=[0,2,4].filter(r=>g[r].some(c=>c.s==='F')).length;
-    const huntTrigger=fr===3; let scatterPay=0; if(huntTrigger){ scatterPay=bet*2; total+=scatterPay; }
-    return {total:Math.round(total*100)/100, wins, orbs, moons:run, freeGames, freeTrigger:freeGames>0, huntTrigger, scatterPay,
+    // free games: moons anywhere (one per reel). 3, 4, 5 moons pay 2x, 10x, 50x the bet and start 6 free games.
+    // On a regular spin, 1 or 2 moons can still start the free games by luck (no scatter pay).
+    let moons=0; for(let r=0;r<5;r++) if(g[r].some(c=>c.s==='M')) moons++;
+    let scatterPay=0, freeGames=0, lucky=false;
+    if(moons>=3){ scatterPay=SCATTER[moons]*bet; total+=scatterPay; freeGames=FREE_GAMES; }
+    else if(moons>0 && !free && rng()<RANDOM.LUCKY){ freeGames=FREE_GAMES; lucky=true; }
+    return {total:Math.round(total*100)/100, wins, orbs, moons, freeGames, freeTrigger:freeGames>0, lucky, huntTrigger:false, scatterPay,
       holdTrigger: orbs>=6};
   }
   // ===== Moonrise Free Games =====
@@ -107,7 +107,7 @@ const ENGINE = (() => {
   // one free game: returns the grid, its line result, extra games, Frostfang's collection, and whether Frost Link starts
   function freeSpin(fs, bet){
     fs.left--; fs.played++;
-    const g=spinGrid(bet,true,fs), ev=evaluate(g,bet);
+    const g=spinGrid(bet,true,fs), ev=evaluate(g,bet,1,true);
     const out={g, ev, more:ev.freeGames, link:ev.orbs>=6, collect:null, multUp:false};
     fs.left+=ev.freeGames;
     if(!out.link && ev.orbs && g[4].some(c=>c.s==='F')){
@@ -291,6 +291,6 @@ const ENGINE = (() => {
     const min=Math.round(MOON.MIN_PAY*bet*100)/100, add=Math.max(0, Math.round((min-st.pot)*100)/100);
     st.pot=Math.round((st.pot+add)*100)/100; return add;
   }
-  return {LINES,LINE,BASE_W,FREE_W,HOLD,FG,RANDOM,SNOWFIGHT,FREE_GAMES,freeStart,freeSpin,crackRoll,crackOrbs,snowRoll,snowFight,setUnit:u=>{UNIT=u}, moonEnsure, moonSnow, moonFinish,SYM,PAY,JP,GRAND_SEED,GRAND_K,HOLD_SPIN_RATE,grandChance,MOON,inZone,moonStart,moonGrid,moonResolve,spinGrid,evaluate,holdStep,holdTotal,orbValue,setRng:f=>rng=f};
+  return {LINES,SCATTER,LINE,BASE_W,FREE_W,HOLD,FG,RANDOM,SNOWFIGHT,FREE_GAMES,freeStart,freeSpin,crackRoll,crackOrbs,snowRoll,snowFight,setUnit:u=>{UNIT=u}, moonEnsure, moonSnow, moonFinish,SYM,PAY,JP,GRAND_SEED,GRAND_K,HOLD_SPIN_RATE,grandChance,MOON,inZone,moonStart,moonGrid,moonResolve,spinGrid,evaluate,holdStep,holdTotal,orbValue,setRng:f=>rng=f};
 })();
 if(typeof module!=='undefined') module.exports=ENGINE;
