@@ -1673,12 +1673,14 @@ async function spinReels(g,free){
  // Frostfang peeks: a gasp from the right pillar when the moon tease starts, otherwise now and then a quick peek before reel 1 lands
  if(ROWS===3&&!inHold){const tr=stops.findIndex((s,r)=>s.tease&&r>0);
   // the left-side peek means a Diamond Hunt attempt: he stays until the last reel stops
-  if(g.peek&&!free){setTimeout(()=>{peek('L',stops[4].t-200,false,true);say(['Ooh, gems?','Anything shiny?','Hmm hmm hmm...'][Math.random()*3|0],1600);},60);}
+  if(g.peek&&!free){setTimeout(()=>{peek('L',99999,false,true);say('Ooh, shiny!');},60);}
   else if(tr>0){const a=stops[tr-1].t,d=stops[tr].t-a-380;if(d>300)setTimeout(()=>peek('B',d),a);
    if(has(0,'M')&&has(1,'M'))setTimeout(()=>say('Full moon tonight!',1600),a+120);}
   else if(Math.random()<0.2&&stops[0].t>=650){setTimeout(()=>peek('B',stops[0].t-420),60);}}
  await Promise.all([0,1,2,3,4].map(r=>spinColumn(r,g[r],ROWS,stops[r].t,r*90*T,stops[r].tease&&r>0?stops[r-1].t:null,rnd,moonSnd[r])));
  SOUND.spin(false);
+ // the left-side peek stays in view until reel 5 has stopped, then he ducks back out
+ if(g.peek&&!free){await sleep(450);clearTimeout(peek.t);if(peek.im){const im=peek.im;im.classList.add('out');setTimeout(()=>{if(im.parentNode)im.remove()},320);}}
 }
 // one spot spinning on its own (Hold & Spin): a strip of every symbol scrolling down, landing on finalHTML
 const ALLSYM='WFPSBCAKQJTOMD'.split('');
