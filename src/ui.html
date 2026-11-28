@@ -919,8 +919,14 @@ async function huntIntro(g,mods){
  cells.forEach((c,i)=>{const s=c.dataset.s;if(E.GEMS[s]&&i%5>0)c.classList.add('wspark');});
  SOUND.play('feature');cheer(1800);await sleep(1100);
  cells.forEach(c=>c.classList.remove('wspark'));}
+// end of a bonus: the bonus music stops and a celebration plays (the big one at 50x the bet or more);
+// the main music comes back once the celebration has mostly played
+let celebT=0;
+function celebrate(won){clearTimeout(celebT);SOUND.music(null);const big=won>=bet()*50;SOUND.play(big?'win_bonus_big':'win_bonus');celebrate.t0=Date.now();celebrate.len=big?9000:8000;}
+function afterCelebrate(){const wait=Math.max(0,(celebrate.len||0)-(Date.now()-(celebrate.t0||0)));clearTimeout(celebT);
+ celebT=setTimeout(()=>{if(!inFree&&!inHold&&!grid.classList.contains('moon'))SOUND.music('base')},wait);}
 async function moonBonus(mods,gemVals){
- SOUND.play('feature');SOUND.music('moon');cheer(2400);say('Diamond Hunt Bonus!',2600);
+ SOUND.play('feature');SOUND.music('hunt');cheer(2400);say('Diamond Hunt Bonus!',2600);
  const on=Object.keys(GEMTXT).filter(k=>mods&&mods[k]);
  showMsg(`<img class="ttl" src="${XIMG.T_HUNT}" alt="Diamond Hunt Bonus"><div class="gemlist">${on.map(k=>`<div>${ART[{sapphire:'Z',ruby:'R',emerald:'E'}[k]]}<span>${GEMTXT[k]}</span></div>`).join('')}</div>`);
  await sleep(1800+on.length*900);hideMsg();clearMarks();
@@ -988,8 +994,8 @@ async function moonBonus(mods,gemVals){
   shown=st.spins;lab();await sleep(ev.collected.length||ev.path.length?500:200);
  }
  banner('');const won=Math.round(st.pot*100)/100;
- showMsg(`<h2>DIAMOND HUNT WIN</h2><p>Final grid ${STEPN(st.level)}</p><div class="big" id="fw">$0.00</div>`);SOUND.play('winBig');cheer(3200);await countUp($('fw'),0,won,1800);await sleep(1400);hideMsg();
- SOUND.music('base');$('winLine').textContent=' ';drawMeter.max=null;grid.classList.remove('moon');sizeFrame();cells.forEach(c=>c.classList.remove('zone','zgrow','fizzle','got'));for(let i=15;i<40;i++)cells[i].innerHTML='';$('meter').classList.add('hidden');
+ showMsg(`<h2>DIAMOND HUNT WIN</h2><p>Final grid ${STEPN(st.level)}</p><div class="big" id="fw">$0.00</div>`);celebrate(won);cheer(3200);await countUp($('fw'),0,won,1800);await sleep(1400);hideMsg();
+ afterCelebrate();$('winLine').textContent=' ';drawMeter.max=null;grid.classList.remove('moon');sizeFrame();cells.forEach(c=>c.classList.remove('zone','zgrow','fizzle','got'));for(let i=15;i<40;i++)cells[i].innerHTML='';$('meter').classList.add('hidden');
  const back=E.spinGrid(bet(),false);back.forEach((col,r)=>col.forEach((c,y)=>paint(y*5+r,c)));
  return won;
 }
@@ -1005,7 +1011,7 @@ function drawCollect(fs){const m=$('meter');m.classList.remove('hidden');
  const step=E.FG.COLLECT_STEP,k=fs.collects%step;let dots='';for(let i=0;i<step;i++)dots+=`<span class="${i<k?'on':''}">${ART.O}</span>`;
  m.innerHTML=`<div class="dots">${dots}</div><small>${k}/${step} collections to orbs <b>×${fs.mult+1}</b></small>`;}
 async function freeGames(n){
- inFree=true;SOUND.play('feature');SOUND.music('moon');cheer(2400);say('Moonrise free games!',2400);
+ inFree=true;SOUND.play('feature');SOUND.music('free');cheer(2400);say('Moonrise free games!',2400);
  showMsg(`<img class="ttl" src="${XIMG.T_FREE}" alt="Moonrise Free Games"><div class="big">${n} FREE GAMES</div><p>No card symbols: only Frostfang, pumpkins, skulls, bats, candles and wilds!</p>`);
  await sleep(2600);hideMsg();clearMarks();$('frameEl').classList.add('freef');
  const fs=E.freeStart(n);let tot=0;setWin(0);
@@ -1019,8 +1025,8 @@ async function freeGames(n){
   await sleep(250);
  }
  banner('');$('meter').classList.add('hidden');$('frameEl').classList.remove('freef');tot=Math.round(tot*100)/100;
- showMsg(`<h2>FREE GAMES WIN</h2><p>${fs.played} free games played</p><div class="big" id="fw">$0.00</div>`);SOUND.play('winBig');cheer(3200);await countUp($('fw'),0,tot,1800);await sleep(1400);hideMsg();
- SOUND.music('base');inFree=false;
+ showMsg(`<h2>FREE GAMES WIN</h2><p>${fs.played} free games played</p><div class="big" id="fw">$0.00</div>`);celebrate(tot);cheer(3200);await countUp($('fw'),0,tot,1800);await sleep(1400);hideMsg();
+ inFree=false;afterCelebrate();
  const back=E.spinGrid(bet(),false);back.forEach((col,r)=>col.forEach((c,y)=>paint(y*5+r,c)));
  return tot;
 }
@@ -1045,7 +1051,7 @@ async function wildSpark(){const ws=[];cells.forEach((c,i)=>{if(c.dataset.s==='W
  ws.forEach(c=>c.classList.add('wspark'));SOUND.play('glide');await sleep(900);ws.forEach(c=>c.classList.remove('wspark'));}
 async function snowballFight(){
  peek('B',1800,false,true);await sleep(450);SOUND.play('throw');await sleep(250);SOUND.play('impact');
- const fr=$('frameEl'),sp=document.createElement('img');sp.className='splat';sp.src=XIMG.SPLAT;sp.alt='';fr.appendChild(sp);say('Snowball fight!',2000);SOUND.play('feature');
+ const fr=$('frameEl'),sp=document.createElement('img');sp.className='splat';sp.src=XIMG.SPLAT;sp.alt='';fr.appendChild(sp);say('Snowball fight!',2000);SOUND.play('feature');SOUND.music('snow');
  await sleep(900);sp.remove();
  const f=E.snowFight(denom(),mult()),seq=f.seq.slice();let picks=0;const count={};
  showMsg(`<img class="ttl ttls" src="${XIMG.T_SNOW}" alt="Snowball Fight"><p>Pick snowballs. Match 3 to win that prize!</p><div class="sfgrid" id="sfgrid">${Array.from({length:15},(_,i)=>`<button class="sfball" data-i="${i}">${imgTag(XIMG.PICK)}</button>`).join('')}</div>`);
@@ -1066,8 +1072,8 @@ async function snowballFight(){
  showMsg(`<h2>${prize[0]==='X'?'SNOWBALL WIN':prize+' JACKPOT!'}</h2><p>${SF_LABEL[prize]}</p><div class="big" id="sw">$0.00</div>`);
  if(prize[0]!=='X'){$('jp'+prize).classList.add('flash');setTimeout(()=>$('jp'+prize).classList.remove('flash'),2600);SOUND.play('jackpot',{level:prize});say(prize==='MINI'?'Mini jackpot!':prize==='MINOR'?'Minor jackpot!':prize==='GRAND'?'THE GRAND!!!':prize==='MAXI'?'Maxi jackpot!':'Major jackpot!',2000);if(prize==='GRAND')SOUND.play('grand');}
  else SOUND.play('winMed');
- cheer(2600);await countUp($('sw'),0,amt,1400);await countUp($('win'),0,amt,300);await sleep(1300);hideMsg();
- return amt;
+ setTimeout(()=>celebrate(amt),700);cheer(2600);await countUp($('sw'),0,amt,1400);await countUp($('win'),0,amt,300);await sleep(1300);hideMsg();
+ afterCelebrate();return amt;
 }
 
 // ---------- controls ----------

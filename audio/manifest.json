@@ -24,12 +24,15 @@
   "throw",
   "winBig",
   "winMed",
-  "winSmall"
+  "winSmall",
+  "win_bonus",
+  "win_bonus_big"
  ],
  "music": [
   "music_base",
-  "music_hold",
-  "music_moon"
+  "music_free",
+  "music_hunt",
+  "music_snow"
  ],
  "voice": [
   "100_fresh_snow_fresh_credits",
@@ -87,8 +90,11 @@
   "frost_link_lock_those_orbs": "frost_link"
  },
  "loops": {
-  "music_base": 62.60868480725624,
+  "music_base": 115.725306,
   "music_hold": 64.0,
-  "music_moon": 73.84614512471656
+  "music_moon": 73.84614512471656,
+  "music_free": 56.248413,
+  "music_hunt": 52.740476,
+  "music_snow": 37.714785
  }
 }
