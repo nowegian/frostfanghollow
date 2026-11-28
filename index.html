@@ -57,10 +57,10 @@ h1 span{background:linear-gradient(180deg,#ffe08a,var(--pump));-webkit-backgroun
 @keyframes crackin{from{transform:translate(-50%,-50%) scale(.15);opacity:.4}to{transform:translate(-50%,-50%) scale(1);opacity:1}}
 .crack.fade{transition:opacity .6s;opacity:0}
 /* Frostfang punches the glass: his fist (73% across, 55% down the picture) lands on the centre of the reels */
-.smash{position:absolute;left:50%;top:48%;height:92%;transform:translate(-73%,-55%) scale(1);transform-origin:73% 55%;z-index:10;pointer-events:none;
+.smash{position:absolute;left:50%;top:48%;height:92%;transform:translate(-58%,-58%) scale(1);transform-origin:58% 58%;z-index:10;pointer-events:none;
  filter:drop-shadow(0 10px 20px #000c);animation:smashin .52s cubic-bezier(.5,0,.75,0) both}
-@keyframes smashin{from{transform:translate(-73%,-55%) scale(.35);opacity:0}60%{opacity:1}to{transform:translate(-73%,-55%) scale(1.08);opacity:1}}
-.smash.away{transition:opacity .45s,transform .45s;opacity:0;transform:translate(-73%,-40%) scale(.9)}
+@keyframes smashin{from{transform:translate(-58%,-58%) scale(.8);opacity:0}35%{opacity:1}to{transform:translate(-58%,-58%) scale(1);opacity:1}}
+.smash.away{transition:opacity .45s,transform .45s;opacity:0;transform:translate(-58%,-45%) scale(.9)}
 .frame.shake{animation:fshake .45s}@keyframes fshake{20%{transform:translate(-6px,3px)}40%{transform:translate(5px,-4px)}60%{transform:translate(-4px,-2px)}80%{transform:translate(3px,3px)}}
 /* Snowball Fight */
 .splat{position:absolute;left:50%;top:45%;width:62%;transform:translate(-50%,-50%) scale(.2);z-index:9;pointer-events:none;
@@ -169,9 +169,9 @@ h1 span{background:linear-gradient(180deg,#ffe08a,var(--pump));-webkit-backgroun
 .side{width:clamp(80px,17vw,150px);display:flex;flex-direction:column;align-items:center;justify-content:flex-end;position:relative}
 #beast{width:100%;transition:transform .2s}
 #beast.imgmode{aspect-ratio:560/620}
-#beast img.ffimg{display:block;width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 6px 10px #000a) drop-shadow(0 0 14px #6cc8ff44);user-select:none;pointer-events:none;transform-origin:50% 90%;transition:transform .25s}
-#beast.act-throw img.ffimg{transform:rotate(-14deg) translate(-6px,-10px) scale(1.04)}
-#beast.act-cheer img.ffimg{animation:ffcheer .32s ease-in-out infinite alternate;filter:drop-shadow(0 6px 10px #000a) drop-shadow(0 0 22px #ffd34d88) brightness(1.12)}
+#beast .ffimg{display:block;width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 6px 10px #000a) drop-shadow(0 0 14px #6cc8ff44);user-select:none;pointer-events:none;transform-origin:50% 90%;transition:transform .25s}
+#beast.act-throw .ffimg{transform:rotate(-14deg) translate(-6px,-10px) scale(1.04)}
+#beast.act-cheer .ffimg{filter:drop-shadow(0 6px 10px #000a) drop-shadow(0 0 22px #ffd34d88) brightness(1.12)}
 @keyframes ffcheer{from{transform:translateY(0) scale(1)}to{transform:translateY(-16px) scale(1.05) rotate(3deg)}}
 #beast.throw{animation:throw .5s}@keyframes throw{30%{transform:rotate(-12deg) translateY(-8px)}70%{transform:rotate(8deg)}}
 #beast.idle{animation:bob 2.4s ease-in-out infinite}@keyframes bob{50%{transform:translateY(-6px)}}
@@ -230,7 +230,7 @@ button{font-family:inherit;cursor:pointer;border:none;color:#fff;font-weight:700
 .tg.test{background:#7a2a00;border-color:#ffb066}.tg.test.armed{background:#ff8a1f;animation:pulse .6s infinite alternate}
 .close{float:right;background:#3c1680;border-radius:8px;padding:6px 12px}
 .foot{text-align:center;font-size:11px;opacity:.5;margin-top:12px}
-@media (max-width:560px){#beast.imgmode{width:87px;height:96px}#beast img.ffimg{height:96px;width:auto}.meter{width:auto;margin:0 8px 0 0}.meter .dots{flex-wrap:nowrap}.meter .dots span{width:16px;height:16px}.stage{flex-direction:column-reverse}.side{width:100%;flex-direction:row;justify-content:center;height:70px}#beast{width:80px}.bubble{margin:0 8px 0 0}
+@media (max-width:560px){#beast.imgmode{width:87px;height:96px}#beast .ffimg{height:96px;width:auto}.meter{width:auto;margin:0 8px 0 0}.meter .dots{flex-wrap:nowrap}.meter .dots span{width:16px;height:16px}.stage{flex-direction:column-reverse}.side{width:100%;flex-direction:row;justify-content:center;height:70px}#beast{width:80px}.bubble{margin:0 8px 0 0}
  .panel{grid-template-columns:1fr 1fr auto}.panel .box.winb{grid-column:span 2}.tools{grid-column:span 2}}
 
 /* ---- reels centred; Frostfang lives inside the Moonrise grid ---- */
@@ -241,8 +241,8 @@ button{font-family:inherit;cursor:pointer;border:none;color:#fff;font-weight:700
 #beast{position:absolute;z-index:0;display:none;width:auto;aspect-ratio:auto;pointer-events:none;
  transition:left .3s ease,top .3s ease,width .45s ease,height .45s ease}
 .grid.moon #beast{display:block}
-#beast img.ffimg{width:100%;height:100%;object-fit:contain;opacity:.92}
-#beast.act-cheer img.ffimg{opacity:1}
+#beast .ffimg{width:100%;height:100%;object-fit:contain;opacity:.92}
+#beast.act-cheer .ffimg{opacity:1}
 .grid.moon .cell{position:relative;z-index:1}
 .grid.moon .cell.zone{background:radial-gradient(circle,#3b5fd04d,#1b2a7a26)}
 
@@ -281,7 +281,7 @@ button{font-family:inherit;cursor:pointer;border:none;color:#fff;font-weight:700
 /* ---- Diamond Hunt: the grid is invisible. Only Frostfang shows, sized to the grid and moving with it;
    the spots under him look like every other spot, and orbs, diamonds and +1 SPIN cubes sit in front of him ---- */
 #beast{z-index:4;border-radius:0;background:transparent;box-shadow:none;overflow:visible}
-#beast img.ffimg{opacity:1}
+#beast .ffimg{opacity:1}
 .grid.moon .cell.zone{background:linear-gradient(#1a1240,#0e0828);box-shadow:none;opacity:.55}
 .grid.moon .cell.zone[data-s="O"],.grid.moon .cell.zone[data-s="D"],.grid.moon .cell.zone[data-s="X"]{z-index:5;opacity:1;background:none!important}
 .grid.moon .cell.zone.got{z-index:5}
@@ -290,6 +290,11 @@ button{font-family:inherit;cursor:pointer;border:none;color:#fff;font-weight:700
 .grid.moon .cell:not(.zone)[data-s="O"],.grid.moon .cell:not(.zone)[data-s="D"]{background:linear-gradient(#1a12408c,#0e08288c)}
 .grid.moon .cell .val.gemv,.grid.moon .tile .val.gemv{inset:auto 0 3%!important;top:auto!important;transform:none;font-size:clamp(10px,1.9vw,16px);color:#e8fbff;text-shadow:0 0 6px #2a7bd6,0 2px 0 #06204a,0 0 3px #000}
 #beast.zgrow{animation:zgrow .7s ease-out}
+/* Frostfang sprite sheets: .ffbox is his 560x620 picture area (fitted inside #beast), .ffimg the frame, with extra room above and at the sides for jumps, throws and the diamond */
+#beast{container-type:size}
+#beast .ffbox{position:absolute;left:50%;top:50%;width:min(100cqw,calc(100cqh*560/620));aspect-ratio:560/620;transform:translate(-50%,-50%);pointer-events:none}
+#beast .ffbox>.ffimg{position:absolute;left:-14.2857%;top:-25.8065%;width:128.5714%!important;height:125.8065%!important;background:no-repeat 0 0/100% 100%}
+.smash{aspect-ratio:1;background:no-repeat 0 0/600% 100%}
 </style>
 </head>
 <body>
@@ -1228,16 +1233,21 @@ for(const k in XIMG){const pre=new Image();pre.src=XIMG[k];}
 const imgTag=src=>`<img class="symimg" src="${src}" alt="" draggable="false">`;
 const orbHTML=v=>v&&v.jp&&XIMG[v.jp]?imgTag(XIMG[v.jp]):ART.O+valHTML(v);
 const gemHTML=(plus,cash)=>plus&&XIMG.DPLUS?imgTag(XIMG.DPLUS):ART.D+(cash?`<div class="val gemv">${fmtCr(cash)}</div>`:'');
-const FIMG={idle:'img/frostfang_idle.webp',throw:'img/frostfang_throw.webp',cheer:'img/frostfang_cheer.webp',grab:'img/frostfang_grab.webp'};
-for(const k in FIMG){const pre=new Image();pre.src=FIMG[k];}
+const FIMG={idle:1,throw:1,cheer:1,grab:1};
+const FSPR={idle:8,cheer:6,throw:6,grab:6,smash:6};
+for(const k in FSPR){const pre=new Image();pre.src='img/ff_'+k+'.webp';}
+const sprSF=()=>{try{return SF()}catch(e){return 1}};
+function sprPlay(d,name,a,b,fps,loop){clearInterval(d._t);if(d._r)d._r();d._r=null;const n=FSPR[name];
+ d.style.backgroundImage=`url(img/ff_${name}.webp)`;d.style.backgroundSize=(n*100)+'% 100%';let f=a;
+ const set=()=>{d.style.backgroundPosition=(f/(n-1)*100)+'% 0'};set();if(a===b&&!loop)return Promise.resolve();
+ return new Promise(res=>{d._r=res;d._t=setInterval(()=>{if(!d.isConnected){clearInterval(d._t);res();return}
+  if(f<b)f++;else if(loop)f=a;set();if(!loop&&f>=b){clearInterval(d._t);d._r=null;setTimeout(res,1000/fps)}},1000/fps)})}
+const POSE={idle:['idle',0,7,6,1],cheer:['cheer',0,5,9,1],throw:['throw',0,5,10,0],grab:['grab',0,2,8,0],hug:['grab',3,5,7,0]};
 let poseNow='';
-const pose=p=>{const be=$('beast');if(p===poseNow)return;poseNow=p;
- if(FIMG[p]||FIMG.idle){const src=FIMG[p]||FIMG.idle;const cur=be.querySelector('img.ffimg');
-  be.classList.add('imgmode');
-  if(!cur)be.innerHTML=`<img class="ffimg" src="${src}" alt="Frostfang" draggable="false">`;
-  else if(cur.getAttribute('src')!==src)cur.src=src; // swap in place: his frame never collapses
-  be.classList.toggle('act-throw',p==='throw'&&!FIMG.throw);be.classList.toggle('act-cheer',p==='cheer');}
- else be.innerHTML=ART2['frost_'+p];};
+const pose=p=>{const be=$('beast');if(p===poseNow)return Promise.resolve();poseNow=p;be.classList.add('imgmode');
+ let d=be.querySelector('.ffimg');if(!d){be.innerHTML='<div class="ffbox"><div class="ffimg" role="img" aria-label="Frostfang"></div></div>';d=be.querySelector('.ffimg');}
+ be.classList.toggle('act-cheer',p==='cheer');const [nm,a,b,fps,lp]=POSE[p];return sprPlay(d,nm,a,b,fps/sprSF(),lp);};
+const ffRect=()=>($('beast').querySelector('.ffbox')||$('beast')).getBoundingClientRect();
 pose('idle');
 
 // ---------- state ----------
@@ -1413,17 +1423,17 @@ function showMsg(html){const m=$('msg');m.innerHTML=html;m.classList.remove('hid
 function hideMsg(){$('msg').classList.add('hidden')}
 async function countUp(el,from,to,ms){const st=performance.now();ms=ms*SF();return new Promise(res=>{function f(t){const p=Math.min(1,(t-st)/ms);const cv=from+(to-from)*p;if(el.id==='win'){winAmt=cv;el.textContent=fmtBank(cv)}else el.textContent=['hw','fw','bw'].includes(el.id)?fmtBank(cv):fmt(cv);if(p<1){if(Math.random()<.3)sfx.tick();requestAnimationFrame(f)}else res()}requestAnimationFrame(f)})}
 function clearMarks(){cells.forEach(c=>c.classList.remove('win','dim'))}
-async function flyGem(fromIdx,plus){const be=$('beast');pose(FIMG.grab?'grab':'throw');
- const a=cells[fromIdx].getBoundingClientRect(),b=be.getBoundingClientRect();const gem=document.createElement('div');gem.className='ball gem';gem.innerHTML=gemHTML(plus);document.body.appendChild(gem);
- const x0=a.left+a.width/2-17,y0=a.top+a.height/2-17,x1=b.left+b.width*(FIMG.grab?0.53:0.5)-17,y1=b.top+b.height*(FIMG.grab?0.65:0.35)-17,dur=480*SF(),st=performance.now();
+async function flyGem(fromIdx,plus){pose('grab');
+ const a=cells[fromIdx].getBoundingClientRect(),b=ffRect();const gem=document.createElement('div');gem.className='ball gem';gem.innerHTML=gemHTML(plus);document.body.appendChild(gem);
+ const x0=a.left+a.width/2-17,y0=a.top+a.height/2-17,x1=b.left+b.width*0.52-17,y1=b.top+b.height*0.07-17,dur=480*SF(),st=performance.now();
  await new Promise(res=>{function f(t){const p=Math.min(1,(t-st)/dur);const e=p*p*(3-2*p);gem.style.left=(x0+(x1-x0)*e)+'px';gem.style.top=(y0+(y1-y0)*e-Math.sin(p*Math.PI)*90)+'px';gem.style.transform=`scale(${1.3-p*.5})`;if(p<1)requestAnimationFrame(f);else res()}requestAnimationFrame(f)});
- gem.remove();SOUND.play('gem');pose('idle');}
-async function flyBall(toIdx){SOUND.play('throw');const be=$('beast');be.classList.remove('idle');be.classList.add('throw');pose('throw');
- const a=be.getBoundingClientRect(),b=cells[toIdx].getBoundingClientRect();const ball=document.createElement('div');ball.className='ball';ball.innerHTML=XIMG.SNOW?imgTag(XIMG.SNOW):ART2.snowball;document.body.appendChild(ball);
- const lp=FIMG.throw?[0.78,0.20]:FIMG.idle?[0.80,0.42]:[0.6,0.5]; // where the snowball sits in the throwing pose
+ gem.remove();SOUND.play('gem');pose('hug').then(()=>{if(poseNow==='hug')pose('idle')});}
+async function flyBall(toIdx){const be=$('beast');be.classList.remove('idle');pose('throw');await sleep(200);SOUND.play('throw');
+ const a=ffRect(),b=cells[toIdx].getBoundingClientRect();const ball=document.createElement('div');ball.className='ball';ball.innerHTML=XIMG.SNOW?imgTag(XIMG.SNOW):ART2.snowball;document.body.appendChild(ball);
+ const lp=[1.045,0.065];
  const x0=a.left+a.width*lp[0]-13,y0=a.top+a.height*lp[1]-13,x1=b.left+b.width/2-13,y1=b.top+b.height/2-13,dur=520*SF(),st=performance.now();
  await new Promise(res=>{function f(t){const p=Math.min(1,(t-st)/dur);const x=x0+(x1-x0)*p,y=y0+(y1-y0)*p-Math.sin(p*Math.PI)*120;ball.style.left=x+'px';ball.style.top=y+'px';ball.style.transform=`scale(${1+p*.4}) rotate(${p*540}deg)`;if(p<1)requestAnimationFrame(f);else res()}requestAnimationFrame(f)});
- ball.remove();be.classList.remove('throw');be.classList.add('idle');pose('idle');}
+ ball.remove();be.classList.add('idle');pose('idle');}
 
 // Hold & Spin: Frostfang leans out from the pillar farthest from the targets and throws snowballs that add credits to orbs
 async function holdSnowballs(snows,H){
@@ -1742,8 +1752,8 @@ async function freeGames(n){
 // ---------- Ice Crack: a surprise Frost Link on a regular spin ----------
 async function iceCrack(g){
  const fr=$('frameEl'),ck=document.createElement('img');ck.className='crack';ck.src=XIMG.CRACK;ck.alt='';
- const sm=document.createElement('img');sm.className='smash';sm.src=XIMG.SMASH;sm.alt='';fr.appendChild(sm);SOUND.play('throw');
- await sleep(520);SOUND.play('impact');SOUND.play('impact');fr.appendChild(ck);fr.classList.add('shake');say('Orbs incoming!',1600);
+ const sm=document.createElement('div');sm.className='smash';fr.appendChild(sm);SOUND.play('throw');sprPlay(sm,'smash',0,4,4/0.52,0);
+ await sleep(520);sprPlay(sm,'smash',5,5,1,0);SOUND.play('impact');SOUND.play('impact');fr.appendChild(ck);fr.classList.add('shake');say('Orbs incoming!',1600);
  await sleep(450);fr.classList.remove('shake');sm.classList.add('away');setTimeout(()=>sm.remove(),500);
  const spots=E.crackOrbs(g,bet());
  for(const s of spots){const i=s.y*5+s.r;paint(i,g[s.r][s.y]);cells[i].classList.add('land');SOUND.play('orb',{n:spotsN(s)});await sleep(160*SF()+60);}
