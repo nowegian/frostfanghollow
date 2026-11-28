@@ -1321,14 +1321,29 @@ const SOUND = (() => {
 
   // ---------- Frostfang's chatter (made-up monster language) ----------
   const VOWELS = [[700, 1150], [400, 2000], [300, 870], [550, 1700], [650, 1050]];
-  async function say(text) {
-    if (!ready() || !prefs.voice) return;
+  // Frostfang's lines play one after another in the order they were asked for (none cuts another off).
+  // A line already waiting is not queued twice, and at most 4 wait at once.
+  let vChain = Promise.resolve(), vPending = 0;
+  const vQueued = new Set();
+  function say(text) {
+    if (!text || !ready() || !prefs.voice) return vChain;
     const slug = text.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '');
     const file = voiceFile(slug);
-    if (file) { const buf = await loadVoice(file);
-      if (buf) { if (voiceNow) { try { voiceNow.stop(); } catch (e) {} }
-        const s = ctx.createBufferSource(); s.buffer = buf; s.connect(voiceBus); s.start(); voiceNow = s; s.onended = () => { if (voiceNow === s) voiceNow = null; }; return; } }
-    return;   // recorded lines only: the old made-up chatter is retired
+    if (!file || vQueued.has(file) || vPending >= 4) return vChain;
+    vQueued.add(file); vPending++;
+    vChain = vChain.then(async () => {
+      const buf = await loadVoice(file);
+      if (!buf) return;
+      await new Promise(res => {
+        const s = ctx.createBufferSource(); s.buffer = buf; s.connect(voiceBus);
+        s.onended = () => { if (voiceNow === s) voiceNow = null; res(); };
+        voiceNow = s; s.start();
+        setTimeout(res, (buf.duration + 0.4) * 1000);   // safety net if onended never fires
+      });
+    }).catch(() => {}).then(() => { vPending--; vQueued.delete(file); });
+    return vChain;
+  }
+  async function chatterUnused(text) {
     const excited = (text.match(/!/g) || []).length, syl = Math.max(2, Math.min(12, Math.round(text.replace(/[^a-z]/gi, '').length / 2.6)));
     let t = ctx.currentTime + 0.02; const base = 190 + excited * 25;
     for (let k = 0; k < syl; k++) {
@@ -1346,7 +1361,7 @@ const SOUND = (() => {
 
   // ---------- public ----------
   return {
-    FILES, prefs, init, play, spin, music, say,
+    FILES, prefs, init, play, spin, music, say, voiceIdle: () => vChain,
     get mode() { return mode; },
     set(k, v) { prefs[k] = v; savePrefs(); if (k === 'on' && v) init(); applyVolumes();
       if (k === 'on' && v && mode) { const m = mode; mode = null; music(m); } },
@@ -1539,7 +1554,9 @@ async function jpWon(k){const f=JF[k];if(!f)return;const ef=f+'e';
 let rig=null,busy=false, auto=false, inHold=false, inFree=false;
 // spin speed 1-4: 1 is the relaxed default, 4 is fastest. SF() scales every animation time.
 if(![1,2,3,4].includes(S.speed))S.speed=1;
-const SF=()=>[1.3,1,0.7,0.45][S.speed-1];
+// SPEED only changes the reels (RSF); everything else (bonuses, Frostfang, autoplay pauses) keeps the relaxed pace (SF)
+const RSF=()=>[1.3,1,0.7,0.45][S.speed-1];
+const SF=()=>1.3;
 if(S.betI!=null||!S.acc||S.acc.MAXI==null){delete S.betI;S.denI=S.denI??1;S.multI=S.multI??0;S.acc={MAXI:0,MAJOR:0,GRAND:0};}
 S.denI=Math.min(S.denI,DENOMS.length-1);S.multI=Math.min(S.multI,MAXM[S.denI]);
 const denom=()=>DENOMS[S.denI], mult=()=>MULTS[S.multI];
@@ -1655,9 +1672,9 @@ async function holdSnowballs(snows,H){
 const easeBack=x=>{const c1=1.70158,c3=c1+1;return 1+c3*Math.pow(x-1,3)+c1*Math.pow(x-1,2)}; // ends with a small bounce
 async function spinReels(g,free){
  clearMarks();
- const ROWS=g[0].length,POOL=ROWS>3?MRAND:free?FRAND:RAND,T=SF();
+ const ROWS=g[0].length,POOL=ROWS>3?MRAND:free?FRAND:RAND,T=RSF();
  cells.forEach(c=>c.classList.remove('fizzle','got','land'));
- spinOrbN=0;SOUND.play('spinStart');SOUND.spin(true,Math.round(55*SF()));
+ spinOrbN=0;SOUND.play('spinStart');SOUND.spin(true,Math.round(55*RSF()));
  const rnd=()=>{const s=POOL[Math.floor(Math.random()*POOL.length)];return {s,orb:s==='O'?null:undefined}};
  // stop times: one reel at a time, left to right. Tease a reel when it can start a feature:
  // 2 or more moons already showing (moons are scatters: they count anywhere)
@@ -1686,7 +1703,7 @@ async function spinReels(g,free){
 const ALLSYM='WFPSBCAKQJTOMD'.split('');
 function spinCell(i,finalHTML,stopAt,startDelay){
  return new Promise(done=>{
-  const c0=cells[i],h=c0.offsetHeight,T=SF(),v=h*[0.021,0.026,0.031,0.036][S.speed-1];
+  const c0=cells[i],h=c0.offsetHeight,T=RSF(),v=h*[0.021,0.026,0.031,0.036][S.speed-1];
   const Tw=120*T,Td=380*T,dd=v*Td/4.70158,run=Math.max(stopAt-startDelay,Tw+Td+200);
   const F=Math.max(6,Math.round((v*(run-Tw-Td)+dd)/h));
   const rnd=()=>{const s=ALLSYM[Math.floor(Math.random()*ALLSYM.length)];return s==='O'?ART.O:s==='D'?ART.D:ART[s]};
@@ -1711,7 +1728,7 @@ function spinCell(i,finalHTML,stopAt,startDelay){
 }
 function spinColumn(r,final,ROWS,stopAt,startDelay,teaseAt,rnd,moonSnd){
  return new Promise(done=>{
-  const c0=cells[r],h=c0.offsetHeight,p=ROWS>1?cells[5+r].offsetTop-c0.offsetTop:h+6,winH=(ROWS-1)*p+h,T=SF();
+  const c0=cells[r],h=c0.offsetHeight,p=ROWS>1?cells[5+r].offsetTop-c0.offsetTop:h+6,winH=(ROWS-1)*p+h,T=RSF();
   const v=p*[0.021,0.026,0.031,0.036][S.speed-1];            // reel speed, px per ms
   const Tw=150*T, Td=420*T, dd=v*Td/4.70158; // wind-up, settle time, settle distance (matches speed into the bounce)
   const run=Math.max(stopAt-startDelay,Tw+Td+200);
@@ -1871,6 +1888,8 @@ let celebT=0;
 function celebrate(won){clearTimeout(celebT);SOUND.music(null);const big=won>=bet()*50;SOUND.play(big?'win_bonus_big':'win_bonus');celebrate.t0=Date.now();celebrate.len=big?9000:8000;}
 function afterCelebrate(){const wait=Math.max(0,(celebrate.len||0)-(Date.now()-(celebrate.t0||0)));clearTimeout(celebT);
  celebT=setTimeout(()=>{if(!inFree&&!inHold&&!grid.classList.contains('moon'))SOUND.music('base')},wait);}
+// wait for Frostfang's queued lines to finish (at most 4 s)
+const voiceWait=()=>Promise.race([SOUND.voiceIdle?SOUND.voiceIdle():Promise.resolve(),new Promise(r=>setTimeout(r,4000))]);
 async function moonBonus(mods,gemVals){
  SOUND.play('feature');SOUND.music('hunt');cheer(2400);say('Diamond Hunt Bonus!',2600);
  const on=Object.keys(GEMTXT).filter(k=>mods&&mods[k]);
@@ -1918,6 +1937,7 @@ async function moonBonus(mods,gemVals){
   // 2) the grid travels to each diamond, nearest first
   if(ev.path.length){say(['Shiny!','Mine! Mine!','Ooh, diamonds!','Gimme gimme!'][Math.floor(Math.random()*4)]);await sleep(300);}
   for(const p of ev.path){
+   await voiceWait();
    await glide(view,p.row,p.col);
    const i=p.y*5+p.r;cells[i].classList.add('got');
    const parts=p.parts||[];

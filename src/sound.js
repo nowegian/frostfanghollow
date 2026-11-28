@@ -233,14 +233,29 @@ const SOUND = (() => {
 
   // ---------- Frostfang's chatter (made-up monster language) ----------
   const VOWELS = [[700, 1150], [400, 2000], [300, 870], [550, 1700], [650, 1050]];
-  async function say(text) {
-    if (!ready() || !prefs.voice) return;
+  // Frostfang's lines play one after another in the order they were asked for (none cuts another off).
+  // A line already waiting is not queued twice, and at most 4 wait at once.
+  let vChain = Promise.resolve(), vPending = 0;
+  const vQueued = new Set();
+  function say(text) {
+    if (!text || !ready() || !prefs.voice) return vChain;
     const slug = text.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '');
     const file = voiceFile(slug);
-    if (file) { const buf = await loadVoice(file);
-      if (buf) { if (voiceNow) { try { voiceNow.stop(); } catch (e) {} }
-        const s = ctx.createBufferSource(); s.buffer = buf; s.connect(voiceBus); s.start(); voiceNow = s; s.onended = () => { if (voiceNow === s) voiceNow = null; }; return; } }
-    return;   // recorded lines only: the old made-up chatter is retired
+    if (!file || vQueued.has(file) || vPending >= 4) return vChain;
+    vQueued.add(file); vPending++;
+    vChain = vChain.then(async () => {
+      const buf = await loadVoice(file);
+      if (!buf) return;
+      await new Promise(res => {
+        const s = ctx.createBufferSource(); s.buffer = buf; s.connect(voiceBus);
+        s.onended = () => { if (voiceNow === s) voiceNow = null; res(); };
+        voiceNow = s; s.start();
+        setTimeout(res, (buf.duration + 0.4) * 1000);   // safety net if onended never fires
+      });
+    }).catch(() => {}).then(() => { vPending--; vQueued.delete(file); });
+    return vChain;
+  }
+  async function chatterUnused(text) {
     const excited = (text.match(/!/g) || []).length, syl = Math.max(2, Math.min(12, Math.round(text.replace(/[^a-z]/gi, '').length / 2.6)));
     let t = ctx.currentTime + 0.02; const base = 190 + excited * 25;
     for (let k = 0; k < syl; k++) {
@@ -258,7 +273,7 @@ const SOUND = (() => {
 
   // ---------- public ----------
   return {
-    FILES, prefs, init, play, spin, music, say,
+    FILES, prefs, init, play, spin, music, say, voiceIdle: () => vChain,
     get mode() { return mode; },
     set(k, v) { prefs[k] = v; savePrefs(); if (k === 'on' && v) init(); applyVolumes();
       if (k === 'on' && v && mode) { const m = mode; mode = null; music(m); } },
