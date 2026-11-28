@@ -8,6 +8,7 @@ SPECS = {  # name: cols, rows, keyed (dark box background baked in)
     'candles': (5, 4, True),
     'pumpkin': (6, 4, False),
     'skull': (6, 4, False),
+    'frostfang': (3, 2, False),
 }
 OUT = 256          # output frame size (square)
 CANVAS = 448       # static symbol canvas

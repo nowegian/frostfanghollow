@@ -113,12 +113,13 @@ h1 span{background:linear-gradient(180deg,#ffe08a,var(--pump));-webkit-backgroun
 .cell.blur svg{filter:blur(2.5px) brightness(.85);transform:translateY(6px)}
 .cell.win{animation:pulse .5s infinite alternate;box-shadow:0 0 0 3px var(--gold),0 0 18px var(--gold)}
 @keyframes pulse{to{transform:scale(1.06);filter:brightness(1.3)}}
-.cell.win[data-s="P"] img.symimg,.cell.win[data-s="S"] img.symimg,.cell.win[data-s="B"] img.symimg,.cell.win[data-s="C"] img.symimg{visibility:hidden}
-.cell.win[data-s="P"]::after,.cell.win[data-s="S"]::after,.cell.win[data-s="B"]::after,.cell.win[data-s="C"]::after{content:"";position:absolute;left:50%;top:50%;height:94%;aspect-ratio:1;transform:translate(-50%,-50%);background:0 0/100% 100% no-repeat;filter:drop-shadow(0 3px 3px #000a);pointer-events:none}
+.cell.win[data-s="F"] img.symimg,.cell.win[data-s="P"] img.symimg,.cell.win[data-s="S"] img.symimg,.cell.win[data-s="B"] img.symimg,.cell.win[data-s="C"] img.symimg{visibility:hidden}
+.cell.win[data-s="F"]::after,.cell.win[data-s="P"]::after,.cell.win[data-s="S"]::after,.cell.win[data-s="B"]::after,.cell.win[data-s="C"]::after{content:"";position:absolute;left:50%;top:50%;height:94%;aspect-ratio:1;transform:translate(-50%,-50%);background:0 0/100% 100% no-repeat;filter:drop-shadow(0 3px 3px #000a);pointer-events:none}
 .cell.win[data-s="P"]::after{background-image:url(img/sym_pumpkin_win.webp);background-size:2400% 100%;animation:symwin 2.00s steps(24,jump-none) infinite}
 .cell.win[data-s="S"]::after{background-image:url(img/sym_skull_win.webp);background-size:2400% 100%;animation:symwin 2.00s steps(24,jump-none) infinite}
 .cell.win[data-s="B"]::after{background-image:url(img/sym_bat_win.webp);background-size:2500% 100%;animation:symwin 2.08s steps(25,jump-none) infinite}
 .cell.win[data-s="C"]::after{background-image:url(img/sym_candles_win.webp);background-size:2000% 100%;animation:symwin 1.67s steps(20,jump-none) infinite}
+.cell.win[data-s="F"]::after{background-image:url(img/sym_frostfang_win.webp);background-size:600% 100%;animation:symwin .75s steps(6,jump-none) infinite}
 @keyframes symwin{from{background-position:0 0}to{background-position:100% 0}}
 .cell.dim{opacity:.35}
 .cell.hidec>*{visibility:hidden}
@@ -1483,7 +1484,7 @@ for(const k of 'WFPSBCAKQJTOMXD')ART[k]=ART2[k];
 const IMG={F:'img/sym_frostfang.webp',B:'img/sym_bat.webp',S:'img/sym_skull.webp',P:'img/sym_pumpkin.webp',K:'img/sym_K.webp',A:'img/sym_A.webp',C:'img/sym_candles.webp',W:'img/sym_wild.webp',O:'img/sym_gold_coin.webp',Z:'img/sym_sapphire.webp',R:'img/sym_ruby.webp',E:'img/sym_emerald.webp',T:'img/sym_10.webp',J:'img/sym_J.webp',Q:'img/sym_Q.webp',M:'img/sym_moon.webp',D:'img/sym_diamond.webp',X:'img/sym_gold_coin_plus.webp'};
 for(const k in IMG){ART[k]=`<img class="symimg${k==='O'?' orbimg':''}" src="${IMG[k]}" alt="" draggable="false">`;const pre=new Image();pre.src=IMG[k];}
 // extra artwork that isn't a plain reel symbol: jackpot orbs (shown instead of orb + label) and the +1 diamond
-const XIMG={WIN_P:'img/sym_pumpkin_win.webp',WIN_S:'img/sym_skull_win.webp',WIN_B:'img/sym_bat_win.webp',WIN_C:'img/sym_candles_win.webp',PICK:'img/snowball_pick.webp',SPLAT:'img/splat.webp',CRACK:'img/ice_crack.webp',SMASH:'img/frostfang_smash.webp',T_SNOW:'img/title_snowball_fight.webp',T_HUNT:'img/title_diamond_hunt.webp',T_FREE:'img/title_free_games.webp',T_LINK:'img/title_frost_link.webp',MINI:'img/orb_mini.webp',MINOR:'img/orb_minor.webp',MAJOR:'img/orb_major.webp',GRAND:'img/orb_grand.webp',DPLUS:'img/sym_diamond_plus.webp',DMANY:'img/sym_many_diamonds.webp',DPLUS2:'img/sym_many_diamond_plus.webp',COIN2:'img/sym_many_gold_coin.webp',COIN2PLUS:'img/sym_many_gold_coin_plus.webp',FFSYM:'img/sym_frostfang_bonus.webp',SNOW:'img/fx_snowball.webp'};
+const XIMG={WIN_F:'img/sym_frostfang_win.webp',WIN_P:'img/sym_pumpkin_win.webp',WIN_S:'img/sym_skull_win.webp',WIN_B:'img/sym_bat_win.webp',WIN_C:'img/sym_candles_win.webp',PICK:'img/snowball_pick.webp',SPLAT:'img/splat.webp',CRACK:'img/ice_crack.webp',SMASH:'img/frostfang_smash.webp',T_SNOW:'img/title_snowball_fight.webp',T_HUNT:'img/title_diamond_hunt.webp',T_FREE:'img/title_free_games.webp',T_LINK:'img/title_frost_link.webp',MINI:'img/orb_mini.webp',MINOR:'img/orb_minor.webp',MAJOR:'img/orb_major.webp',GRAND:'img/orb_grand.webp',DPLUS:'img/sym_diamond_plus.webp',DMANY:'img/sym_many_diamonds.webp',DPLUS2:'img/sym_many_diamond_plus.webp',COIN2:'img/sym_many_gold_coin.webp',COIN2PLUS:'img/sym_many_gold_coin_plus.webp',FFSYM:'img/sym_frostfang_bonus.webp',SNOW:'img/fx_snowball.webp'};
 for(const k in XIMG){const pre=new Image();pre.src=XIMG[k];}
 const imgTag=src=>`<img class="symimg" src="${src}" alt="" draggable="false">`;
 const orbHTML=(v,v2)=>v2?`<div class="dbl">${imgTag(XIMG.COIN2)}<div class="val v1${v.jp?' jpv':''}">${v.jp||fmtCr(v.cash)}</div><div class="val v2${v2.jp?' jpv':''}">${v2.jp||fmtCr(v2.cash)}</div></div>`:ART.O+valHTML(v);
