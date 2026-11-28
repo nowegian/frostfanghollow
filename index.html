@@ -295,6 +295,38 @@ button{font-family:inherit;cursor:pointer;border:none;color:#fff;font-weight:700
 #beast .ffbox{position:absolute;left:50%;top:50%;width:min(100cqw,calc(100cqh*560/620));aspect-ratio:560/620;transform:translate(-50%,-50%);pointer-events:none}
 #beast .ffbox>.ffimg{position:absolute;left:-14.2857%;top:-25.8065%;width:128.5714%!important;height:125.8065%!important;background:no-repeat 0 0/100% 100%}
 .smash{aspect-ratio:1;background:no-repeat 0 0/600% 100%}
+/* ---- wide desktop: buttons in two columns beside the reels, CREDIT / WIN / BET in one row underneath ---- */
+.cab.wide{width:min(1500px,100%);--fw:min(1000px,calc((100vh - 300px)*1.6),calc(100vw - 440px))}
+.cab.wide .stage:has(.frame.holdf){--fw:min(1000px,calc((100vh - 300px)*1.28),calc(100vw - 440px))}
+.cab.wide .stage:has(.frame.freef){--fw:min(1000px,calc((100vh - 310px)*1.6),calc(100vw - 440px))}
+.cab.wide .stage:has(.frame.moonf){--fw:min(780px,calc((100vh - 300px)*0.842))}
+.cab.wide .stage>.frame{width:var(--fw)!important}
+.cab.wide .sidecol{position:absolute;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;align-items:center;gap:16px;width:176px;z-index:6}
+.cab.wide #sideL{right:calc(50% + var(--fw)/2 + 22px)}
+.cab.wide #sideR{left:calc(50% + var(--fw)/2 + 22px)}
+.cab.wide .sidecol .tg{flex:none;width:164px;min-width:0;padding:14px 10px;border-radius:999px;font-size:15px;font-weight:700;letter-spacing:1.5px;color:#eaf6ff;text-shadow:0 2px 0 #1a0838,0 0 8px #6cc8ff88;
+ background:radial-gradient(120% 90% at 50% 0%,#6a4be0 0%,#2d1a78 45%,#140b3f 100%);border:2px solid #bfe9ffaa;box-shadow:inset 0 0 0 2px #2a1460,inset 0 0 14px #6cc8ff66,0 0 12px #6cc8ff44,0 6px 12px #000b;transition:filter .15s,transform .1s}
+.cab.wide .sidecol .tg:hover{filter:brightness(1.18)}
+.cab.wide .sidecol .tg:active{transform:scale(.96)}
+.cab.wide .sidecol .tg.on{background:radial-gradient(120% 90% at 50% 0%,#b07cff 0%,#6a2fd0 50%,#2d1270 100%);border-color:#e6d4ff}
+.cab.wide .sidecol .tg.cash{background:radial-gradient(120% 90% at 50% 0%,#ffd36a 0%,#e08a10 50%,#7a3a00 100%);border-color:#ffe9a8;color:#fff;text-shadow:0 2px 0 #5a2400}
+.cab.wide .sidecol .sm{width:58px;height:58px;font-size:32px;font-weight:700;color:#eaf6ff;background:radial-gradient(circle at 50% 30%,#6a4be0,#22125e 70%);border:3px solid #bfe9ffaa;box-shadow:inset 0 0 12px #6cc8ff66,0 0 12px #6cc8ff44,0 5px 10px #000b}
+.cab.wide .sidecol .sm:hover:not(:disabled){filter:brightness(1.18)}
+.cab.wide .sidecol #spin{width:148px;margin:0;grid-row:auto}
+.cab.wide .stage:has(.frame.moonf)>#sideL{top:0;transform:none}
+.cab.wide .stage>.meter,.cab.wide .stage:has(.frame.moonf)>.meter{position:absolute;left:auto;right:calc(50% + var(--fw)/2 + 22px);top:auto;bottom:0;transform:none;width:164px;max-width:none;margin:0;padding:8px 10px}
+.cab.wide .stage>.meter:not(.hidden)~#sideL,.cab.wide .stage:has(>.meter:not(.hidden))>#sideL{top:0;transform:none}
+.cab.wide .panel{width:min(900px,var(--fw));grid-template-columns:1fr 1.15fr 1fr;gap:14px;margin-top:4px}
+.cab.wide .panel .tools{display:none}
+.cab.wide .panel .winb{order:2}.cab.wide .panel .betbox{order:3}
+.cab.wide .panel .box{min-height:66px;border-radius:16px;background:linear-gradient(#2a1a6ae6,#100834e6);border:2px solid #bfe9ff88;box-shadow:inset 0 0 14px #6cc8ff44,0 0 10px #6cc8ff33,0 6px 12px #000a}
+.cab.wide .panel .box small{font-size:11px;letter-spacing:2px;color:#cfe9ff;opacity:.85}
+.cab.wide .panel .box div{font-size:clamp(18px,1.7vw,24px)}
+.cab.wide .panel .winb{border-color:#ffd36a;box-shadow:inset 0 0 16px #ffb02e55,0 0 16px #ffb02e66,0 6px 12px #000a;background:linear-gradient(#3a1d66e6,#140834e6)}
+.cab.wide .panel .winb div{color:#ffe28a;text-shadow:0 0 10px #ffb02e88}
+.cab.wide .panel .betbox{flex-direction:column;gap:4px}
+.cab.wide .panel .betbox>small{display:block}
+.cab.wide .panel .denoms{justify-content:center}
 </style>
 </head>
 <body>
@@ -1249,6 +1281,19 @@ const pose=p=>{const be=$('beast');if(p===poseNow)return Promise.resolve();poseN
  be.classList.toggle('act-cheer',p==='cheer');const [nm,a,b,fps,lp]=POSE[p];return sprPlay(d,nm,a,b,fps/sprSF(),lp);};
 const ffRect=()=>($('beast').querySelector('.ffbox')||$('beast')).getBoundingClientRect();
 pose('idle');
+
+// wide desktop: move the buttons into columns beside the reels (and back when the window narrows)
+const WIDE=matchMedia('(min-width:1180px) and (min-height:600px)');
+const wlHome=new Map();
+function wideLayout(){const cab=$('frameEl').closest('.cab');if(!cab||cab.classList.contains('m'))return;const on=WIDE.matches;
+ let L=$('sideL'),R=$('sideR');
+ if(!L){const st=$('frameEl').parentNode;L=document.createElement('div');L.id='sideL';L.className='sidecol';R=document.createElement('div');R.id='sideR';R.className='sidecol';st.prepend(L);st.append(R);}
+ for(const [col,ids] of [[L,['info','refill','sound']],[R,['betUp','spin','betDn','auto','speed']]])for(const id of ids){const el=$(id);if(!el)continue;
+  if(!wlHome.has(id)){const mk=document.createComment(id);el.before(mk);wlHome.set(id,mk);}
+  if(on)col.append(el);else wlHome.get(id).after(el);}
+ const bl=document.querySelector('.betbox>small');if(bl){bl.dataset.t=bl.dataset.t||bl.textContent;bl.textContent=on?'BET':bl.dataset.t;}
+ L.hidden=R.hidden=!on;cab.classList.toggle('wide',on);if(typeof placePet==='function'&&placePet.v)requestAnimationFrame(()=>placePet(placePet.v));}
+WIDE.addEventListener('change',wideLayout);wideLayout();
 
 // ---------- state ----------
 // casino-style bets: 50 credits x multiplier (1x-10x) x denomination
