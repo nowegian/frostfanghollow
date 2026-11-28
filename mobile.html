@@ -330,6 +330,9 @@ button{font-family:inherit;cursor:pointer;border:none;color:#fff;font-weight:700
 .cab.wide .panel .denoms{justify-content:center}
 .modal .card p>img.symimg{height:48px;width:auto;float:left;margin:0 10px 4px 0}
 .modal .card p:has(>img.symimg){overflow:hidden}
+.sfj{display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%}
+.sfj img.symimg{height:auto!important;width:96%!important;max-width:none}
+.sfj small{font-size:11px;font-weight:700;color:#fff;text-shadow:0 1px 2px #000}
 
 /* ================= phone layout ================= */
 html,body{height:100%;overscroll-behavior:none}
@@ -489,15 +492,15 @@ const ENGINE = (() => {
     A:{3:10,4:30,5:120}, K:{3:10,4:30,5:120}, Q:{3:10,4:30,5:80}, J:{3:10,4:30,5:80}, T:{3:10,4:20,5:70}
   };
   // Regular spins: no orbs. Frostfang (F) is the top pay symbol on every reel; moons (M) are the free-games scatter, at most one per reel.
-  const BASE_W = {F:2.5,P:5,S:6,B:7,C:8,A:10,K:10,Q:12,J:12,T:12,W:1.75,M:2.8};
+  const BASE_W = {F:2.5,P:5,S:6,B:7,C:8,A:10,K:10,Q:12,J:12,T:12,W:2.9,M:3.1};
   const MOON_REELS = [0,1,2,3,4];
-  // Free games: the card symbols (A, K, Q, J, 10) are taken off the reels. Orbs land, and Frostfang on reel 5 collects them.
-  const FREE_W = {F:4,P:5,S:6,B:7,C:8,W:4.3,M:1.2,O:5};
+  // Free games: the card symbols (A, K, Q, J, 10) are taken off the reels. No orbs (orbs are retired for now).
+  const FREE_W = {F:4,P:5,S:6,B:7,C:8,W:4.3,M:1.2};
   const SCATTER = {3:2, 4:10, 5:50};               // moons anywhere: x total bet, paid up front
   const LINE = {K:0.75};                           // scales every line pay
   const FREE_GAMES = 6;                           // 3+ moons anywhere (or the lucky single-moon trigger) = 6 free games
   const FG = {COLLECT_STEP:4, MAX_MULT:3, ORB_K:1.8};  // every 4 collections raise the orb multiplier (x2, then x3)
-  const RANDOM = {CRACK:1/230, SNOWBALL:1/700, LUCKY:1/400};  // surprise features on regular spins; LUCKY: 1 or 2 moons start the free games anyway
+  const RANDOM = {CRACK:0, SNOWBALL:1/700, LUCKY:1/400};  // surprise features on regular spins; LUCKY: 1 or 2 moons start the free games anyway
   const SNOWFIGHT = {MINI:0.60, X1:0.12, X2:0.10, X3:0.08, MINOR:0.08, MAJOR:0.02};
   const JP = {MINI:20, MINOR:50, MAJOR:300}; // x bet seeds (MAJOR also grows)
   const GRAND_SEED = 9000;           // dollars, same at every bet, grows from here
@@ -586,9 +589,9 @@ const ENGINE = (() => {
   function freeSpin(fs, bet){
     fs.left--; fs.played++;
     const g=spinGrid(bet,true,fs), ev=evaluate(g,bet,1,true);
-    const out={g, ev, more:ev.freeGames, link:ev.orbs>=6, collect:null, multUp:false};
+    const out={g, ev, more:ev.freeGames, link:false, collect:null, multUp:false};
     fs.left+=ev.freeGames;
-    if(!out.link && ev.orbs && g[4].some(c=>c.s==='F')){
+    if(false){
       const list=[]; g.forEach((col,r)=>col.forEach((c,y)=>{ if(c.s==='O') list.push({r,y,orb:c.orb}); }));
       out.collect=list; fs.collects++;
       const m=Math.min(FG.MAX_MULT, 1+Math.floor(fs.collects/FG.COLLECT_STEP));
@@ -607,10 +610,13 @@ const ENGINE = (() => {
   }
   const snowRoll=()=>rng()<RANDOM.SNOWBALL;
   // Snowball Fight: pick snowballs until one prize shows 3 times. Returns the prize and the order the picks reveal.
-  function snowFight(){
+  // GRAND chance inside a Snowball Fight: proportional to the bet, so the GRAND returns GRAND_K of every bet at any bet size
+  const grandSnowChance = bet => Math.min(1, GRAND_K*bet/GRAND_SEED/RANDOM.SNOWBALL);
+  function snowFight(bet){
     const keys=Object.keys(SNOWFIGHT); let x=rng(), prize=keys[keys.length-1];
-    for(const k of keys){ if((x-=SNOWFIGHT[k])<0){ prize=k; break; } }
-    const others=[]; keys.forEach(k=>{ if(k!==prize){ others.push(k,k); } });
+    if(bet && rng()<grandSnowChance(bet)) prize='GRAND';
+    else for(const k of keys){ if((x-=SNOWFIGHT[k])<0){ prize=k; break; } }
+    const others=[]; keys.forEach(k=>{ if(k!==prize){ others.push(k,k); } }); if(prize!=='GRAND') others.push('GRAND');
     const nOther=Math.floor(rng()*Math.min(9,others.length+1));
     const seq=[prize,prize]; for(let k=0;k<nOther;k++) seq.push(others.splice(Math.floor(rng()*others.length),1)[0]);
     for(let k=seq.length-1;k>0;k--){ const j=Math.floor(rng()*(k+1)); [seq[k],seq[j]]=[seq[j],seq[k]]; }
@@ -1532,7 +1538,7 @@ addEventListener('resize',sizeFrame);
 // ---------- grid ----------
 const grid=$('grid'), cells=[];
 for(let i=0;i<40;i++){const d=document.createElement('div');d.className='cell'+(i>=15?' xrow':'')+(i>=25?' x8':'');grid.appendChild(d);cells.push(d);}
-const RAND='WFPSBCAKQJTM'.split(''),FRAND='WFPSBCPSBCOM'.split(''),MRAND='FPSBCAKQJTOOD'.split('');
+const RAND='WFPSBCAKQJTM'.split(''),FRAND='WFPSBCPSBCM'.split(''),MRAND='FPSBCAKQJTOOD'.split('');
 function symHTML(c){if(!c)return '';
  if(c.s==='O'&&c.orb) return orbHTML(c.orb);
  if(c.s==='D') return gemHTML(c.plus,c.cash);
@@ -1721,8 +1727,7 @@ async function play(){
  if(ev.huntTrigger){await sleep(600);total+=await moonBonus();}
  if(ev.freeTrigger){await sleep(700);total+=await freeGames(ev.freeGames);}
  // surprise features on regular spins
- if(!feat){if(E.crackRoll()){feat=true;await sleep(300);await iceCrack(g);total+=await holdAndSpin(g,null);}
-  else if(E.snowRoll()){feat=true;await sleep(300);total+=await snowballFight();}}
+ if(!feat&&E.snowRoll()){feat=true;await sleep(300);total+=await snowballFight();}
  S.credit+=total;if(total>=bet()*20&&!feat)await bigWin(total);
  setWin(total);save();busy=false;$('spin').disabled=false;drawMeters();
  if(auto){await sleep(total>0?900:350);if(auto)play();}
@@ -1850,7 +1855,7 @@ async function moonBonus(){
 }
 
 // ---------- Moonrise Free Games ----------
-// Frostfang (only on reel 5 here) collects every orb on screen; 6+ orbs start Frost Link instead. Moons add more games.
+// Free games: card symbols are off the reels. 3+ moons add 6 more games.
 async function flyTo(fromIdx,toIdx,html){const a=cells[fromIdx].getBoundingClientRect(),b=cells[toIdx].getBoundingClientRect();
  const o=document.createElement('div');o.className='ball flyorb';o.innerHTML=html;const sz=Math.min(a.width,a.height)*.9;Object.assign(o.style,{width:sz+'px',height:sz+'px'});document.body.appendChild(o);
  const x0=a.left+a.width/2-sz/2,y0=a.top+a.height/2-sz/2,x1=b.left+b.width/2-sz/2,y1=b.top+b.height/2-sz/2,dur=420*SF(),st=performance.now();
@@ -1861,28 +1866,16 @@ function drawCollect(fs){const m=$('meter');m.classList.remove('hidden');
  m.innerHTML=`<div class="dots">${dots}</div><small>${k}/${step} collections to orbs <b>×${fs.mult+1}</b></small>`;}
 async function freeGames(n){
  inFree=true;SOUND.play('feature');SOUND.music('moon');cheer(2400);say('Moonrise free games!',2400);
- showMsg(`<img class="ttl" src="${XIMG.T_FREE}" alt="Moonrise Free Games"><div class="big">${n} FREE GAMES</div><p>No card symbols: only Frostfang, pumpkins, skulls, bats, candles and wilds. Orbs land, and Frostfang on reel 5 collects them all!</p>`);
+ showMsg(`<img class="ttl" src="${XIMG.T_FREE}" alt="Moonrise Free Games"><div class="big">${n} FREE GAMES</div><p>No card symbols: only Frostfang, pumpkins, skulls, bats, candles and wilds!</p>`);
  await sleep(2600);hideMsg();clearMarks();$('frameEl').classList.add('freef');
  const fs=E.freeStart(n);let tot=0;setWin(0);
  const lab=()=>banner(`FREE GAME ${fs.played} OF ${fs.played+fs.left} · WIN ${fmt(tot)}`,true);
- $('winLine').textContent='Moonrise Free Games: Frostfang on reel 5 collects every orb';drawCollect(fs);
+ $('winLine').textContent='Moonrise Free Games: no card symbols on the reels';
  while(fs.left>0){
   await sleep(450);const o=E.freeSpin(fs,bet());lab();
   await spinReels(o.g,true);
   if(o.ev.total>0){await showWins(o.ev,o.g);await countUp($('win'),tot,tot+o.ev.total,Math.min(1200,300+o.ev.total/bet()*50));tot+=o.ev.total;lab();}
   if(o.more){SOUND.play('plus');cheer(1400);say('More free games!',1600);banner(`+${o.more} FREE GAMES!`,true);await sleep(1400);lab();}
-  if(o.link){await sleep(500);const w=await holdAndSpin(o.g,' ');tot+=w;SOUND.music('moon');setWin(tot);lab();}
-  else if(o.collect){const fi=o.g[4].findIndex(c=>c.s==='F')*5+4;cells[fi].classList.add('win');say("I'll take those!",1400);await sleep(350);
-   const jv=jpVals();
-   for(const c of o.collect){const i=c.y*5+c.r,v=c.orb.jp?jv[c.orb.jp]:c.orb.cash;cells[i].classList.add('got');
-    const fly=flyTo(i,fi,orbHTML(c.orb));
-    if(c.orb.jp){$('jp'+c.orb.jp).classList.add('flash');setTimeout(()=>$('jp'+c.orb.jp).classList.remove('flash'),2200);SOUND.play('jackpot',{level:c.orb.jp});if(c.orb.jp==='MAJOR')jpWon('MAJOR');}
-    else SOUND.play('lock',{n:4});
-    await fly;cells[i].innerHTML='';cells[i].classList.remove('got');
-    await countUp($('win'),tot,tot+v,c.orb.jp?800:220);tot+=v;lab();}
-   cells[fi].classList.remove('win');
-   if(o.multUp){SOUND.play('grow');cheer(1600);say(`Orbs times ${fs.mult}!`,1600);banner(`ORBS NOW ×${fs.mult}!`,true);await sleep(1400);lab();}
-   drawCollect(fs);}
   await sleep(250);
  }
  banner('');$('meter').classList.add('hidden');$('frameEl').classList.remove('freef');tot=Math.round(tot*100)/100;
@@ -1905,13 +1898,13 @@ async function iceCrack(g){
 }
 
 // ---------- Snowball Fight: pick snowballs until one prize shows 3 times ----------
-const SF_LABEL={MINI:'MINI',MINOR:'MINOR',MAJOR:'MAJOR',X1:'1× BET',X2:'2× BET',X3:'3× BET'};
-function sfTile(k){if(k[0]==='X')return `<div class="sfx">${k[1]}×<small>${fmt((+k[1])*bet())}</small></div>`;return XIMG[k]?imgTag(XIMG[k]):`<b>${k}</b>`;}
+const SF_LABEL={MINI:'MINI',MINOR:'MINOR',MAJOR:'MAJOR',GRAND:'GRAND',X1:'1× BET',X2:'2× BET',X3:'3× BET'};
+function sfTile(k){if(k[0]==='X')return `<div class="sfx">${k[1]}×<small>${fmt((+k[1])*bet())}</small></div>`;return `<div class="sfj">${imgTag('img/plaque_'+k.toLowerCase()+'.webp')}<small>${fmt(jpVals()[k])}</small></div>`;}
 async function snowballFight(){
  peek('L',1800,false,true);await sleep(450);SOUND.play('throw');await sleep(250);SOUND.play('impact');
  const fr=$('frameEl'),sp=document.createElement('img');sp.className='splat';sp.src=XIMG.SPLAT;sp.alt='';fr.appendChild(sp);say('Snowball fight!',2000);SOUND.play('feature');
  await sleep(900);sp.remove();
- const f=E.snowFight(),seq=f.seq.slice();let picks=0;const count={};
+ const f=E.snowFight(bet()),seq=f.seq.slice();let picks=0;const count={};
  showMsg(`<img class="ttl ttls" src="${XIMG.T_SNOW}" alt="Snowball Fight"><p>Pick snowballs. Match 3 to win that prize!</p><div class="sfgrid" id="sfgrid">${Array.from({length:12},(_,i)=>`<button class="sfball" data-i="${i}">${imgTag(XIMG.PICK)}</button>`).join('')}</div>`);
  $('msg').classList.add('sf');
  const prize=await new Promise(done=>{let idle;
@@ -1925,10 +1918,10 @@ async function snowballFight(){
   document.querySelectorAll('#sfgrid .sfball').forEach(b=>b.onclick=()=>pickOne(b));arm();
   say('Pick a snowball!',1600);});
  const jv=jpVals(),amt=prize[0]==='X'?Math.round((+prize[1])*bet()*100)/100:jv[prize];
- if(prize==='MAJOR')jpWon('MAJOR');
+ if(prize==='MAJOR'||prize==='GRAND')jpWon(prize);
  $('msg').classList.remove('sf');
  showMsg(`<h2>${prize[0]==='X'?'SNOWBALL WIN':prize+' JACKPOT!'}</h2><p>${SF_LABEL[prize]}</p><div class="big" id="sw">$0.00</div>`);
- if(prize[0]!=='X'){$('jp'+prize).classList.add('flash');setTimeout(()=>$('jp'+prize).classList.remove('flash'),2600);SOUND.play('jackpot',{level:prize});say(prize==='MINI'?'Mini jackpot!':prize==='MINOR'?'Minor jackpot!':'Major jackpot!',2000);}
+ if(prize[0]!=='X'){$('jp'+prize).classList.add('flash');setTimeout(()=>$('jp'+prize).classList.remove('flash'),2600);SOUND.play('jackpot',{level:prize});say(prize==='MINI'?'Mini jackpot!':prize==='MINOR'?'Minor jackpot!':prize==='GRAND'?'THE GRAND!!!':'Major jackpot!',2000);if(prize==='GRAND')SOUND.play('grand');}
  else SOUND.play('winMed');
  cheer(2600);await countUp($('sw'),0,amt,1400);await countUp($('win'),0,amt,300);await sleep(1300);hideMsg();
  return amt;
@@ -1967,16 +1960,15 @@ $('info').onclick=()=>{const u=bet()/50;let pt='';for(const s of ['F','P','S','B
  <h4>Wild</h4><p>${ART.W.replace('<svg','<svg width="40" height="36"')} Appears on reels 2–5 and substitutes for all pay symbols, including Frostfang, but not for moons.</p>
  <h4>Frostfang</h4><p>${ART.F} Frostfang is the top-paying symbol on every reel.</p>
  <h4>Moonrise Free Games</h4><p>${ART.M} Moons are scatters: they count anywhere, at most one per reel. <b>3, 4 or 5 moons</b> pay <b>2×, 10× or 50× the bet</b> up front and start <b>6 free games</b>. Even 1 or 2 moons can start the free games now and then, at random. 3 or more moons during free games add 6 more games and pay again.<br>
- During free games <b>the card symbols (A, K, Q, J and 10) are taken off the reels</b>: only Frostfang, pumpkins, skulls, bats, candles, wilds, moons and orbs land. When Frostfang lands on <b>reel 5</b>, he <b>collects the value of every orb on screen</b>. Every 4 collections raise the value of new orbs: ×2, then ×3. If <b>6 or more orbs</b> land at once, Frost Link starts instead.</p>
- <h4>Frost Link</h4><p>The orb bonus. It starts two ways: <b>Ice Crack</b>, when at random on a regular spin Frostfang smashes the glass and 6 to 9 orbs appear; or when <b>6 or more orbs</b> land during free games. The reels grow to <b>5 rows</b> (25 spots): orbs lock, you get 3 spins, and each new orb resets the count to 3. Orbs carry cash or the MINI, MINOR or MAJOR jackpot. On some spins Frostfang throws snowballs that add credits to orbs showing numbers. <b>GRAND orb:</b> a rare orb that wins the GRAND; bigger bets make it more likely. <b>Full screen:</b> fill all 25 spots and the win is <b>doubled</b> (a GRAND is paid once, not doubled).</p>
- <h4>Snowball Fight</h4><p>Rarely, after a regular spin, Frostfang starts a snowball fight. Pick snowballs until one prize shows up 3 times, and you win it: the <b>MINI</b> (most often), <b>MINOR</b>, <b>MAJOR</b>, or <b>1×, 2× or 3× the bet</b>.</p>
+ During free games <b>the card symbols (A, K, Q, J and 10) are taken off the reels</b>: only Frostfang, pumpkins, skulls, bats, candles, wilds and moons land.</p>
+ <h4>Snowball Fight</h4><p>Rarely, after a regular spin, Frostfang starts a snowball fight. Pick snowballs until one prize shows up 3 times, and you win it: the <b>MINI</b> (most often), <b>MINOR</b>, <b>MAJOR</b>, <b>1×, 2× or 3× the bet</b>, or, very rarely, the <b>GRAND</b>. Bigger bets make the GRAND more likely.</p>
  <h4>Bets</h4><p>50 fixed lines. Pick a denomination (1¢, 2¢ or 5¢), then 1 to 5 credits per line (50 to 250 credits). Bets run from $0.50 to $12.50. New players start with $100, and your balance is saved between visits. Use <b>ADD $100</b> to top up.</p>
  <h4>Jackpots</h4><p>MINI is ${E.JP.MINI}× the bet and MINOR is ${E.JP.MINOR}× the bet. MAJOR starts at ${E.JP.MAJOR}× the bet and grows with every spin. At your bet of ${fmt(bet())} that's ${fmt(E.JP.MINI*bet())}, ${fmt(E.JP.MINOR*bet())} and ${fmt(E.JP.MAJOR*bet())}+.<br>
- <b>GRAND starts at ${fmt(E.GRAND_SEED)} at every bet</b> and grows with every spin. It's won by the rare GRAND orb in Frost Link. Your chance grows with your bet: about 1 in ${Math.round(E.GRAND_SEED/(E.GRAND_K*bet())).toLocaleString()} spins at your bet of ${fmt(bet())}, from 1 in 450,000 at $0.50 to 1 in 18,000 at $12.50.</p>
+ <b>GRAND starts at ${fmt(E.GRAND_SEED)} at every bet</b> and grows with every spin. It's won in the Snowball Fight. Your chance grows with your bet: about 1 in ${Math.round(E.GRAND_SEED/(E.GRAND_K*bet())).toLocaleString()} spins at your bet of ${fmt(bet())}, from 1 in 450,000 at $0.50 to 1 in 18,000 at $12.50.</p>
  <h4>Payout &amp; odds (Minnesota standard)</h4>
  <p>Built to the payout rule in Minnesota's tribal-state compacts for video games of chance: a game not affected by player skill must return at least 80% and no more than 95% of the amount wagered.</p>
  <ul><li><b>Theoretical return: about 93% at every bet.</b> Measured over 48 million simulated spins, plus the GRAND's fixed 4% share, which is the same at every bet because its odds scale with the bet. This includes the 1% of each bet that grows the MAJOR and GRAND meters.</li>
- <li>Odds per spin: MINI about 1 in 510, MINOR about 1 in 820, MAJOR about 1 in 9,000, GRAND about 1 in 225,000 ÷ your bet in dollars. Moonrise Free Games about 1 in 130 (6.2 games on average), Frost Link about 1 in 215, Snowball Fight about 1 in 705.</li>
+ <li>Odds per spin: MINI about 1 in 1,200, MINOR about 1 in 9,000, MAJOR about 1 in 37,000, GRAND about 1 in 225,000 ÷ your bet in dollars. Moonrise Free Games about 1 in 105 (6.3 games on average), Snowball Fight about 1 in 705.</li>
  <li>Even at the smallest bet ($0.50, about 1 in 450,000), the GRAND is far more likely than the compacts' 1 in 17,000,000 limit, and every advertised award hits much more often than once in 100 million games.</li>
  <li>Every spin is independent. Past results never change the odds.</li></ul>
  <p style="opacity:.6">Play money only. A real-money machine needs independent lab certification and approval by the Minnesota Department of Public Safety.</p>`;$('pays').classList.remove('hidden')};

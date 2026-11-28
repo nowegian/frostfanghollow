@@ -22,6 +22,6 @@ for(let i=0;i<N;i++){const g=E.spinGrid(bet,false),ev=E.evaluate(g,bet);let w=ev
  if(ev.huntTrigger)w+=runMoon();
  if(!ev.freeTrigger&&!ev.huntTrigger){
   if(E.crackRoll()){C.crack++;E.crackOrbs(g,bet);w+=runHold(g);}
-  else if(E.snowRoll()){C.snow++;const f=E.snowFight();const v=f.prize[0]==='X'?(+f.prize[1])*bet:jp[f.prize];if(f.prize[0]!=='X')C[f.prize]++;w+=v;P.Sn+=v;}}
+  else if(E.snowRoll()){C.snow++;const f=E.snowFight(bet);const v=f.prize[0]==='X'?(+f.prize[1])*bet:jp[f.prize];if(f.prize[0]!=='X')C[f.prize]++;w+=v;if(f.prize==='GRAND')P.G+=v;else P.Sn+=v;}}
  won+=w;sq+=w*w;}
 console.log(JSON.stringify({N,bet,won,sq,P,C}));

@@ -11,15 +11,15 @@ const ENGINE = (() => {
     A:{3:10,4:30,5:120}, K:{3:10,4:30,5:120}, Q:{3:10,4:30,5:80}, J:{3:10,4:30,5:80}, T:{3:10,4:20,5:70}
   };
   // Regular spins: no orbs. Frostfang (F) is the top pay symbol on every reel; moons (M) are the free-games scatter, at most one per reel.
-  const BASE_W = {F:2.5,P:5,S:6,B:7,C:8,A:10,K:10,Q:12,J:12,T:12,W:1.75,M:2.8};
+  const BASE_W = {F:2.5,P:5,S:6,B:7,C:8,A:10,K:10,Q:12,J:12,T:12,W:2.9,M:3.1};
   const MOON_REELS = [0,1,2,3,4];
-  // Free games: the card symbols (A, K, Q, J, 10) are taken off the reels. Orbs land, and Frostfang on reel 5 collects them.
-  const FREE_W = {F:4,P:5,S:6,B:7,C:8,W:4.3,M:1.2,O:5};
+  // Free games: the card symbols (A, K, Q, J, 10) are taken off the reels. No orbs (orbs are retired for now).
+  const FREE_W = {F:4,P:5,S:6,B:7,C:8,W:4.3,M:1.2};
   const SCATTER = {3:2, 4:10, 5:50};               // moons anywhere: x total bet, paid up front
   const LINE = {K:0.75};                           // scales every line pay
   const FREE_GAMES = 6;                           // 3+ moons anywhere (or the lucky single-moon trigger) = 6 free games
   const FG = {COLLECT_STEP:4, MAX_MULT:3, ORB_K:1.8};  // every 4 collections raise the orb multiplier (x2, then x3)
-  const RANDOM = {CRACK:1/230, SNOWBALL:1/700, LUCKY:1/400};  // surprise features on regular spins; LUCKY: 1 or 2 moons start the free games anyway
+  const RANDOM = {CRACK:0, SNOWBALL:1/700, LUCKY:1/400};  // surprise features on regular spins; LUCKY: 1 or 2 moons start the free games anyway
   const SNOWFIGHT = {MINI:0.60, X1:0.12, X2:0.10, X3:0.08, MINOR:0.08, MAJOR:0.02};
   const JP = {MINI:20, MINOR:50, MAJOR:300}; // x bet seeds (MAJOR also grows)
   const GRAND_SEED = 9000;           // dollars, same at every bet, grows from here
@@ -108,9 +108,9 @@ const ENGINE = (() => {
   function freeSpin(fs, bet){
     fs.left--; fs.played++;
     const g=spinGrid(bet,true,fs), ev=evaluate(g,bet,1,true);
-    const out={g, ev, more:ev.freeGames, link:ev.orbs>=6, collect:null, multUp:false};
+    const out={g, ev, more:ev.freeGames, link:false, collect:null, multUp:false};
     fs.left+=ev.freeGames;
-    if(!out.link && ev.orbs && g[4].some(c=>c.s==='F')){
+    if(false){
       const list=[]; g.forEach((col,r)=>col.forEach((c,y)=>{ if(c.s==='O') list.push({r,y,orb:c.orb}); }));
       out.collect=list; fs.collects++;
       const m=Math.min(FG.MAX_MULT, 1+Math.floor(fs.collects/FG.COLLECT_STEP));
@@ -129,10 +129,13 @@ const ENGINE = (() => {
   }
   const snowRoll=()=>rng()<RANDOM.SNOWBALL;
   // Snowball Fight: pick snowballs until one prize shows 3 times. Returns the prize and the order the picks reveal.
-  function snowFight(){
+  // GRAND chance inside a Snowball Fight: proportional to the bet, so the GRAND returns GRAND_K of every bet at any bet size
+  const grandSnowChance = bet => Math.min(1, GRAND_K*bet/GRAND_SEED/RANDOM.SNOWBALL);
+  function snowFight(bet){
     const keys=Object.keys(SNOWFIGHT); let x=rng(), prize=keys[keys.length-1];
-    for(const k of keys){ if((x-=SNOWFIGHT[k])<0){ prize=k; break; } }
-    const others=[]; keys.forEach(k=>{ if(k!==prize){ others.push(k,k); } });
+    if(bet && rng()<grandSnowChance(bet)) prize='GRAND';
+    else for(const k of keys){ if((x-=SNOWFIGHT[k])<0){ prize=k; break; } }
+    const others=[]; keys.forEach(k=>{ if(k!==prize){ others.push(k,k); } }); if(prize!=='GRAND') others.push('GRAND');
     const nOther=Math.floor(rng()*Math.min(9,others.length+1));
     const seq=[prize,prize]; for(let k=0;k<nOther;k++) seq.push(others.splice(Math.floor(rng()*others.length),1)[0]);
     for(let k=seq.length-1;k>0;k--){ const j=Math.floor(rng()*(k+1)); [seq[k],seq[j]]=[seq[j],seq[k]]; }

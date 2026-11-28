@@ -1,6 +1,6 @@
 # Frostfang Hollow Link
 
-An original frozen-Halloween slot game with Moonrise Free Games, a Frost Link orb bonus and four jackpots. It runs in the browser and uses play money only: nothing to buy, nothing to win.
+An original frozen-Halloween slot game with Moonrise Free Games, a Snowball Fight and four jackpots. It runs in the browser and uses play money only: nothing to buy, nothing to win.
 
 - **`index.html`**: desktop game
 - **`mobile.html`**: phone game, for a phone held upright. Phones that open `index.html` are sent here automatically, and the phone menu has a DESKTOP VERSION button
@@ -23,10 +23,9 @@ python3 -m http.server 8000
 
 - 5 reels by 3 rows, 50 fixed paylines, with Wild on reels 2–5.
 - Bets from $0.50 to $12.50: 1¢, 2¢ or 5¢ at 1 to 5 credits per line (50 to 250 credits), e.g. 1¢ gives $0.50, $1.00, $1.50, $2.00 or $2.50. New players start with $100, the balance is saved between visits, and ADD $100 tops it up
-- **Frost Link** (orb bonus): starts from Ice Crack (Frostfang smashes the glass on a random regular spin) or 6+ orbs in free games. Orbs lock on a 5-row grid with 3 spins that reset on every new orb. Filling all 25 spots doubles the win
-- **Jackpots**: MINI (20× bet), MINOR (50×), MAJOR (300×, grows), and GRAND (starts at $9,000 at every bet, grows). The GRAND orb is more likely at bigger bets
-- **Moonrise Free Games**: moons are scatters. 3, 4 or 5 anywhere pay 2×, 10× or 50× the bet and start 6 free games; 1 or 2 moons can also start them at random. In free games the card symbols (A, K, Q, J, 10) are removed, orbs land, and Frostfang on reel 5 collects every orb
-- **Frostfang** is the top-paying symbol. (The Diamond Hunt code is still in the game but has no trigger for now.)
+- **Jackpots**: MINI (20× bet), MINOR (50×), MAJOR (300×, grows), and GRAND (starts at $9,000 at every bet, grows). All four are won in the Snowball Fight; the GRAND is more likely at bigger bets
+- **Moonrise Free Games**: moons are scatters. 3, 4 or 5 anywhere pay 2×, 10× or 50× the bet and start 6 free games; 1 or 2 moons can also start them at random. In free games the card symbols (A, K, Q, J, 10) are removed. 3+ moons in free games add 6 more
+- **Frostfang** is the top-paying symbol. Orbs, Frost Link (Hold & Spin) and the Diamond Hunt are switched off for now; their code is still in the game for a future bonus
 - Every bonus prize comes in steps of 10 credits, so bonus totals are always round
 - Real reel strips with motion blur and suspense on reel 5, SPEED 1–4, synthesized music and effects, and voice lines for Frostfang
 - A $ / CR toggle for the credit, bet and win displays
@@ -54,7 +53,7 @@ This is a play-money game. A real-money machine needs independent lab certificat
 | `index.html`, `mobile.html` | Built, playable pages (all code inlined) |
 | `img/` | Artwork: symbols, jackpot orbs, Frostfang poses, frames, backgrounds, logo, plaques, spin button (WebP) |
 | `audio/voice/`, `audio/manifest.json` | Frostfang's voice lines; the manifest lists which lines have recordings |
-| `src/engine.js` | Game maths: reels, pays, free games, Frost Link, jackpots |
+| `src/engine.js` | Game maths: reels, pays, free games, Snowball Fight, jackpots |
 | `src/art.js` | Drawn fallback art for anything without an image file |
 | `src/sound.js` | Synthesized music and effects; plays recorded voice lines when available |
 | `src/ui.html` | Desktop page template |
