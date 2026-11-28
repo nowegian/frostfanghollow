@@ -327,6 +327,17 @@ button{font-family:inherit;cursor:pointer;border:none;color:#fff;font-weight:700
 .cab.wide .panel .betbox{flex-direction:column;gap:4px}
 .cab.wide .panel .betbox>small{display:block}
 .cab.wide .panel .denoms{justify-content:center}
+/* paylines */
+#linesvg{position:absolute;inset:0;width:100%;height:100%;z-index:4;pointer-events:none;overflow:visible}
+#linesvg polyline{fill:none;stroke-width:5;stroke-linejoin:round;stroke-linecap:round;opacity:.92;filter:drop-shadow(0 0 4px #000) drop-shadow(0 0 6px currentColor)}
+#linesvg text{font:700 14px Fredoka,system-ui,sans-serif;paint-order:stroke;stroke:#000;stroke-width:3px}
+.plines{display:grid;grid-template-columns:repeat(auto-fill,minmax(64px,1fr));gap:6px;margin:6px 0 12px}
+.plines div{position:relative;background:#0c0828;border:1px solid #ffffff22;border-radius:6px;padding:3px 3px 0;text-align:center}
+.plines svg{width:100%;display:block}
+.plines polyline{fill:none;stroke-width:2.4;stroke-linejoin:round;stroke-linecap:round}
+.plines span{font-size:10px;opacity:.75}
+.modal .card p>img.symimg{height:48px;width:auto;float:left;margin:0 10px 4px 0}
+.modal .card p:has(>img.symimg){overflow:hidden}
 </style>
 </head>
 <body>
@@ -452,8 +463,8 @@ function wideLayout(){const cab=$('frameEl').closest('.cab');if(!cab||cab.classL
 WIDE.addEventListener('change',wideLayout);wideLayout();
 
 // ---------- state ----------
-// casino-style bets: 50 credits x multiplier (1x-10x) x denomination
-const DENOMS=[0.01,0.02,0.05], MULTS=[1,2,3,5,10], MAXM=[4,4,4];
+// casino-style bets: 50 fixed lines x 1-5 credits per line x denomination
+const DENOMS=[0.01,0.02,0.05], MULTS=[1,2,3,4,5], MAXM=[4,4,4];
 const dLabel=d=>Math.round(d*100)+'¢';
 const START=100;
 const fresh=()=>({credit:START,denI:1,multI:0,speed:1,acc:{MAJORX:0,GRAND:0}});
@@ -566,7 +577,7 @@ function drawMeters(){const j=jpVals();for(const k in j)$('jp'+k).querySelector(
  const crs=Math.floor(S.credit/denom()+1e-6).toLocaleString();
  $('credit').textContent=S.bank==='cr'?crs+' CR':fmt(S.credit);$('creditCr').textContent='';
  $('bankUnit').classList.toggle('cr',S.bank==='cr');E.setUnit(denom());
- $('bet').textContent=S.bank==='cr'?`${(50*mult()).toLocaleString()} CR`:fmt(bet());$('betCr').textContent=`${mult()}× bet`;$('win').textContent=fmtBank(winAmt);
+ $('bet').textContent=S.bank==='cr'?`${(50*mult()).toLocaleString()} CR`:fmt(bet());$('betCr').textContent=`50 lines × ${mult()}`;$('win').textContent=fmtBank(winAmt);
  $('betDn').disabled=busy||S.multI===0;$('betUp').disabled=busy||S.multI>=MAXM[S.denI];
  $('denoms').innerHTML=DENOMS.map((d,i)=>`<button data-i="${i}" class="${i===S.denI?'on':''}" ${busy?'disabled':''}>${dLabel(d)}</button>`).join('');
  $('denoms').querySelectorAll('button').forEach(b=>b.onclick=()=>{if(busy)return;S.denI=+b.dataset.i;S.multI=Math.min(S.multI,MAXM[S.denI]);save();drawMeters()});
@@ -623,7 +634,20 @@ function say(t,ms=1800){SOUND.say(t);const b=$('bubble');b.textContent=t;b.class
 function showMsg(html){const m=$('msg');m.innerHTML=html;m.classList.remove('hidden')}
 function hideMsg(){$('msg').classList.add('hidden')}
 async function countUp(el,from,to,ms){const st=performance.now();ms=ms*SF();return new Promise(res=>{function f(t){const p=Math.min(1,(t-st)/ms);const cv=from+(to-from)*p;if(el.id==='win'){winAmt=cv;el.textContent=fmtBank(cv)}else el.textContent=['hw','fw','bw'].includes(el.id)?fmtBank(cv):fmt(cv);if(p<1){if(Math.random()<.3)sfx.tick();requestAnimationFrame(f)}else res()}requestAnimationFrame(f)})}
-function clearMarks(){cells.forEach(c=>c.classList.remove('win','dim'))}
+function clearMarks(){cells.forEach(c=>c.classList.remove('win','dim'));clearInterval(lineT);const sv=$('linesvg');if(sv)sv.innerHTML='';}
+// ---------- paylines: draw the winning lines over the reels ----------
+const LCOL=['#ffd34d','#6cf0ff','#ff6ad5','#7dff8a','#ff9a3d','#b48cff','#ff5d6c','#4dd2ff','#e8ff5a','#ffffff'];
+let lineT=0;
+function lineSVG(ws){const gEl=$('grid');let sv=$('linesvg');
+ if(!sv){sv=document.createElementNS('http://www.w3.org/2000/svg','svg');sv.id='linesvg';gEl.appendChild(sv);}
+ const W=gEl.clientWidth,H=gEl.clientHeight,cw=cells[0].offsetWidth;sv.setAttribute('viewBox',`0 0 ${W} ${H}`);
+ sv.innerHTML=ws.map(w=>{const pts=E.LINES[w.line-1].map((y,r)=>{const c=cells[y*5+r];return [c.offsetLeft+c.offsetWidth/2,c.offsetTop+c.offsetHeight/2]});
+  pts.unshift([pts[0][0]-cw*0.55,pts[0][1]]);pts.push([pts[pts.length-1][0]+cw*0.55,pts[pts.length-1][1]]);
+  const col=LCOL[(w.line-1)%LCOL.length];
+  return `<polyline points="${pts.map(p=>p.map(v=>v.toFixed(1)).join(',')).join(' ')}" stroke="${col}" color="${col}"/><text x="${(pts[0][0]+6).toFixed(1)}" y="${(pts[0][1]+5).toFixed(1)}" fill="${col}">${w.line}</text>`}).join('');}
+function cycleLines(ws,tail){clearInterval(lineT);if(!ws.length)return;lineSVG(ws);if(ws.length<2)return;let k=-1;
+ lineT=setInterval(()=>{k=(k+1)%ws.length;const w=ws[k];lineSVG([w]);
+  $('winLine').textContent=`Line ${w.line}: ${w.n} × ${E.SYM[w.s].name} pays ${fmt(w.amt)}`+tail;},1500*SF()+300);}
 async function flyGem(fromIdx,plus){pose('grab');
  const a=cells[fromIdx].getBoundingClientRect(),b=ffRect();const gem=document.createElement('div');gem.className='ball gem';gem.innerHTML=gemHTML(plus);document.body.appendChild(gem);
  const x0=a.left+a.width/2-17,y0=a.top+a.height/2-17,x1=b.left+b.width*0.52-17,y1=b.top+b.height*0.07-17,dur=480*SF(),st=performance.now();
@@ -760,8 +784,9 @@ async function showWins(ev,g,label){
  const all=new Set();ev.wins.forEach(w=>w.cells.forEach(([r,y])=>all.add(y*5+r)));
  if(ev.scatterPay)g.forEach((col,r)=>col.forEach((c,y)=>{if(c.s==='F')all.add(y*5+r)}));
  cells.forEach((c,i)=>c.classList.add(all.has(i)?'win':'dim'));
- const best=ev.wins.sort((a,b)=>b.amt-a.amt)[0];
- $('winLine').textContent=(best?`${best.n} × ${E.SYM[best.s].name}, ${best.ways} way${best.ways>1?'s':''}: ${fmt(best.amt)}`:'')+(ev.wins.length>1?`  (+${ev.wins.length-1} more)`:'')+(ev.scatterPay?`  Frostfang pays ${fmt(ev.scatterPay)}`:'')+(label||'');
+ const best=ev.wins.sort((a,b)=>b.amt-a.amt)[0];const tail=(ev.scatterPay?`  ·  Frostfang pays ${fmt(ev.scatterPay)}`:'')+(label||'');
+ $('winLine').textContent=(best?`Line ${best.line}: ${best.n} × ${E.SYM[best.s].name} pays ${fmt(best.amt)}`:'')+(ev.wins.length>1?`  (+${ev.wins.length-1} more line${ev.wins.length>2?'s':''})`:'')+tail;
+ if(ev.wins.length&&ev.wins[0].line)cycleLines(ev.wins.slice(),tail);
  {const x=ev.total/bet();SOUND.play(x>=20?'winBig':x>=5?'winMed':'winSmall');}
 }
 
@@ -1016,8 +1041,9 @@ $('refill').onclick=()=>{if(busy)return;S.credit=Math.round((S.credit+START)*100
 document.addEventListener('keydown',e=>{if(e.code==='Space'&&$('pays').classList.contains('hidden')&&$('soundM').classList.contains('hidden')){e.preventDefault();$('spin').click()}});
 $('info').onclick=()=>{const u=bet()/50;let pt='';for(const s of ['P','S','B','C','A','K','Q','J','T']){const p=E.PAY[s];pt+=`<div>${ART[s]}<br>5: ${fmt(p[5]*u)}<br>4: ${fmt(p[4]*u)}<br>3: ${fmt(p[3]*u)}</div>`}
  $('payCard').innerHTML=`<button class="close" onclick="document.getElementById('pays').classList.add('hidden')">Close</button><h3>How to play</h3>
- <p>243 ways to win. Match symbols on adjacent reels from the left. Pays shown per way at your current bet of ${fmt(bet())}.</p>
+ <p><b>50 fixed lines.</b> Match 3, 4 or 5 symbols on a line, on touching reels starting from reel 1. Only the highest win on each line is paid, and wins on different lines add up. Pays shown per line at your current bet of ${fmt(bet())} (${mult()} credit${mult()>1?'s':''} per line).</p>
  <div class="pt">${pt}</div>
+ <h4>The 50 lines</h4><div class="plines">${E.LINES.map((ln,i)=>`<div><svg viewBox="0 0 50 30"><g fill="#ffffff22">${[0,1,2].map(y=>[0,1,2,3,4].map(r=>`<rect x="${r*10+1}" y="${y*10+1}" width="8" height="8" rx="1.5"/>`).join('')).join('')}</g><polyline points="${ln.map((y,r)=>`${r*10+5},${y*10+5}`).join(' ')}" stroke="${LCOL[i%LCOL.length]}"/></svg><span>${i+1}</span></div>`).join('')}</div>
  <h4>Wild</h4><p>${ART.W.replace('<svg','<svg width="40" height="36"')} Appears on reels 2–5 and substitutes for all pay symbols, but not for moons or Frostfang.</p>
  <h4>Moonrise Free Games</h4><p>${ART.M.replace('<svg','<svg width="40" height="36"')} Each reel shows at most one moon. Moons on touching reels starting from <b>reel 1</b> start free games: <b>3 reels = 6 free games, 4 reels = 8, 5 reels = 10</b>. Moons landing during free games add more games the same way.<br>In free games, <b>orbs land on the reels</b> and Frostfang can appear on reel 5. When he lands, he <b>collects the value of every orb on screen</b>. Every 4 collections raise the value of new orbs: ×2, then ×3. If <b>6 or more orbs</b> land at once, Frost Link starts instead.</p>
  <h4>Diamond Hunt</h4><p>${ART.F.replace('<svg','<svg width="40" height="36"')} Frostfang is a bonus symbol that lands only on <b>reels 1, 3 and 5</b>. All three together pay <b>2× the bet</b> and start the Diamond Hunt. The reels grow to <b>8 rows by 5 reels</b>, and a glowing grid starts at 2×2.<br>

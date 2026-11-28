@@ -5,11 +5,10 @@ const ENGINE = (() => {
     C:{name:'Candle'}, A:{name:'A'}, K:{name:'K'}, Q:{name:'Q'}, J:{name:'J'}, T:{name:'10'},
     O:{name:'Orb'}, M:{name:'Moon'}
   };
-  // pay per way, as multiple of (bet / 25)
-  // pays in credits at the 1x bet (50 credits), always in steps of 10, so every win is a whole number of 10-credit steps
+  // line pays in credits for one line at the 1x bet (50 lines x 1 credit), always in steps of 10, so every win is a whole number of 10-credit steps
   const PAY = {
-    P:{3:50,4:160,5:500}, S:{3:40,4:120,5:380}, B:{3:30,4:80,5:250}, C:{3:20,4:60,5:190},
-    A:{3:10,4:30,5:90}, K:{3:10,4:30,5:90}, Q:{3:10,4:30,5:60}, J:{3:10,4:30,5:60}, T:{3:10,4:20,5:50}
+    P:{3:50,4:160,5:750}, S:{3:40,4:120,5:550}, B:{3:30,4:80,5:400}, C:{3:20,4:60,5:250},
+    A:{3:10,4:30,5:120}, K:{3:10,4:30,5:120}, Q:{3:10,4:30,5:80}, J:{3:10,4:30,5:80}, T:{3:10,4:20,5:70}
   };
   // Regular spins: no orbs. Frostfang (F) is a bonus symbol on reels 1, 3 and 5 only; moons (M) on any reel.
   // At most one moon and one Frostfang per reel.
@@ -77,19 +76,22 @@ const ENGINE = (() => {
     const v=[0.5,0.5,1,1,1,2,2,3,5,8][Math.floor(rng()*10)]*FG.ORB_K*mult;
     return {cash:money(cashOf(v*bet,bet))};
   }
+  // 50 fixed paylines (row on reels 1-5; 0 = top, 1 = middle, 2 = bottom)
+  const LINES = [
+    [1,1,1,1,1],[0,0,0,0,0],[2,2,2,2,2],[0,1,2,1,0],[2,1,0,1,2],[0,0,1,2,2],[2,2,1,0,0],[1,0,0,0,1],[1,2,2,2,1],[1,0,1,2,1],
+    [1,2,1,0,1],[0,1,0,1,0],[2,1,2,1,2],[1,1,0,1,1],[1,1,2,1,1],[0,1,1,1,0],[2,1,1,1,2],[0,0,1,0,0],[2,2,1,2,2],[0,2,0,2,0],
+    [2,0,2,0,2],[1,0,2,0,1],[1,2,0,2,1],[0,2,2,2,0],[2,0,0,0,2],[0,0,2,0,0],[2,2,0,2,2],[0,1,2,2,2],[2,1,0,0,0],[1,0,0,1,2],
+    [1,2,2,1,0],[0,0,0,1,2],[2,2,2,1,0],[0,1,1,1,1],[2,1,1,1,1],[1,1,1,0,0],[1,1,1,2,2],[0,0,1,1,1],[2,2,1,1,1],[1,0,1,0,1],
+    [1,2,1,2,1],[0,1,0,0,0],[2,1,2,2,2],[1,1,0,0,0],[1,1,2,2,2],[0,0,0,1,1],[2,2,2,1,1],[1,0,0,0,0],[1,2,2,2,2],[0,1,2,1,2]];
   function evaluate(g, bet, mult){
-    mult=mult||1; const unit=bet/50*mult, wins=[]; let total=0;   // bet/50 = dollars per credit at this bet
-    for(const s in PAY){
-      let ways=1, n=0; const cells=[];
-      for(let r=0;r<5;r++){
-        const hits=[]; g[r].forEach((c,y)=>{ if(c.s===s||c.s==='W') hits.push(y); });
-        if(!hits.length) break;
-        ways*=hits.length; n++; hits.forEach(y=>cells.push([r,y]));
-      }
-      if(n>=3 && g[0].some(c=>c.s===s)){
-        const amt=Math.round(PAY[s][n]*ways*unit*100)/100; total+=amt; wins.push({s,n,ways,amt,cells});
-      }
-    }
+    mult=mult||1; const unit=bet/50*mult, wins=[]; let total=0;   // bet/50 = dollars per credit (each of the 50 lines bets 1 credit)
+    LINES.forEach((ln,li)=>{
+      const s=g[0][ln[0]].s; if(!PAY[s]) return;
+      let n=1; while(n<5){ const c=g[n][ln[n]].s; if(c===s||c==='W') n++; else break; }
+      if(n<3) return;
+      const amt=Math.round(PAY[s][n]*unit*100)/100; total+=amt;
+      wins.push({s,n,line:li+1,amt,cells:ln.slice(0,n).map((y,r)=>[r,y])});
+    });
     let orbs=0; g.forEach(col=>col.forEach(c=>{ if(c.s==='O') orbs++; }));
     // free games: moons on touching reels starting from reel 1 (one per reel); 3, 4, 5 reels = 6, 8, 10 free games
     let run=0; for(let r=0;r<5;r++){ if(g[r].some(c=>c.s==='M')) run++; else break; }
@@ -289,6 +291,6 @@ const ENGINE = (() => {
     const min=Math.round(MOON.MIN_PAY*bet*100)/100, add=Math.max(0, Math.round((min-st.pot)*100)/100);
     st.pot=Math.round((st.pot+add)*100)/100; return add;
   }
-  return {LINE,BASE_W,FREE_W,HOLD,FG,RANDOM,SNOWFIGHT,FREE_GAMES,freeStart,freeSpin,crackRoll,crackOrbs,snowRoll,snowFight,setUnit:u=>{UNIT=u}, moonEnsure, moonSnow, moonFinish,SYM,PAY,JP,GRAND_SEED,GRAND_K,HOLD_SPIN_RATE,grandChance,MOON,inZone,moonStart,moonGrid,moonResolve,spinGrid,evaluate,holdStep,holdTotal,orbValue,setRng:f=>rng=f};
+  return {LINES,LINE,BASE_W,FREE_W,HOLD,FG,RANDOM,SNOWFIGHT,FREE_GAMES,freeStart,freeSpin,crackRoll,crackOrbs,snowRoll,snowFight,setUnit:u=>{UNIT=u}, moonEnsure, moonSnow, moonFinish,SYM,PAY,JP,GRAND_SEED,GRAND_K,HOLD_SPIN_RATE,grandChance,MOON,inZone,moonStart,moonGrid,moonResolve,spinGrid,evaluate,holdStep,holdTotal,orbValue,setRng:f=>rng=f};
 })();
 if(typeof module!=='undefined') module.exports=ENGINE;

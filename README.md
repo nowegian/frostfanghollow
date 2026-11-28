@@ -21,8 +21,8 @@ python3 -m http.server 8000
 
 ## Game features
 
-- 5 reels by 3 rows, 243 ways to win, with Wild on reels 2–5
-- Bets from $0.50 to $25.00: 1¢, 2¢ or 5¢ at 1×, 2×, 3×, 5× or 10× (50 to 500 credits). New players start with $100, the balance is saved between visits, and ADD $100 tops it up
+- 5 reels by 3 rows, 50 fixed paylines, with Wild on reels 2–5. Winning lines are drawn over the reels and the PAYS screen shows all 50
+- Bets from $0.50 to $12.50: 1¢, 2¢ or 5¢ at 1 to 5 credits per line (50 to 250 credits), e.g. 1¢ gives $0.50, $1.00, $1.50, $2.00 or $2.50. New players start with $100, the balance is saved between visits, and ADD $100 tops it up
 - **Hold & Spin**: 6 or more orbs lock in place with 3 spins that reset on every new orb, and every empty spot spins on its own. Filling all 15 spots doubles the win
 - **Jackpots**: MINI (20× bet), MINOR (50×), MAJOR (300×, grows), and GRAND (starts at $9,000 at every bet, grows). The GRAND orb is more likely at bigger bets
 - **Moonrise Bonus**: 4 or more moons on touching reels, starting from reel 1, grow the reels to 8 rows. A solid grid shape with Frostfang inside travels to collect diamonds and grows from 2×2 up to 8×5. Every diamond resets the spins to 3, at least one orb lands in the grid on every spin, and Frostfang throws prize snowballs
