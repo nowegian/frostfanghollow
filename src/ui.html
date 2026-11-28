@@ -33,11 +33,11 @@ h1 span{background:linear-gradient(180deg,#ffe08a,var(--pump));-webkit-backgroun
 .jps.art .jp b{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 .jps.art .jp i{position:absolute;left:0;right:0;top:var(--py);transform:translateY(-50%);font-size:11cqw;line-height:1;text-shadow:0 2px 0 #000,0 0 8px #000}
 .jps.art .jp.grand{background-image:url(img/plaque_grand.webp);--py:59%}
-.jps.art .jp.major{background-image:url(img/plaque_major.webp);--py:56%}
-.jps.art .jp.maxi{background-image:url(img/plaque_maxi.webp);--py:56%}
-.jps.art .jp.minor{background-image:url(img/plaque_minor.webp);--py:55%}
-.jps.art .jp.mini{background-image:url(img/plaque_mini.webp);--py:56%}
-@media (max-width:560px){.jps.art{grid-template-columns:repeat(6,1fr);gap:2px 4px}.jps.art .jp{grid-column:span 2}.jps.art .jp.grand,.jps.art .jp.major{grid-column:span 3}}
+.jps.art .jp.major{background-image:url(img/plaque_major.webp);--py:60%}
+.jps.art .jp.maxi{background-image:url(img/plaque_maxi.webp);--py:60%}
+.jps.art .jp.minor{background-image:url(img/plaque_minor.webp);--py:60%}
+.jps.art .jp.mini{background-image:url(img/plaque_mini.webp);--py:60%}
+@media (max-width:560px){.jps.art{grid-template-columns:repeat(6,1fr);gap:2px 4px}.jps.art .jp{grid-column:span 2}.jps.art .jp.minor,.jps.art .jp.mini{grid-column:span 3}}
 #spin.art{background:url(img/button_spin.webp) center/contain no-repeat;box-shadow:none;border-radius:50%;filter:drop-shadow(0 6px 10px #000c);
  text-shadow:0 2px 0 #7a2a00,0 0 10px #000a;font-size:clamp(18px,3.6vw,24px);transition:transform .08s,filter .2s}
 #spin.art:hover{filter:drop-shadow(0 6px 10px #000c) drop-shadow(0 0 16px #ff8a1f) brightness(1.08)}
@@ -342,9 +342,9 @@ button{font-family:inherit;cursor:pointer;border:none;color:#fff;font-weight:700
 <div class="cab">
   <h1 class="logo"><img src="img/logo.webp" alt="Frostfang Hollow Link" draggable="false"></h1>
   <div class="jps art">
-    <div class="jp grand" id="jpGRAND"><b>GRAND</b><i>$0</i></div>
-    <div class="jp major" id="jpMAJOR"><b>MAJOR</b><i>$0</i></div>
     <div class="jp maxi" id="jpMAXI"><b>MAXI</b><i>$0</i></div>
+    <div class="jp major" id="jpMAJOR"><b>MAJOR</b><i>$0</i></div>
+    <div class="jp grand" id="jpGRAND"><b>GRAND</b><i>$0</i></div>
     <div class="jp minor" id="jpMINOR"><b>MINOR</b><i>$0</i></div>
     <div class="jp mini" id="jpMINI"><b>MINI</b><i>$0</i></div>
   </div>
