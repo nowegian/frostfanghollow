@@ -178,6 +178,7 @@ h1 span{background:linear-gradient(180deg,#ffe08a,var(--pump));-webkit-backgroun
 #beast.idle{animation:bob 2.4s ease-in-out infinite}@keyframes bob{50%{transform:translateY(-6px)}}
 .bubble{background:#fff;color:#2b1563;font-weight:700;font-size:12px;padding:6px 8px;border-radius:12px;margin-bottom:6px;text-align:center;min-height:30px;opacity:0;transition:opacity .3s}
 .bubble.on{opacity:1}
+#bubble{display:none!important}
 .ball{position:fixed;width:34px;height:34px;z-index:20;pointer-events:none;filter:drop-shadow(0 0 8px #bfe9ff)}.ball svg,.ball img{width:100%;height:100%;object-fit:contain}
 .banner{position:absolute;left:0;right:0;top:-2px;text-align:center;pointer-events:none;z-index:5}
 .banner span{display:inline-block;background:linear-gradient(#ff9b3d,#c2410c);border:2px solid #ffd9a8;border-radius:999px;padding:3px 16px;font-weight:700;letter-spacing:1px;box-shadow:0 4px 10px #0008;font-size:clamp(12px,2.4vw,16px)}
@@ -641,7 +642,8 @@ function peek(kind,ms,over,force){
  peek.t=setTimeout(()=>{im.classList.add('out');peek.t=setTimeout(()=>{if(im.parentNode)im.remove()},320)},Math.max(250,ms));
 }
 window.ffPeek=peek;window.ffDbg={get S(){return S},SB,jpWon:k=>jpWon(k)};
-function say(t,ms=1800){SOUND.say(t);const b=$('bubble');b.textContent=t;b.classList.add('on');clearTimeout(say.t);say.t=setTimeout(()=>b.classList.remove('on'),ms)}
+// Frostfang's lines are voice only (no speech bubble)
+function say(t){SOUND.say(t)}
 function showMsg(html){const m=$('msg');m.innerHTML=html;m.classList.remove('hidden')}
 function hideMsg(){$('msg').classList.add('hidden')}
 async function countUp(el,from,to,ms){const st=performance.now();ms=ms*SF();return new Promise(res=>{function f(t){const p=Math.min(1,(t-st)/ms);const cv=from+(to-from)*p;if(el.id==='win'){winAmt=cv;el.textContent=fmtBank(cv)}else el.textContent=['hw','fw','bw'].includes(el.id)?fmtBank(cv):fmt(cv);if(p<1){if(Math.random()<.3)sfx.tick();requestAnimationFrame(f)}else res()}requestAnimationFrame(f)})}
@@ -787,7 +789,7 @@ async function showWins(ev,g,label){
 }
 
 async function play(){
- if(busy)return; if(S.credit<bet()){auto=false;$('auto').classList.remove('on');say('Out of credits! Tap ADD $100.');drawMeters();return}
+ if(busy)return; if(S.credit<bet()){auto=false;$('auto').classList.remove('on');say('Out of credits! Tap ADD $100.');$('winLine').textContent='Out of credits! Tap ADD $100.';drawMeters();return}
  busy=true;$('spin').disabled=true;hideMsg();
  S.credit-=bet();jpAdd(bet());setWin(0);drawMeters();
  $('winLine').textContent='Good luck…';
